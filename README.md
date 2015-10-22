@@ -3,7 +3,7 @@ The JINSECT toolkit is a Java-based toolkit and library that supports and demons
 
 ## Main concepts
 
-# Code Snippets
+## Code Snippets
 * Create an n-gram graph from a string:
 
 ```java
