@@ -122,24 +122,6 @@ public class INSECTFileDB<TObjectType extends Serializable> extends INSECTDB
     
     @Override
     public boolean existsObject(String sObjectName, String sObjectCategory) {
-        /* OBSOLETE:
-        FileInputStream fi;
-        try {
-            fi = new FileInputStream(getFileName(sObjectName, sObjectCategory));
-            fi.close();
-        }
-        catch (FileNotFoundException e)
-        {
-            return false;
-        }
-        catch (IOException ioe) {
-            ioe.printStackTrace();
-            return false;
-        }
-
-        return true;
-         */
-        
         return new File(getFileName(sObjectName, sObjectCategory)).exists();
     }
     

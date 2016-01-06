@@ -4,18 +4,16 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import salvo.jesus.graph.*;
-
 import org.jgrapht.traverse.*;
 import org.jgrapht.*;
 import org.jgrapht.graph.*;
 
-import gr.demokritos.iit.jinsect.documentModel.representations.DocumentNGramGraph;
-import gr.demokritos.iit.jinsect.documentModel.representations.DocumentNGramSymWinGraph;
 import gr.demokritos.iit.jinsect.documentModel.representations.NGramJGraph;
 import gr.demokritos.iit.jinsect.documentModel.representations.NGramSymJGraph;
 import gr.demokritos.iit.jinsect.jutils;
 import gr.demokritos.iit.jinsect.utils;
+
+import gr.demokritos.iit.jinsect.structs.encoders.*;
 
 /**
  * Unit test for simple App.
@@ -86,6 +84,14 @@ public class AppTest
 		System.out.println(dfsE.getEncoding());
 	}
 
+	/* TODO: add testcases for canonical coding */
+	public void testCanonical() {
+		NGramJGraph ngg = new NGramJGraph("ATACA");
+		CanonicalCoder cCoder = new CanonicalCoder(ngg.getGraphLevel(0));
+
+		System.out.println(cCoder.getEncoding());
+	}
+
 	public void testSimilarities() 
 	{
 		UniqueJVertexGraph uvgA = new UniqueJVertexGraph();
@@ -136,16 +142,6 @@ public class AppTest
 		System.out.println(jutils.graphToDot(dng.getGraphLevel(0), true));
 		/* TODO: make sure that the two representations come up with the
 		 * same result */
-		assertTrue( true );
-	}
-
-	public void testNGramSymJGraph() {
-		NGramSymJGraph nsg = new NGramSymJGraph("abcdef", 3, 3, 2);
-		DocumentNGramSymWinGraph dng = new DocumentNGramSymWinGraph();
-		dng.setDataString("abcdef");
-
-		System.out.println(jutils.graphToDot(nsg.getGraphLevel(0), true));
-		System.out.println(utils.graphToDot(dng.getGraphLevel(0), true));
 		assertTrue( true );
 	}
 

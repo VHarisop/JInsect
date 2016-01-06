@@ -1,6 +1,5 @@
 package gr.demokritos.iit.jinsect.documentModel.representations;
 
-import gr.demokritos.iit.jinsect.structs.DocumentSet;
 import gr.demokritos.iit.jinsect.utils;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -258,18 +257,5 @@ public class NGramSymJGraph extends NGramJGraph {
             }
 
         }
-    }
-    
-    public static void main(String args[]) {
-        DocumentNGramSymWinGraph ngs = new DocumentNGramSymWinGraph(3,3,3);
-//        DocumentSet ds = new DocumentSet("/downloads/Torrents/Data/DUC2006/duc2006_docs/D0601A/", 1.0);
-//        ds.createSets(true);
-//        ngs.setDataString(utils.loadFileSetToString(ds.toFilenameSet(ds.FROM_WHOLE_SET)));
-//        System.out.println("Size:" + ngs.getGraphLevel(0).getEdgesCount() + " edges and " + 
-//                ngs.getGraphLevel(0).getVerticesCount() + " vertices.");
-        ngs.setDataString("abcdef");
-        //ngs.setDataString("This is");
-        
-        System.out.println(gr.demokritos.iit.jinsect.utils.graphToDot(ngs.getGraphLevel(0), true));
     }
 }

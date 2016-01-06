@@ -5,10 +5,6 @@
 
 package gr.demokritos.iit.jinsect;
 
-import gr.demokritos.iit.conceptualIndex.structs.Concatenation;
-import gr.demokritos.iit.conceptualIndex.structs.Distribution;
-import gr.demokritos.iit.conceptualIndex.structs.DistributionGraph;
-import gr.demokritos.iit.conceptualIndex.structs.Union;
 import gr.demokritos.iit.jinsect.storage.IFileLoader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -28,9 +24,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import javax.swing.JFrame;
-import gr.demokritos.iit.jinsect.algorithms.statistics.CombinationGenerator;
 import gr.demokritos.iit.jinsect.algorithms.nlp.PorterStemmer;
-import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.TreeSet;
@@ -38,17 +32,12 @@ import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.html.HTML.Tag;
 import javax.swing.text.html.HTMLEditorKit.ParserCallback;
 import javax.swing.text.html.parser.ParserDelegator;
-import salvo.jesus.graph.Edge;
-import salvo.jesus.graph.Vertex;
-import salvo.jesus.graph.VertexImpl;
-import salvo.jesus.graph.WeightedEdge;
 
 /** A class including a set of useful, general purpose functions.
  *
  * @author ggianna
  */
 public final class utils {
-
 	public static long Count = 0;
 	public static long Sum = 0;
 
@@ -79,204 +68,6 @@ public final class utils {
 	public final static double abs(double dNum) {
 		return (dNum > 0)?dNum:-dNum;
 	}
-
-	/** Looks up a given (undirected) edge in a selected graph. 
-	 * The edge is described based on the label of its
-	 *vertices.
-	 *@param gGraph The graph to use.
-	 *@param sHead The label of the head or tail vertex of the edge.
-	 *@param sTail The label of the tail or tail vertex of the edge.
-	 *@return The edge, if found, otherwise null.
-	 */
-	public static final Edge locateEdgeInGraph(UniqueVertexGraph gGraph, String sHead, String sTail) {
-		VertexImpl vHead = new VertexImpl();
-		vHead.setLabel(sHead);
-		VertexImpl vTail = new VertexImpl();
-		vTail.setLabel(sTail);
-		return locateEdgeInGraph(gGraph, vHead, vTail);
-	}
-
-	/** Looks up a vertex, based on its label, within a given graph.
-	 *@param gGraph The graph to use.
-	 *@param sToFind The label of the desired vertex.
-	 *@return The vertex, if found, otherwise null.
-	 */
-	public static final Vertex locateVertexInGraph(UniqueVertexGraph gGraph, String sToFind) {
-		return gGraph.locateVertex(new VertexImpl(sToFind));
-	}
-
-	/** Looks up a vertex in a given graph.
-	 *@param gGraph The graph to use.
-	 *@param vToFind The vertex to locate.
-	 *@return The vertex, if found, otherwise null.
-	 */
-	public static final Vertex locateVertexInGraph(UniqueVertexGraph gGraph, Vertex vToFind) {
-		return gGraph.locateVertex(vToFind);
-	}
-
-	/** Looks up a given (undirected) edge in a selected graph. 
-	 * The edge is described based on the label of its
-	 *vertices.
-	 *@param gGraph The graph to use.
-	 *@param vHead A vertex with the desired label for the head or tail of the edge.
-	 *@param vTail A vertex with the desired label for the tail or tail of the edge.
-	 *@return The edge, if found, otherwise null.
-	 */
-	public static final Edge locateEdgeInGraph(UniqueVertexGraph gGraph, Vertex vHead, Vertex vTail) {
-
-		Edge eRes = locateDirectedEdgeInGraph(gGraph, vHead, vTail);
-		return eRes == null ? locateDirectedEdgeInGraph(gGraph, vTail, vHead) : eRes;
-	}
-
-	/** Looks up a given directed edge in a selected graph. 
-	 * The edge is described based on the label of its
-	 *vertices.
-	 *@param gGraph The graph to use.
-	 *@param vHead A vertex with the desired label for the head of the edge.
-	 *@param vTail A vertex with the desired label for the tail of the edge.
-	 *@return The edge, if found, otherwise null.
-	 */
-	public static final Edge locateDirectedEdgeInGraph(UniqueVertexGraph gGraph, Vertex vHead, Vertex vTail) {
-		try {
-			vHead = locateVertexInGraph(gGraph, vHead);
-			if (vHead == null)
-				return null;
-			vTail = locateVertexInGraph(gGraph, vTail);
-			if (vTail == null)
-				return null;
-
-			List lEdges =  gGraph.getEdges(vHead);
-			Iterator iIter = lEdges.iterator();
-			String sTailLbl = vTail.getLabel();
-			while (iIter.hasNext())
-			{
-				Edge eCurrent = (Edge)iIter.next();
-				if (vHead != vTail) {
-					if (eCurrent.getVertexB().getLabel().compareTo(sTailLbl) == 0)
-						return eCurrent; // Found. Return edge.
-				}
-				else 
-				{
-					if ((eCurrent.getVertexA().getLabel().equals(sTailLbl)) && 
-							(eCurrent.getVertexB().getLabel().equals(sTailLbl)))
-						return eCurrent; // Found. Return edge.
-				}
-			}
-			return null;    // Not found
-		}
-		catch (NullPointerException e) {
-			return null;
-		}
-	}
-
-	/** Gets the outgoing edges of a given vertex in a graph.
-	 *@param gGraph The graph to use.
-	 *@param vHead A vertex with the desired label for the head of the edge.
-	 *@return A list of outgoing edges from <code>vHead</code>. If no such edges exist returns an
-	 *empty list.
-	 */
-	public static final List getOutgoingEdges(UniqueVertexGraph gGraph, Vertex vHead) {
-		Vertex vNode = locateVertexInGraph(gGraph, vHead.toString());
-		ArrayList lRes = new ArrayList();
-		if (vNode != null) {
-			List neighbours = gGraph.getAdjacentVertices(vNode);
-			Iterator iIter = neighbours.iterator();
-			while (iIter.hasNext()) {
-				Vertex vCandidateParent = (Vertex)iIter.next();
-				// Add only child neighbours
-				Edge eCur = locateDirectedEdgeInGraph(gGraph, vNode, vCandidateParent);
-				if (eCur != null)
-					lRes.add(eCur);
-			}
-
-			return lRes;
-		}
-
-		return new ArrayList();
-	}
-
-	/** Gets the adjacent vertices of outgoing edges from a given vertex in a 
-	 * graph.
-	 *@param gGraph The graph to use.
-	 *@param vHead A vertex with the desired label for the head of the edge.
-	 *@return A list of vertices of outgoing edges from the given head. 
-	 * If no such edges exist returns an empty list.
-	 */
-	public static final List getOutgoingAdjacentVertices(UniqueVertexGraph gGraph, Vertex vHead) {
-		Vertex vNode = locateVertexInGraph(gGraph, vHead.toString());
-		ArrayList<Vertex> lRes = new ArrayList<Vertex>();
-		if (vNode != null) {
-			List neighbours = gGraph.getAdjacentVertices(vNode);
-			Iterator iIter = neighbours.iterator();
-			while (iIter.hasNext()) {
-				Vertex vCandidateParent = (Vertex)iIter.next();
-				// Add only child neighbours
-				Edge eCur = locateDirectedEdgeInGraph(gGraph, vNode, vCandidateParent);
-				if (eCur != null)
-					lRes.add(vCandidateParent);
-			}
-
-			return lRes;
-		}
-
-		return new ArrayList();
-	}
-
-	/** Gets the incoming edges to a given vertex in a directed graph.
-	 *@param gGraph The graph to use.
-	 *@param vTail A vertex with the desired label for the tail of the edge.
-	 *@return A list of incoming edges to <code>vTail</code>. If no such edges exist returns an
-	 *empty list.
-	 */
-	public static final List getIncomingEdges(UniqueVertexGraph gGraph, Vertex vTail) {
-		Vertex vNode = locateVertexInGraph(gGraph, vTail.toString());
-		ArrayList lRes = new ArrayList();
-		if (vNode != null) {
-			List neighbours = gGraph.getAdjacentVertices(vNode);
-			Iterator iIter = neighbours.iterator();
-			while (iIter.hasNext()) {
-				Vertex vCandidateParent = (Vertex)iIter.next();
-				// Remove non-parent neighbours
-				// Add only poarent neighbours
-				Edge eCur = locateDirectedEdgeInGraph(gGraph, vCandidateParent, vNode);
-				if (eCur != null)
-					lRes.add(eCur);
-			}
-
-			return lRes;
-		}
-
-		return new ArrayList();
-	}
-
-	/** Gets the adjacent vertices of incoming edges of a given vertex in a 
-	 * directed graph.
-	 *@param gGraph The graph to use.
-	 *@param vTail A vertex with the desired label for the tail of the edge.
-	 *@return A list of incoming vertices to <code>vTail</code>. If no such edges exist returns an
-	 *empty list.
-	 */
-	public static final List getAdjacentIncomingVertices(UniqueVertexGraph gGraph, Vertex vTail) {
-		Vertex vNode = locateVertexInGraph(gGraph, vTail.toString());
-		ArrayList<Vertex> lRes = new ArrayList();
-		if (vNode != null) {
-			List neighbours = gGraph.getAdjacentVertices(vNode);
-			Iterator iIter = neighbours.iterator();
-			while (iIter.hasNext()) {
-				Vertex vCandidateParent = (Vertex)iIter.next();
-				// Remove non-parent neighbours
-				// Add only poarent neighbours
-				Edge eCur = locateDirectedEdgeInGraph(gGraph, vCandidateParent, vNode);
-				if (eCur != null)
-					lRes.add(vCandidateParent);
-			}
-
-			return lRes;
-		}
-
-		return new ArrayList();
-	}
-
 
 	/** Testbench function. Not to be used.
 	*/
@@ -451,186 +242,6 @@ public final class utils {
 		return sbRes.toString();
 	}
 
-	/** Creates a formatted string representation of a (possibly nested) list, 
-	 * taking into account {@link Union} and 
-	 *{@link Concatenation} objects and using a given separator.
-	 *@param lToPrint The (possibly nested) list.
-	 *@param sSeparator The separator to use for elements of the same level.
-	 *@return The string representation of the (possibly nested) list.
-	 */
-	public static final String printList(List lToPrint, String sSeparator) {
-		String sRes = new String();
-
-		Iterator iIter = lToPrint.iterator();
-		while (iIter.hasNext()) {
-			Object oNext = iIter.next();
-			if ((oNext instanceof Union) || (oNext instanceof Concatenation))
-			{
-				sRes += oNext.toString();
-				if (iIter.hasNext())
-					sRes += sSeparator;
-			}
-			else
-				if (oNext instanceof List)
-					sRes += "(" + printList((List)oNext, sSeparator) + ")";
-				else
-					sRes += sSeparator + (oNext.toString()) + sSeparator;
-
-		}
-
-		return sRes;
-
-	}
-
-	/** Creates a formatted string representation of a (possibly nested) list, 
-	 * taking into account {@link Union} and 
-	 *{@link Concatenation} objects.
-	 *@param lToPrint The (possibly nested) list.
-	 *@return The string representation of the (possibly nested) list.
-	 */
-	public static final String printList(List lToPrint) {
-		String sSeparator;
-		if (lToPrint instanceof Union)
-			sSeparator = "|";
-		else
-			sSeparator = ",";
-
-		return printList(lToPrint, sSeparator);
-	}
-
-	/** Creates a {@link Union} of combinations of elements taken from a given list for a given number
-	 * of elements per combined set. 
-	 *@param oObj The input list.
-	 *@param iBySize The size of elements to use in every combination returned.
-	 *@return The {@link Union} of combination alternatives.
-	 */
-	public static final Union getCombinationsBy(Object oObj, int iBySize) {
-		Union uRes = new Union();
-
-		List lList;
-		// If unary, wrap in list.
-		if (!(oObj instanceof List)) {
-			lList = new ArrayList();
-			lList.add(oObj);
-		}
-		else
-			lList = (List)oObj;
-
-		int[] indices;
-		CombinationGenerator cgGen = new CombinationGenerator (lList.size(), iBySize);
-		while (cgGen.hasMore()) {
-			Concatenation cComb = new Concatenation();
-			indices = cgGen.getNext ();
-			for (int i = 0; i < indices.length; i++) {
-				cComb.add(lList.get(indices[i]));
-			}
-			uRes.add(cComb);
-		}        
-		return uRes;
-	}    
-
-	/** Calculates the substrings matching particular requirements in a given string,
-	 * given a maximum substring size. If a string of a particular size is not matched, then it
-	 * is broken into its substrings, which in turn are attempted to be matched. Every matched 
-	 * substring is not analysed further.
-	 *@param sStr The input string.
-	 *@param iMaxSubStringSize The maximum substring size to take into account.
-	 *@param isMatcher  A matcher of type {@link IMatching} to use, in order to take into account 
-	 * a given substring or not.
-	 *@return A {@link Union} of the matched substrings within the given string.
-	 */
-	public static final Union getSubStrings(String sStr, int iMaxSubStringSize, 
-			IMatching isMatcher) {
-		return getSubStrings(sStr, iMaxSubStringSize, 
-				isMatcher, Integer.MAX_VALUE, 0);
-	}
-
-	/** Calculates the substrings matching particular requirements in a given string,
-	 * given a maximum substring size. If a string of a particular size is not matched, then it
-	 * is broken into its substrings, which in turn are attempted to be matched. Every matched 
-	 * substring is not analysed further. The string will also not be analyzed further from a 
-	 * given depth of analysis (break-downs).
-	 *@param sStr The input string.
-	 *@param iMaxSubStringSize The maximum substring size to take into account.
-	 *@param isMatcher  A matcher of type {@link IMatching} to use, in order to take into account 
-	 * a given substring or not.
-	 *@param iMaxDepth The maximum depth of analysis to use for the substring analysis.
-	 *@return A {@link Union} of the matched substrings within the given string.
-	 */
-	public static final Union getSubStrings(String sStr, int iMaxSubStringSize, 
-			IMatching isMatcher, int iMaxDepth) {
-		return getSubStrings(sStr, iMaxSubStringSize, 
-				isMatcher, iMaxDepth, 0);
-	}
-
-	/** Helper function. Calculates the substrings matching particular requirements in a given string,
-	 * given a maximum substring size. If a string of a particular size is not matched, then it
-	 * is broken into its substrings, which in turn are attempted to be matched. Every matched 
-	 * substring is not analysed further. The string will also not be analyzed further from a 
-	 * given depth of analysis (break-downs).
-	 *@param sStr The input string.
-	 *@param iMaxSubStringSize The maximum substring size to take into account.
-	 *@param isMatcher  A matcher of type {@link IMatching} to use, in order to take into account 
-	 * a given substring or not.
-	 *@param iMaxDepth The maximum depth of analysis to use for the substring analysis.
-	 *@param iCurDepth The current reached depth.
-	 *@return A {@link Union} of the matched substrings within the given string.
-	 */
-	public static final Union getSubStrings(String sStr, int iMaxSubStringSize, 
-			IMatching isMatcher, int iMaxDepth, int iCurDepth) {
-		// Check max depth
-		if (iCurDepth > iMaxDepth)
-			return new Union();
-
-		Union aRes = new Union();
-		if (sStr.length() == 0)
-			return aRes;
-
-		// For each window of size iMaxSubStringSize within the string
-		boolean bFoundMainMatch = false;
-		for (int iCnt=0; iCnt <= sStr.length() - iMaxSubStringSize; iCnt++) {
-			List aTemp = new ArrayList();
-			// Break the word in three pieces (prefix, window, suffix)
-			String sPrefix = sStr.substring(0, iCnt);
-			String sMain = sStr.substring(iCnt, iMaxSubStringSize + iCnt);
-			String sSuffix = sStr.substring(iMaxSubStringSize + iCnt);
-			// If main part matches
-			if (isMatcher.match(sMain)) {
-				// apply the lookup process for the rest of the word parts (prefix, suffix)
-				// and create return set
-				Union u = getSubStrings(sPrefix, sPrefix.length(), isMatcher, iMaxDepth, iCurDepth + 1);
-				if (!(u.isEmpty()))
-					aTemp = getListProduct(u, sMain);
-				else
-				{
-					ArrayList lList = new ArrayList();
-					lList.add(sMain);
-					aTemp.add(lList);
-				}
-
-
-				u = getSubStrings(sSuffix, sSuffix.length(), isMatcher, iMaxDepth, iCurDepth + 1);
-				ArrayList lTmp = new ArrayList();
-				if (!(u.isEmpty()))
-					aTemp = getListProduct(aTemp, u);
-
-				bFoundMainMatch = true;
-
-				aRes.addAll(aTemp);
-			}            
-			// else continue
-		}
-		if (!bFoundMainMatch) // if no match was found at this size
-			// attempt smaller size
-			if (sStr.length() < 2) {
-				aRes.add(sStr);
-			}
-			else
-				if (iMaxSubStringSize > 1)
-					return getSubStrings(sStr, iMaxSubStringSize - 1, isMatcher, iMaxDepth, iCurDepth + 1);
-
-		return aRes;
-	}
 
 	/** Returns the system encoding String.
 	 *@return A String indicating the System default encoding.
@@ -741,28 +352,6 @@ public final class utils {
 	}
 
 	/**
-	 * Bubble sorts the strings in a given String list, where the longest string is the first checked.
-	 *@param l The input list.
-	 *@return The sorted list.
-	 */
-	public static final List bubbleSortVerticesByStringLength(List l) {
-		boolean bChanged = true;
-		while (bChanged) {
-			bChanged = false;
-			for (int iCnt = 0; iCnt < l.size() - 1; iCnt++) {
-				if ((l.get(iCnt + 1).toString()).length() > (l.get(iCnt).toString()).length()) {
-					VertexImpl vTmp = (VertexImpl)(l.get(iCnt + 1));
-					l.set(iCnt + 1, l.get(iCnt));
-					l.set(iCnt, vTmp);
-					bChanged = true;
-				}
-			}
-		}
-
-		return l;
-	}
-
-	/**
 	 *Parses the command line expecting values of either
 	 *`-switch` or
 	 *`-key=value`
@@ -834,100 +423,6 @@ public final class utils {
 		}
 		return dSum;
 	}    
-
-	/** Renders a graph to its DOT representation (See GraphViz for more info on the format).
-	 *@param gTree The input graph.
-	 *@param bDirected Indicate whether the graph should be described as a directed graph or not.
-	 *@return The DOT formatted string representation of the graph.
-	 */
-	public static String graphToDot(UniqueVertexGraph gTree, boolean bDirected) {
-		StringBuffer sb = new StringBuffer();
-		String sConnector;
-		boolean bDistroGraph = gTree instanceof DistributionGraph;
-
-		// Render graph
-		if (!bDirected) {
-			sb.append("graph {\n");
-			sConnector = "--";
-		}
-		else {
-			sb.append("digraph {\n");
-			sConnector = "->";
-		}
-
-		Iterator iIter = gTree.getEdgeSet().iterator();
-		while (iIter.hasNext()) {
-			Edge e = (Edge)iIter.next();
-			String sA = "_" + e.getVertexA().toString().replaceAll("\\W", "_");
-			String sB = "_" + e.getVertexB().toString().replaceAll("\\W", "_");
-			String sLabel = "";
-			if (e instanceof WeightedEdge) {
-				sLabel += String.format("%4.2f", ((WeightedEdge)e).getWeight());
-			}
-			if (bDistroGraph) {
-				Distribution dTmp;
-				if ((dTmp = (Distribution)((DistributionGraph)gTree).EdgeDistros.get(e)) != null)
-					sLabel += " - Distro: " + dTmp.toString();
-			}
-			if (e instanceof WeightedEdge)
-				sb.append("\t" + sA + " " + sConnector + " " + sB + 
-						" [label=\"" + sLabel.replaceAll("\\s+", " ") + "\"]\n");
-			else
-				sb.append("\t" + sA + " " + sConnector + " " + sB + "\n");
-			sb.append("\t" + sA + " [label=\"" + sA + "\"] " + "\n");
-		}
-		sb.append("}");
-
-		return sb.toString();
-	}
-
-	/** Renders a graph to its DOT representation (See GraphViz for more info on the format).
-	 *@param gTree The input graph.
-	 *@param bDirected Indicate whether the graph should be described as a directed graph or not.
-	 *@param hEdgeDistros The map between edges and their distributions
-	 *@return The DOT formatted string representation of the graph.
-	 */
-	public static String graphToDot(UniqueVertexGraph gTree, boolean bDirected, Map hEdgeDistros) {
-		StringBuffer sb = new StringBuffer();
-		String sConnector;
-		boolean bDistroGraph = (hEdgeDistros != null);
-
-		// Render graph
-		if (!bDirected) {
-			sb.append("graph {\n");
-			sConnector = "--";
-		}
-		else {
-			sb.append("digraph {\n");
-			sConnector = "->";
-		}
-
-		Iterator iIter = gTree.getEdgeSet().iterator();
-		while (iIter.hasNext()) {
-			Edge e = (Edge)iIter.next();
-			// Always use the underscore prefix
-			String sA = "_" + e.getVertexA().toString().replaceAll("\\W", "_");
-			String sB = "_" + e.getVertexB().toString().replaceAll("\\W", "_");
-			String sLabel = "";
-			if (e instanceof WeightedEdge) {
-				sLabel += String.format("%4.2f", ((WeightedEdge)e).getWeight());
-			}
-			if (bDistroGraph) {
-				Distribution dTmp;
-				if ((dTmp = (Distribution)(hEdgeDistros.get(e))) != null)
-					sLabel += " - Distro: " + dTmp.toString();
-			}
-			if (e instanceof WeightedEdge)
-				sb.append("\t" + sA + " " + sConnector + " " + sB + 
-						" [label=\"" + sLabel.replaceAll("\\s+", " ") + "\"]\n");
-			else
-				sb.append("\t" + sA + " " + sConnector + " " + sB + "\n");
-			sb.append("\t" + sA + " [label=\"" + sA + "\"] " + "\n");
-		}
-		sb.append("}");
-
-		return sb.toString();
-	}
 
 	/** Loads the contents of a file into a string, <i>without preserving newlines</i>. 
 	 *@param sFilename The filename of the file to load.
@@ -1129,19 +624,19 @@ public final class utils {
 		ParserDelegator parserDelegator = new ParserDelegator();
 		ParserCallback parserCallback = new ParserCallback() {
 			@Override
-			public void handleText(final char[] data, final int pos) {
-				list.add(new String(data));
-			}
+				public void handleText(final char[] data, final int pos) {
+					list.add(new String(data));
+				}
 			@Override
-			public void handleStartTag(Tag tag, MutableAttributeSet attribute, int pos) { }
+				public void handleStartTag(Tag tag, MutableAttributeSet attribute, int pos) { }
 			@Override
-			public void handleEndTag(Tag t, final int pos) {  }
+				public void handleEndTag(Tag t, final int pos) {  }
 			@Override
-			public void handleSimpleTag(Tag t, MutableAttributeSet a, final int pos) { }
+				public void handleSimpleTag(Tag t, MutableAttributeSet a, final int pos) { }
 			@Override
-			public void handleComment(final char[] data, final int pos) { }
+				public void handleComment(final char[] data, final int pos) { }
 			@Override
-			public void handleError(final String errMsg, final int pos) { }
+				public void handleError(final String errMsg, final int pos) { }
 		};
 		parserDelegator.parse(reader, parserCallback, true);
 
@@ -1201,7 +696,6 @@ public final class utils {
 		}
 		return sbRes.toString();
 	}
->>>>>>> maven
 
 }
 
@@ -1209,15 +703,15 @@ public final class utils {
 */
 class WindowDefaultAdapter extends WindowAdapter {
 	@Override
-	public void windowClosing(WindowEvent e) {
-		((JFrame)e.getComponent()).setVisible(false);
-		((JFrame)e.getComponent()).dispose();
-	}
+		public void windowClosing(WindowEvent e) {
+			((JFrame)e.getComponent()).setVisible(false);
+			((JFrame)e.getComponent()).dispose();
+		}
 
 	@Override
-	public void windowClosed(WindowEvent e) {
-		if (JFrame.EXIT_ON_CLOSE > 0)
-			System.exit(0);
-	}
+		public void windowClosed(WindowEvent e) {
+			if (JFrame.EXIT_ON_CLOSE > 0)
+				System.exit(0);
+		}
 
 }

@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import gr.demokritos.iit.jinsect.structs.EdgeCachedJLocator;
-import gr.demokritos.iit.jinsect.structs.ISimilarity;
 import gr.demokritos.iit.jinsect.structs.UniqueJVertexGraph;
 import gr.demokritos.iit.jinsect.structs.JVertex;
 import gr.demokritos.iit.jinsect.structs.NGramVertex;
