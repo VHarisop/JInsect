@@ -13,7 +13,7 @@ import gr.demokritos.iit.jinsect.documentModel.representations.NGramSymJGraph;
 import gr.demokritos.iit.jinsect.jutils;
 import gr.demokritos.iit.jinsect.utils;
 
-import gr.demokritos.iit.jinsect.structs.encoders.*;
+import gr.demokritos.iit.jinsect.encoders.*;
 
 /**
  * Unit test for simple App.
@@ -86,10 +86,12 @@ public class AppTest
 
 	/* TODO: add testcases for canonical coding */
 	public void testCanonical() {
-		NGramJGraph ngg = new NGramJGraph("ATACA");
-		CanonicalCoder cCoder = new CanonicalCoder(ngg.getGraphLevel(0));
+		NGramJGraph nggA = new NGramJGraph("ATACA");
+		NGramJGraph nggB = new NGramJGraph("AATAC");
 
-		System.out.println(cCoder.getEncoding());
+		// assert that AAT is lexicographically smaller than ACA
+		assertTrue(jutils.compareCanonicalCodes(nggA.getGraphLevel(0), 
+												nggB.getGraphLevel(0)) > 0);
 	}
 
 	public void testSimilarities() 

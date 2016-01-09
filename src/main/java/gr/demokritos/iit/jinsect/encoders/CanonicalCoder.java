@@ -11,7 +11,7 @@ import gr.demokritos.iit.jinsect.structs.JVertex;
 import gr.demokritos.iit.jinsect.structs.UniqueJVertexGraph;
 
 public class CanonicalCoder 
-extends BaseGraphEncoder implements GraphEncoding {
+extends BaseGraphEncoder implements GraphEncoding, Iterable<String> {
 
 	// 2 strings, one for each pass
 	private String fwdEncodedString = "";
@@ -156,5 +156,58 @@ extends BaseGraphEncoder implements GraphEncoding {
 
 		sEncoded = fwdLabels.toString() + bwdLabels.toString();
 		return sEncoded;
+	}
+
+	@Override
+	public Iterator<String> iterator() {
+		Iterator<String> it = new Iterator<String>() {
+			private int curInd = 0;
+			private int finalInd = unvisited.size(); // size of treemap
+			
+			private Deque<JVertex> alrSeen = new ArrayDeque();
+			private Iterator<JVertex> fwdIter = unvisited.iterator();
+
+			@Override
+			public boolean hasNext() {
+				return curInd < finalInd;
+			}
+
+			@Override 
+			public String next() {
+				String retFwd, retBwd;
+				JVertex vCurr = fwdIter.next();
+
+				// init label of code line
+				retFwd = vCurr.getLabel() + " ";
+				retBwd = vCurr.getLabel() + " ";
+
+				// push to deque
+				alrSeen.push(vCurr);
+
+				for (JVertex vOpp: alrSeen) {
+					Edge eFwd = nGraph.getEdge(vCurr, vOpp);
+					Edge eBwd = nGraph.getEdge(vOpp, vCurr);
+					if (eFwd == null) 
+						retFwd += "0 ";
+					else
+						retFwd += String.valueOf(eFwd.edgeWeight()) + " ";
+					if (eBwd == null)
+						retBwd += "0 ";
+					else
+						retBwd += String.valueOf(eBwd.edgeWeight()) + " ";
+				}
+
+				// increment index
+				curInd++;
+
+				return retFwd + retBwd;
+			}
+
+			@Override
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
+		};
+		return it;
 	}
 }

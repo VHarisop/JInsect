@@ -3,6 +3,9 @@ package gr.demokritos.iit.jinsect;
 import gr.demokritos.iit.jinsect.structs.UniqueJVertexGraph;
 import gr.demokritos.iit.jinsect.structs.JVertex;
 import gr.demokritos.iit.jinsect.structs.Edge;
+import gr.demokritos.iit.jinsect.encoders.CanonicalCoder;
+
+import java.util.Iterator;
 
 /**
  * A utility class accompanying JVertex objects and graphs 
@@ -48,6 +51,51 @@ public final class jutils {
 		double qA = gA.getNormalizedEdgeWeight(vI, vJ);
 		double qB = gB.getNormalizedEdgeWeight(vI, vJ);
 		return qA - qB;
+	}
+
+	
+	/**
+	 * Compares 2 graphs' canonical code representations with respect
+	 * to the standard lexicographic order. Returns -1 if the first graph's
+	 * canonical code is "less" that the second's, 1 if it is "greater", and
+	 * 0 if they are equal.
+	 *
+	 * @param gA the first graph
+	 * @param gB the second graph
+	 * @return an integer denoting the result of the canonical codes' comparison
+	 */
+	public static int compareCanonicalCodes(UniqueJVertexGraph gA,
+											UniqueJVertexGraph gB)
+	{
+		String currA, currB;
+		CanonicalCoder cA = new CanonicalCoder(gA);
+		CanonicalCoder cB = new CanonicalCoder(gB);
+
+		// get iterators on both graphs' canonical codes
+		Iterator<String> caIter = cA.iterator();
+		Iterator<String> cbIter = cB.iterator(); 
+
+		while (caIter.hasNext()) {
+			currA = caIter.next();
+
+			if (cbIter.hasNext()) 
+				currB = cbIter.next();
+			else {
+				// if B's code was depleted, A is "greater"
+				return 1;
+			}
+
+			// if code is unequal at some point, return their difference
+			if (!(currA.equals(currB))) {
+				return currA.compareTo(currB);
+			}
+		}
+
+		// if A was depleted but B was not, return -1 (A is "less")
+		if (cbIter.hasNext()) 
+			return -1;
+		else
+			return 0; // equality case
 	}
 
 
