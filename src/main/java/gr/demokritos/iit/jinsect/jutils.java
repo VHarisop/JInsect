@@ -68,12 +68,10 @@ public final class jutils {
 											UniqueJVertexGraph gB)
 	{
 		String currA, currB;
-		CanonicalCoder cA = new CanonicalCoder(gA);
-		CanonicalCoder cB = new CanonicalCoder(gB);
 
 		// get iterators on both graphs' canonical codes
-		Iterator<String> caIter = cA.iterator();
-		Iterator<String> cbIter = cB.iterator(); 
+		Iterator<String> caIter = (new CanonicalCoder(gA)).iterator();
+		Iterator<String> cbIter = (new CanonicalCoder(gB)).iterator();
 
 		while (caIter.hasNext()) {
 			currA = caIter.next();
