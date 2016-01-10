@@ -8,6 +8,8 @@ import org.jgrapht.traverse.*;
 import org.jgrapht.*;
 import org.jgrapht.graph.*;
 
+import java.lang.Math;
+
 import gr.demokritos.iit.jinsect.documentModel.representations.NGramJGraph;
 import gr.demokritos.iit.jinsect.documentModel.representations.NGramSymJGraph;
 import gr.demokritos.iit.jinsect.jutils;
@@ -39,6 +41,11 @@ public class AppTest
         return new TestSuite( AppTest.class );
     }
 
+	/* Helper function to check doubles for equality */
+	private static boolean eqDouble(double a, double b) {
+		return (Math.abs(a - b) < 0.000001);
+	}
+
 	/**
 	 * Test if equality checking has been properly implemented
 	 * for NGramVertex objects.
@@ -57,43 +64,6 @@ public class AppTest
 		assertTrue(v1.hashCode() == v3.hashCode());
 	}
 
-	/**
-	 * TODO: modify traversal so that it returns all edges
-	 * like dfs coding
-	 */
-	public void testIteration() {
-		NGramJGraph ngg = new NGramJGraph("ACTACT");
-		DepthFirstIterator<JVertex, Edge> iDfs =
-			new DepthFirstIterator<JVertex, Edge>(ngg.getGraphLevel(0));
-
-		while (iDfs.hasNext()) {
-			JVertex nextV = iDfs.next();
-			System.out.println(nextV.toString());
-		}
-	}
-
-	/* TODO: add testcases for Dfs encoding */
-	public void testDfs() {
-		NGramJGraph ngg = new NGramJGraph("ACTAG");
-		DepthFirstEncoder dfsE = 
-			new DepthFirstEncoder(ngg.getGraphLevel(0), new NGramVertex("TAG"));
-
-		System.out.println(dfsE.getEncoding());
-
-		dfsE = new DepthFirstEncoder(ngg.getGraphLevel(0));
-		System.out.println(dfsE.getEncoding());
-	}
-
-	/* TODO: add testcases for canonical coding */
-	public void testCanonical() {
-		NGramJGraph nggA = new NGramJGraph("ATACA");
-		NGramJGraph nggB = new NGramJGraph("AATAC");
-
-		// assert that AAT is lexicographically smaller than ACA
-		assertTrue(jutils.compareCanonicalCodes(nggA.getGraphLevel(0), 
-												nggB.getGraphLevel(0)) > 0);
-	}
-
 	public void testSimilarities() 
 	{
 		UniqueJVertexGraph uvgA = new UniqueJVertexGraph();
@@ -109,7 +79,7 @@ public class AppTest
 		uvgA.addVertex(v3); uvgB.addVertex(v3);
 
 		/* add some edges */
-		uvgA.addEdge(v1, v2, 2.0);
+		uvgA.addEdge(v1, v2, 3.0);
 		uvgA.addEdge(v3, v2, 2.0);
 		uvgB.addEdge(v2, v3, 1.0);
 
@@ -123,12 +93,6 @@ public class AppTest
 		dng.setDataString("ACTACTA");
 		System.out.println(jutils.graphToDot(dng.getGraphLevel(0), false));
 
-		/*
-		for (salvo.jesus.graph.Edge e: dg.getGraphLevel(0).UniqueEdges.keySet()) {
-			System.out.println(e.toString());
-		}
-		*/
-
 		NGramJGraph d = new NGramJGraph();
 		d.setDataString("ACTTAC");
 		
@@ -136,7 +100,6 @@ public class AppTest
 		System.out.println(jutils.graphToDot(dng.getGraphLevel(0), false));
 		dng = dng.intersectGraph(d);
 		System.out.println(jutils.graphToDot(dng.getGraphLevel(0), true));
-
 
 		d.setDataString("ACTT");
 		dng.setDataString("ACTA");
@@ -174,15 +137,14 @@ public class AppTest
 		assertTrue(e23.getSourceLabel().equals("C"));
 		assertTrue(e23.getTargetLabel().equals("G"));
 
-		System.out.printf("V1 Out: %.1f In: %.1f\n",
-						   uvg.outgoingWeightSumOf(v1),
-						   uvg.incomingWeightSumOf(v1));
-		System.out.printf("V2 Out: %.1f In: %.1f\n",
-						   uvg.outgoingWeightSumOf(v2),
-						   uvg.incomingWeightSumOf(v2));
-		System.out.printf("V3 Out: %.1f In: %.1f\n",
-						   uvg.outgoingWeightSumOf(v3),
-						   uvg.incomingWeightSumOf(v3));
+		/* assert that the outgoing and incoming weight sums
+		 * are computed properly for all vertices */
+		assertTrue(eqDouble(uvg.outgoingWeightSumOf(v1), 2.0));
+		assertTrue(eqDouble(uvg.incomingWeightSumOf(v1), 0.0));
+		assertTrue(eqDouble(uvg.outgoingWeightSumOf(v2), 1.0));
+		assertTrue(eqDouble(uvg.incomingWeightSumOf(v2), 4.0));
+		assertTrue(eqDouble(uvg.outgoingWeightSumOf(v3), 2.0));
+		assertTrue(eqDouble(uvg.incomingWeightSumOf(v3), 1.0));
 
 		System.out.printf("V1 - V2 Norm: %.2f\n",
 						  uvg.getNormalizedEdgeWeight(v1, v2));

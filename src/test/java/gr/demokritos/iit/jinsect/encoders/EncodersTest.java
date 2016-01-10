@@ -44,11 +44,14 @@ public class EncodersTest
 		NGramJGraph ngg = new NGramJGraph("ACTAG");
 		DepthFirstEncoder dfsE = 
 			new DepthFirstEncoder(ngg.getGraphLevel(0), new NGramVertex("TAG"));
-
-		System.out.println(dfsE.getEncoding());
+		assertTrue(dfsE.getEncoding().equals("TAG->ACT|TAG->CTA|CTA->ACT|"));
 
 		dfsE = new DepthFirstEncoder(ngg.getGraphLevel(0));
-		System.out.println(dfsE.getEncoding());
+		assertTrue(dfsE.getEncoding().equals("CTA->ACT|TAG->ACT|TAG->CTA|"));
+
+		dfsE = new DepthFirstEncoder(ngg.getGraphLevel(0), new NGramVertex("CTA"));
+		assertTrue(dfsE.getEncoding().equals("CTA->ACT|TAG->ACT|TAG->CTA|"));
+
 	}
 
 	/* TODO: add testcases for canonical coding 
@@ -56,9 +59,12 @@ public class EncodersTest
 	public void testCanonical() {
 		NGramJGraph nggA = new NGramJGraph("ATACA");
 		NGramJGraph nggB = new NGramJGraph("AATAC");
+		// new graph, equal to nggA
+		NGramJGraph nggC = new NGramJGraph("ATACA");
 
 		CanonicalCoder cCoder_A = new CanonicalCoder(nggA.getGraphLevel(0));
 		CanonicalCoder cCoder_B = new CanonicalCoder(nggB.getGraphLevel(0));
+		CanonicalCoder cCoder_C = new CanonicalCoder(nggC.getGraphLevel(0));
 
 		// make sure that the graphs have different canonical codes
 		assertFalse(cCoder_A.getEncoding().equals(cCoder_B.getEncoding()));
@@ -66,5 +72,8 @@ public class EncodersTest
 		// assert that AAT is lexicographically smaller than ACA
 		assertTrue(jutils.compareCanonicalCodes(nggA.getGraphLevel(0), 
 												nggB.getGraphLevel(0)) > 0);
+
+		// assert that two identical graphs give indentical canonical codes
+		assertTrue(cCoder_A.getEncoding().equals(cCoder_C.getEncoding()));
 	}
 }
