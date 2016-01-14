@@ -1,32 +1,34 @@
 package gr.demokritos.iit.jinsect.documentModel.representations;
 
 import gr.demokritos.iit.jinsect.structs.IMergeable;
+
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-import gr.demokritos.iit.jinsect.structs.EdgeCachedJLocator;
 
-/* use salvo's Vertex definition, my own edges */
-//import salvo.jesus.graph.Vertex;
-//import salvo.jesus.graph.NGramVertex;
+import gr.demokritos.iit.jinsect.structs.EdgeCachedJLocator;
 import gr.demokritos.iit.jinsect.structs.JVertex;
 import gr.demokritos.iit.jinsect.structs.NGramVertex;
 import gr.demokritos.iit.jinsect.structs.Edge;
 import gr.demokritos.iit.jinsect.structs.UniqueJVertexGraph;
 
+import gr.demokritos.iit.jinsect.io.LineReader;
+
 import gr.demokritos.iit.jinsect.utils;
 import gr.demokritos.iit.jinsect.jutils;
-import java.util.Arrays;
-import java.util.List;
 
 import org.jgrapht.*;
 import org.jgrapht.graph.*;
@@ -88,7 +90,7 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 
 	}
 
-	/***
+	/**
 	 * Creates a new instance of NGramJGraph
 	 * @param iMinSize The minimum n-gram size
 	 * @param iMaxSize The maximum n-gram size
@@ -101,6 +103,39 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 		CorrelationWindow = iCorrelationWindow;
 
 		InitGraphs();
+	}
+
+	/**
+	 * This method is a proxy to {@link #fromFileLines(File)}
+	 * @param path the string containing the file path
+	 * @return an array of {@link NGramJGraph} objects
+	 */
+	public static NGramJGraph[] fromFileLines(String path) 
+	throws IOException, FileNotFoundException 
+	{
+		return fromFileLines(new File(path));
+	}
+
+	/**
+	 * Creates an array of NGramJGraph objects, each of which is built
+	 * using a line from a given file as a data string.
+	 *
+	 * @param path the {@link java.io.File} from which to read the lines
+	 * @return an array of {@link NGramJGraph} objects
+	 */
+	public static NGramJGraph[] fromFileLines(File path) 
+	throws IOException, FileNotFoundException
+	{
+		/* read lines and allocate array */
+		String[] lines = new LineReader().getLines(path);
+		NGramJGraph[] nGraphs = new NGramJGraph[lines.length]; 
+		
+		/* build the array of n-gram graphs */
+		for (int i = 0; i < lines.length; i++) {
+			nGraphs[i] = new NGramJGraph(lines[i]);
+		} 
+
+		return nGraphs;
 	}
 
 	protected void InitGraphs() {

@@ -5,7 +5,9 @@
   <artifactId>jinsect-core</artifactId>
   <version>1.0a</version>
   <name>JInsect</name>
+  <!-- build details here -->
   <build>
+  <!-- plugins required -->
     <plugins>
 	  <plugin>
 		 <groupId>org.apache.maven.plugins</groupId>
@@ -17,6 +19,14 @@
 		</configuration>
 	  </plugin>
 	</plugins>
+
+    <!-- resources for our tests -->
+    <resources>
+	  <resource>
+	    <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+	  </resource>
+    </resources>
   </build>
 
   <dependencies>
@@ -44,6 +54,7 @@
 
   <reporting>
     <plugins>
+      <!-- Use javadoc -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -51,6 +62,5 @@
       </plugin>
     </plugins>
   </reporting>
-
 
 </project>

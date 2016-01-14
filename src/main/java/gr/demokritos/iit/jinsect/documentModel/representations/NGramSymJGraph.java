@@ -1,6 +1,11 @@
 package gr.demokritos.iit.jinsect.documentModel.representations;
 
 import gr.demokritos.iit.jinsect.utils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -13,8 +18,11 @@ import gr.demokritos.iit.jinsect.structs.JVertex;
 import gr.demokritos.iit.jinsect.structs.Edge;
 
 /**
+ * A version of the {@link NGramJGraph} class, using a symmetrical correlation
+ * window for n-gram cooccurences.
  *
  * @author ggianna
+ * @author VHarisop
  */
 public class NGramSymJGraph extends NGramJGraph {
     /** Speeds up edge location in a given graph, by caching last searches. */
@@ -78,7 +86,41 @@ public class NGramSymJGraph extends NGramJGraph {
 		CorrelationWindow = iCorrelationWindow;
 		setDataString(dataString);
 	}
-    
+	
+	/**
+	 * This method is a proxy to {@link #fromFileLines(File)}
+	 * @param path the string containing the file path
+	 * @return an array of {@link NGramSymJGraph} objects
+	 */
+	public static NGramSymJGraph[] fromFileLines(String path) 
+	throws IOException, FileNotFoundException 
+	{
+		return fromFileLines(new File(path));
+	}
+
+	/**
+	 * Creates an array of NGramJGraph objects, each of which is built
+	 * using a line from a given file as a data string.
+	 *
+	 * @param path the {@link java.io.File} from which to read the lines
+	 * @return an array of {@link NGramJGraph} objects
+	 */
+	public static NGramSymJGraph[] fromFileLines(File path) 
+	throws IOException, FileNotFoundException
+	{
+		/* read lines and allocate array */
+		String[] lines = new LineReader().getLines(path);
+		NGramSymJGraph[] nGraphs = new NGramSymJGraph[lines.length]; 
+
+		/* build the array of n-gram graphs */
+		for (int i = 0; i < lines.length; i++) {
+			nGraphs[i] = new NGramSymJGraph(lines[i]);
+		} 
+
+		return nGraphs;
+	}
+
+
     public void createGraphs() {       
         String sUsableString = new StringBuilder().append(DataString).toString();
         

@@ -98,9 +98,11 @@ public final class jutils {
 
 
 	/** 
-	 * Renders a JGraph to its DOT representation (See GraphViz for more info on the format).
+	 * Renders a JGraph to its DOT representation (See GraphViz for 
+	 * more info on the format).
 	 * @param gTree The input graph.
-	 * @param bDirected Indicate whether the graph should be described as a directed graph or not.
+	 * @param bDirected Indicates whether the graph should be described 
+	 * as a directed graph or not.
 	 * @return The DOT formatted string representation of the graph.
 	 */
 	public static String graphToDot(UniqueJVertexGraph gTree, boolean bDirected) {
