@@ -11,11 +11,13 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+
 import gr.demokritos.iit.jinsect.structs.EdgeCachedJLocator;
 import gr.demokritos.iit.jinsect.structs.UniqueJVertexGraph;
 import gr.demokritos.iit.jinsect.structs.NGramVertex;
 import gr.demokritos.iit.jinsect.structs.JVertex;
 import gr.demokritos.iit.jinsect.structs.Edge;
+import gr.demokritos.iit.jinsect.io.LineReader;
 
 /**
  * A version of the {@link NGramJGraph} class, using a symmetrical correlation
