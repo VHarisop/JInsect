@@ -1,0 +1,9 @@
+# project is in java
+language: java
+
+# only build the maven-core branch
+branches:
+    only:
+        - maven-core
+
+script: mvn clean verify

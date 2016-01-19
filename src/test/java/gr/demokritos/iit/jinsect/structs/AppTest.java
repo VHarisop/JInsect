@@ -4,18 +4,11 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.jgrapht.traverse.*;
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
-
 import java.lang.Math;
 
 import gr.demokritos.iit.jinsect.documentModel.representations.NGramJGraph;
-import gr.demokritos.iit.jinsect.documentModel.representations.NGramSymJGraph;
 import gr.demokritos.iit.jinsect.jutils;
-import gr.demokritos.iit.jinsect.utils;
 
-import gr.demokritos.iit.jinsect.encoders.*;
 
 /**
  * Unit test for simple App.
@@ -81,10 +74,10 @@ public class AppTest
 		/* add some edges */
 		uvgA.addEdge(v1, v2, 3.0);
 		uvgA.addEdge(v3, v2, 2.0);
-		uvgB.addEdge(v2, v3, 1.0);
+		uvgB.addEdge(v1, v2, 1.0);
 
 		double dSim = jutils.graphStructuralSimilarity(uvgA, uvgB);
-		System.out.println("Structural Similarity: " + String.valueOf(dSim));
+		assertTrue(dSim != 0.0);
 	}
 
 	public void testNGramJGraph()
