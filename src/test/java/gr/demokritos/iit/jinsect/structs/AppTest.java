@@ -80,27 +80,51 @@ public class AppTest
 		assertTrue(dSim != 0.0);
 	}
 
+	/**
+	 * Helper function for testNGramJGraph that retrieves an edge based
+	 * on the labels of the vertices it connects.
+	 */
+	private Edge edgeByLabel(UniqueJVertexGraph uvg, String from, String to) {
+		JVertex vFrom = new NGramVertex(from), vTo = new NGramVertex(to);
+		return uvg.getEdge(vFrom, vTo);
+	}
+
 	public void testNGramJGraph()
 	{
 		NGramJGraph dng = new NGramJGraph();
 		dng.setDataString("ACTACTA");
-		System.out.println(jutils.graphToDot(dng.getGraphLevel(0), false));
 
-		NGramJGraph d = new NGramJGraph();
-		d.setDataString("ACTTAC");
+		/* get the underlying graph */
+		UniqueJVertexGraph uvg = dng.getGraphLevel(0);
 		
-		System.out.println(jutils.graphToDot(d.getGraphLevel(0), true));
-		System.out.println(jutils.graphToDot(dng.getGraphLevel(0), false));
-		dng = dng.intersectGraph(d);
-		System.out.println(jutils.graphToDot(dng.getGraphLevel(0), true));
+		Edge e; double delta = 0.000001;
+		
+		e = edgeByLabel(uvg, "CTA", "ACT");
+		assertEquals(e.edgeWeight(), 2.0, delta);
+		e = edgeByLabel(uvg, "CTA", "TAC");
+		assertEquals(e.edgeWeight(), 1.0, delta);
+		e = edgeByLabel(uvg, "CTA", "CTA");
+		assertEquals(e.edgeWeight(), 1.0, delta);
+		e = edgeByLabel(uvg, "TAC", "CTA");
+		assertEquals(e.edgeWeight(), 1.0, delta);
+		e = edgeByLabel(uvg, "TAC", "ACT");
+		assertEquals(e.edgeWeight(), 1.0, delta);
+		e = edgeByLabel(uvg, "ACT", "TAC");
+		assertEquals(e.edgeWeight(), 1.0, delta);
+		e = edgeByLabel(uvg, "ACT", "ACT");
+		assertEquals(e.edgeWeight(), 1.0, delta);
+		e = edgeByLabel(uvg, "ACT", "CTA");
+		assertEquals(e.edgeWeight(), 1.0, delta);
 
-		d.setDataString("ACTT");
+		NGramJGraph d = new NGramJGraph("ACTT");
 		dng.setDataString("ACTA");
 		dng.mergeGraph(d, 0);
-		System.out.println(jutils.graphToDot(dng.getGraphLevel(0), true));
-		/* TODO: make sure that the two representations come up with the
-		 * same result */
-		assertTrue( true );
+
+		/* make sure that merging two graphs works properly */
+		e = edgeByLabel(dng.getGraphLevel(0), "CTA", "ACT");
+		assertEquals(e.edgeWeight(), 1.0, delta);
+		e = edgeByLabel(dng.getGraphLevel(0), "CTT", "ACT");
+		assertEquals(e.edgeWeight(), 1.0, delta);
 	}
 
 	public void testUniqueJGraph()
@@ -139,14 +163,10 @@ public class AppTest
 		assertTrue(eqDouble(uvg.outgoingWeightSumOf(v3), 2.0));
 		assertTrue(eqDouble(uvg.incomingWeightSumOf(v3), 1.0));
 
-		System.out.printf("V1 - V2 Norm: %.2f\n",
-						  uvg.getNormalizedEdgeWeight(v1, v2));
-		System.out.printf("V2 - V3 Norm: %.2f\n",
-						  uvg.getNormalizedEdgeWeight(v2, v3));
-		System.out.printf("V3 - V2 Norm: %.2f\n",
-						  uvg.getNormalizedEdgeWeight(v3, v2));
-
-		assertTrue( true );
+		/* assert that the normalized edge weights are computed properly */
+		assertTrue(eqDouble(uvg.getNormalizedEdgeWeight(v1, v2), 0.33333333333));
+		assertTrue(eqDouble(uvg.getNormalizedEdgeWeight(v2, v3), 0.50000000000));
+		assertTrue(eqDouble(uvg.getNormalizedEdgeWeight(v3, v2), 0.33333333333));
 	}
 
 

@@ -236,8 +236,8 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 
 		/* if the key was not already there, add it now */
 		if ( !(vW.containsKey(vLabel)) ) {
-			System.out.printf("Label not found! - [%s]\n", vLabel);
 			double newVal = vW.putLabel(v.getLabel());
+			System.out.printf("Unseen: %s - new val:%3.3f\n", vLabel, newVal);
 			return (newVal * incomingWeightSumOf(v)) / outSum;
 		}
 		else {
