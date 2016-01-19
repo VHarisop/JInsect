@@ -156,7 +156,9 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 	 * the document n-gram graph.
 	 */
 	public int length() {
-		Iterator<UniqueJVertexGraph> iIter = Arrays.asList(NGramGraphArray).iterator();
+		Iterator<UniqueJVertexGraph> iIter = 
+			Arrays.asList(NGramGraphArray).iterator();
+
 		int iCnt = 0;
 		while (iIter.hasNext())
 			iCnt += (iIter.next()).getEdgeCount();

@@ -1,28 +1,32 @@
-/*
- * Main.java
- *
- * Created on 24 Ιανουάριος 2006, 10:30 μμ
- *
- */
-
 package gr.demokritos.iit.jinsect;
 
+import gr.demokritos.iit.jinsect.documentModel.representations.NGramJGraph;
 
-/**
- *
- * @author PCKid
- */
-public class Main {
-    
-    /** Creates a new instance of Main */
-    public Main() {
-    }
-    
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-    	 
-    }
-    
+class Main {
+	
+	/**
+	 * @param args the command line arguments
+	 */
+	public static void main(String[] args) {
+		if (args.length < 2) {
+			return;
+		}
+		// graph database and query graph
+		try {
+			NGramJGraph[] nGraphs = NGramJGraph.fromFileLines(args[0]);
+			NGramJGraph nggQuery = new NGramJGraph(args[1]);
+
+			for (int i = 0; i < nGraphs.length; ++i) {
+				double similarity = 
+					jutils.graphStructuralSimilarity(nGraphs[i].getGraphLevel(0),
+													 nggQuery.getGraphLevel(0));
+
+				System.out.printf("%s - Sim: %.3f\n", nGraphs[i].getDataString(),
+													 similarity);
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+
 }

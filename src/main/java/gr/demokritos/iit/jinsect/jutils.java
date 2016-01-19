@@ -2,6 +2,7 @@ package gr.demokritos.iit.jinsect;
 
 import gr.demokritos.iit.jinsect.structs.UniqueJVertexGraph;
 import gr.demokritos.iit.jinsect.structs.JVertex;
+import gr.demokritos.iit.jinsect.structs.VertexCoder;
 import gr.demokritos.iit.jinsect.structs.Edge;
 import gr.demokritos.iit.jinsect.encoders.CanonicalCoder;
 
@@ -13,6 +14,32 @@ import java.util.Iterator;
  * @author VHarisop
  */
 public final class jutils {
+	/**
+	 * Gets the quantized value similarity between two graphs based on a map
+	 * of label - weight entries. The quantized value similarity is simply the
+	 * difference of the sums of quantized values of all vertices of each graph.
+	 *
+	 * @param gA the first graph
+	 * @param gB the second graph
+	 * @param vWeights the map of label - value pairs
+	 * @return the quantized value similarity of gA over gB
+	 */
+	public static double getQuantValSimilarity(UniqueJVertexGraph gA,
+											   UniqueJVertexGraph gB,
+											   VertexCoder vWeights)
+	{
+		double qValsA = 0.0;
+		double qValsB = 0.0;
+		for (JVertex vA: gA.vertexSet()) {
+			qValsA += gA.getQuantValue(vA, vWeights);
+		}
+
+		for (JVertex vB: gB.vertexSet()) {
+			qValsB += gB.getQuantValue(vB, vWeights);
+		}
+
+		return qValsA - qValsB;
+	}
 
 	/**
 	 * Gets the structural similarity of a graph over another, which is
@@ -140,6 +167,18 @@ public final class jutils {
 		sb.append("}");
 
 		return sb.toString();
+	}
+
+	/**
+	 * Compares two double values for equality, by checking if their absolute
+	 * difference falls below a very small threshold.
+	 *
+	 * @param a the first number
+	 * @param b the second number
+	 * @return true if the numbers are equal, otherwise false
+	 */
+	public static boolean compareDouble(double a, double b) {
+		return (Math.abs(a - b) < 0.000001);
 	}
 }
 

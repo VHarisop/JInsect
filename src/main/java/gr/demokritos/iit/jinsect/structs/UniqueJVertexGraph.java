@@ -1,17 +1,12 @@
 package gr.demokritos.iit.jinsect.structs;
 
-import gr.demokritos.iit.jinsect.utils;
-
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /* use JGraphT for basic graph operations */
-import org.jgrapht.*;
 import org.jgrapht.graph.*;
 
 /**
@@ -24,7 +19,7 @@ import org.jgrapht.graph.*;
 public class UniqueJVertexGraph 
 extends DefaultDirectedWeightedGraph<JVertex, Edge>
 {
-
+	static final long serialVersionUID = 1L;
     public HashMap<String, JVertex> UniqueVertices;
 
 	/**
@@ -157,7 +152,6 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		// if result is not cached, calculate from the beginning
 		if (!cached) { 	
 			normSum = 0; 
-			JVertex vFrom, vTo;
 
 			// calculate sum of normalized weights
 			for (Edge e: super.edgeSet()) {
@@ -220,6 +214,37 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 
 		// return the geometric mean of the two ratios 
 		return ((kOut * kIn) / (kOut + kIn));
+	}
+
+	/**
+	 * Returns the quantization value of a vertex, which is defined as the product
+	 * of (indegree / outdegree) * vertex_quantization_value, where the 
+	 * quantization value is provided in a hash map that matches vertex labels to
+	 * double values. The aforementioned hashmap is provided by a database that
+	 * builds the graph index. 
+	 *
+	 * @param v the JVertex for which the value is computed
+	 * @param vW the hash map of Label - Weight entries
+	 * @return the vertex's quant value 
+	 */
+	public double getQuantValue(JVertex v, VertexCoder vW) {
+		String vLabel = v.getLabel();
+
+		/* If outSum ~ 0, replace it with unity. */
+		double outSum = outgoingWeightSumOf(v);
+		outSum = (outSum > 0.000001) ? outSum : 1.0;
+
+		/* if the key was not already there, add it now */
+		if ( !(vW.containsKey(vLabel)) ) {
+			System.out.printf("Label not found! - [%s]\n", vLabel);
+			double newVal = vW.putLabel(v.getLabel());
+			return (newVal * incomingWeightSumOf(v)) / outSum;
+		}
+		else {
+			double labelVal = vW.get(vLabel); 
+			return (labelVal * incomingWeightSumOf(v)) / outSum;
+		}
+
 	}
 
 	/**
