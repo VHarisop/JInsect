@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/VHarisop/JInsect.svg?branch=master)](https://travis-ci.org/VHarisop/JInsect)
+
 # JInsect
 The JINSECT toolkit is a Java-based toolkit and library that supports and demonstrates the use of n-gram graphs within Natural Language Processing applications, ranging from summarization and summary evaluation to text classiﬁcation and indexing.
 
