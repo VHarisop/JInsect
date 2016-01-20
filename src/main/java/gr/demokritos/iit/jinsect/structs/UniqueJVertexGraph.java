@@ -9,6 +9,8 @@ import java.util.Set;
 /* use JGraphT for basic graph operations */
 import org.jgrapht.graph.*;
 
+import gr.demokritos.iit.jinsect.structs.calculators.*;
+
 /**
  * UniqueJVertexGraph is an extension to a weighted graph from
  * jgrapht that is used in JInsect. It is an directed graph with
@@ -19,6 +21,19 @@ import org.jgrapht.graph.*;
 public class UniqueJVertexGraph 
 extends DefaultDirectedWeightedGraph<JVertex, Edge>
 {
+
+	/**
+	 * A {@link DegreeVarianceCalculator} that operates on the vertices
+	 * of this graph.
+	 */
+	public DegreeVarianceCalculator degreeVarCalc;
+
+	/**
+	 * A {@link PerVertexVarianceCalculator} that operates on this graph's
+	 * vertices.
+	 */
+	public PerVertexVarianceCalculator perVertexVarCalc;
+
 	static final long serialVersionUID = 1L;
     public HashMap<String, JVertex> UniqueVertices;
 
@@ -217,8 +232,38 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	}
 
 	/**
+	 * Gets the sum of all the graph's vertex degree ratios, which are 
+	 * calculated using {@link #getDegreeRatio}.
+	 *
+	 * @return the sum of all the graph's vertex degree ratios.
+	 */
+	public double getDegreeRatioSum() {
+		double total = 0.0;
+		for (JVertex v: this.vertexSet()) {
+			total += getDegreeRatio(v);
+		}
+		return total;
+	}
+
+	/**
+	 * Gets the degree ratio of a vertex, which is the ratio of its indegree
+	 * over its outdegree. If the vertex's outdegree is zero, it is replaced 
+	 * by 0.1 to avoid division by zero.
+	 *
+	 * @param v the vertex for which the degree ratio is required
+	 * @return the vertex's ratio of indegree over outdegree
+	 */
+	public double getDegreeRatio(JVertex v) {
+		/* if outSum ~ 0, replace it with 0.1 */
+		double outSum = outgoingWeightSumOf(v);
+		outSum = (outSum > 0.000001) ? outSum : 0.1;
+
+		return (incomingWeightSumOf(v) / outSum);
+	}
+
+	/**
 	 * Returns the quantization value of a vertex, which is defined as the product
-	 * of (indegree / outdegree) * vertex_quantization_value, where the 
+	 * of |indegree - outdegree| * vertex_quantization_value, where the 
 	 * quantization value is provided in a hash map that matches vertex labels to
 	 * double values. The aforementioned hashmap is provided by a database that
 	 * builds the graph index. 
@@ -230,19 +275,17 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	public double getQuantValue(JVertex v, VertexCoder vW) {
 		String vLabel = v.getLabel();
 
-		/* If outSum ~ 0, replace it with unity. */
-		double outSum = outgoingWeightSumOf(v);
-		outSum = (outSum > 0.000001) ? outSum : 1.0;
+		double factor = Math.abs(incomingWeightSumOf(v) - outgoingWeightSumOf(v));
 
 		/* if the key was not already there, add it now */
 		if ( !(vW.containsKey(vLabel)) ) {
 			double newVal = vW.putLabel(v.getLabel());
-			System.out.printf("Unseen: %s - new val:%3.3f\n", vLabel, newVal);
-			return (newVal * incomingWeightSumOf(v)) / outSum;
+			// System.out.printf("Unseen: %s - new val:%3.3f\n", vLabel, newVal);
+			return newVal * factor;
 		}
 		else {
 			double labelVal = vW.get(vLabel); 
-			return (labelVal * incomingWeightSumOf(v)) / outSum;
+			return labelVal * factor;
 		}
 
 	}
@@ -286,6 +329,51 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		for (Edge e: eList) { sum += super.getEdgeWeight(e); }
 
 		return sum;
+	}
+
+	/**
+	 * Calculates the total weight variance of the graph's vertices
+	 * as computed by {@link #degreeVarCalc}.
+	 *
+	 * @return the total weight variance
+	 */
+	public double getTotalWeightVariance() {
+		if (degreeVarCalc == null) {
+			degreeVarCalc = new DegreeVarianceCalculator(this);
+		}
+
+		/* get the total variance */
+		return degreeVarCalc.getTotalWeightVariance();
+	}
+
+	/**
+	 * Calculates the average degree variance of the graph's vertices
+	 * as computed by {@link #degreeVarCalc}.
+	 *
+	 * @return the average degree variance of the graph
+	 */
+	public double getTotalDegreeVariance() {
+		if (degreeVarCalc == null) {
+			degreeVarCalc = new DegreeVarianceCalculator(this);
+		}
+
+		/* get the total variance */
+		return degreeVarCalc.getAvgDegreeVariance();
+	}
+
+	/**
+	 * Calculates the sum of this graph's vertex weight variance 
+	 * ratios via {@link #perVertexVarCalc}.
+	 *
+	 * @return the sum of vertex weight variance ratios
+	 */
+	public double getTotalVarRatios() {
+		if (perVertexVarCalc == null) {
+			perVertexVarCalc = new PerVertexVarianceCalculator(this);
+		}
+
+		/* get the total var diff */
+		return perVertexVarCalc.getTotalVarianceRatios();
 	}
 	  
 	@Override
