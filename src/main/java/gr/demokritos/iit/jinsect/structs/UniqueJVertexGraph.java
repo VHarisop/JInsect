@@ -9,6 +9,7 @@ import java.util.Set;
 /* use JGraphT for basic graph operations */
 import org.jgrapht.graph.*;
 
+import gr.demokritos.iit.jinsect.jutils;
 import gr.demokritos.iit.jinsect.structs.calculators.*;
 
 /**
@@ -23,6 +24,11 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 {
 
 	/**
+	 * A {@link VertexEntropy} object to encode the vertices of the graph.
+	 */
+	public VertexEntropy entropyCalc;
+
+	/**
 	 * A {@link DegreeVarianceCalculator} that operates on the vertices
 	 * of this graph.
 	 */
@@ -34,6 +40,11 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 */
 	public PerVertexVarianceCalculator perVertexVarCalc;
 
+	/**
+	 * A {@link DegreeRangeCalculator} that operates on this graph's vertices.
+	 */
+	public DegreeRangeCalculator degreeRangeCalc;
+
 	static final long serialVersionUID = 1L;
     public HashMap<String, JVertex> UniqueVertices;
 
@@ -42,12 +53,23 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 * weights has been cached or not 
 	 */
 	protected boolean cached = false;
-	
+
+	/**
+	 * flag that indicates if the sum of the graph's 
+	 * edge weights has been cached or not
+	 */
+	protected boolean totalCached = false;
+
 	/**
 	 * cached sum of normalized weights for efficient
 	 * similarity calculation
 	 */
 	protected double normSum = 0;
+
+	/**
+	 * cached sum of the graph's edge weights
+	 */
+	protected double edgeSum;
 
 	/**
 	 * Returns a <tt>UniqueJVertexJGraph</tt> object. 
@@ -72,7 +94,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
      * @return The vertex if it is contained in this graph. Otherwise null.
      */
     public synchronized JVertex locateVertex(JVertex v) {
-        return (JVertex)UniqueVertices.get(v.getLabel());
+        return UniqueVertices.get(v.getLabel());
     }
 
     /** 
@@ -81,7 +103,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
      * @return The vertex if it is contained in this graph. Otherwise null.
      */
     public synchronized JVertex locateVertex(String sJVertexLabel) {
-        return (JVertex)UniqueVertices.get(sJVertexLabel);
+        return UniqueVertices.get(sJVertexLabel);
     }
 
 	/**
@@ -154,9 +176,16 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 
 	/**
 	 * Gets the total weight of all the graph's edges. 
+	 *
+	 * @return the total edge weight of the graph
 	 */
 	public double totalEdgeWeight() {
-		return sumWeights(super.edgeSet());
+		if (!totalCached) {
+			edgeSum = sumWeights(super.edgeSet());
+			totalCached = true;
+		}
+
+		return edgeSum;
 	}
 
 	/**
@@ -275,7 +304,8 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	public double getQuantValue(JVertex v, VertexCoder vW) {
 		String vLabel = v.getLabel();
 
-		double factor = Math.abs(incomingWeightSumOf(v) - outgoingWeightSumOf(v));
+		double factor = (incomingWeightSumOf(v) * outgoingWeightSumOf(v)) /
+			(incomingWeightSumOf(v) + outgoingWeightSumOf(v));
 
 		/* if the key was not already there, add it now */
 		if ( !(vW.containsKey(vLabel)) ) {
@@ -347,6 +377,33 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	}
 
 	/**
+	 * Calculates the degree range code, which is defined as the sum 
+	 * of the graph's vertex code + degree ranges. These are the quantities
+	 * <tt>(v_code + max(v_inweight) - min(v_inweight)) * 
+	 * (v_code + max(v_outweight) - min(v_outweight)) </tt> where the 
+	 * <tt>v_code</tt> quantities are supplied by a {@link VertexCoder} 
+	 * object.
+	 *
+	 * @param vWt the vertex coder to use
+	 * @return the sum of degree range codes
+	 */
+	public double getDegreeRangeCode(VertexCoder vwMap) {
+		if (degreeRangeCalc == null) {
+			degreeRangeCalc = new DegreeRangeCalculator(this);
+		}
+		
+		double sum = 0; double[] ranges; double vW;
+		for (JVertex v: this.vertexSet()) {
+			ranges = degreeRangeCalc.getDegrees(v.getLabel());
+			vW = vwMap.get(v.getLabel());
+
+			sum += (vW + ranges[0]) * (vW + ranges[1]);
+		}
+
+		return sum;
+	}
+
+	/**
 	 * Calculates the average degree variance of the graph's vertices
 	 * as computed by {@link #degreeVarCalc}.
 	 *
@@ -359,6 +416,29 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 
 		/* get the total variance */
 		return degreeVarCalc.getAvgDegreeVariance();
+	}
+
+	/**
+	 * Gets the sum of the vertex entropy for the vertices
+	 * of this graph. 
+	 *
+	 * @return the sum of vertex entropies
+	 */
+	public double getTotalVertexEntropy() {
+		if (entropyCalc == null) {
+			entropyCalc = (new VertexEntropy()).
+				withGraph(this).withWeight(10.0);
+			/* put all labels to the entropy object */
+			for (JVertex vCurr: this.vertexSet()) {
+				entropyCalc.putLabel(vCurr);
+			}
+		}
+		
+		double sum = 0;
+		for (JVertex vCurr : this.vertexSet()) {
+			sum += entropyCalc.getWeight(vCurr);
+		}
+		return sum;
 	}
 
 	/**
