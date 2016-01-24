@@ -3,10 +3,19 @@ package gr.demokritos.iit.jinsect.structs;
 import java.util.Map;
 import java.util.HashMap;
 
+/**
+ * This class assign weights (codes) to a set of vertex labels
+ * in order to be used for vertex coding in similarity measures.
+ *
+ * The first label to be added is initialized with a starting value,
+ * and subsequent additions increase the value associated with the
+ * added vertices.
+ *
+ * @author VHarisop
+ */
 public class VertexCoder extends HashMap<String, Double> {
 	static final long serialVersionUID = 1L; 
-
-	static final double INITIAL_VALUE = 0.5;
+	static final double INITIAL_VALUE = 1.0;
 
 	/**
 	 * The weight value to be associated with added keys.
@@ -17,7 +26,7 @@ public class VertexCoder extends HashMap<String, Double> {
 	 * The step by which {@link #weightVal} should be increased
 	 * when a new key is added.
 	 */
-	protected double step = 0.005;
+	protected double step = 0.00005;
 
 	/**
 	 * Creates a new VertexCoder object with default parameters.
@@ -99,7 +108,25 @@ public class VertexCoder extends HashMap<String, Double> {
 			weightVal += step;
 			return (weightVal - step);
 		}
-	} 
+	}
+
+	/**
+	 * Gets the weight associated with a provided key. If the key
+	 * is not found in the backing map, it is added automatically
+	 * and its assigned value is returned.
+	 *
+	 * @param key the key whose weight is requested
+	 * @return the key's associated weight
+	 */
+	public Double getLabel(String key) {
+		if (!super.containsKey(key)) {
+			Double newVal = this.putLabel(key);
+			return newVal;
+		}
+		else {
+			return super.get(key);
+		}
+	}
 
 	/**
 	 * Removes all the mappings for the map. Also resets 

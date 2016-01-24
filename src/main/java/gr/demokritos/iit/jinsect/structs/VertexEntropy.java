@@ -16,7 +16,7 @@ public class VertexEntropy extends HashMap<String, Double> {
 	/**
 	 * The value used for weighing returned values.
 	 */
-	protected double weight = 5.0;
+	protected double weight = 1.0;
 
 	/**
 	 * The {@link UniqueJVertexGraph} this object operates on.
@@ -63,6 +63,13 @@ public class VertexEntropy extends HashMap<String, Double> {
 		return this;
 	}
 
+	/**
+	 * Sets {@link #weight} to a new provided value, returning the modified
+	 * object.
+	 *
+	 * @param weight the new weight to be used
+	 * @return the modified VertexEntropy object
+	 */
 	public VertexEntropy withWeight(double weight) {
 		this.weight = weight;
 		return this;
@@ -93,6 +100,36 @@ public class VertexEntropy extends HashMap<String, Double> {
 	public Double putLabel(String vLabel) {
 		JVertex vCurr = uvg.locateVertex(vLabel);
 		return this.putLabel(vCurr);
+	}
+
+
+	/**
+	 * @see #getEntropy(String)
+	 *
+	 * @param vGet the vertex 
+	 * @return the associated weight
+	 */
+	public Double getEntropy(JVertex vGet) {
+		String vLabel = vGet.getLabel();
+		return getEntropy(vLabel);
+	}
+
+	/**
+	 * Gets the entropy associated with a given vertex. If the vertex's label
+	 * is not found in the backing map, it is automatically added and its new
+	 * associated weight is returned. 
+	 *
+	 * @param vLabel the vertex's label 
+	 * @return the associated weight
+	 */
+	public Double getEntropy(String vLabel) {
+		if (this.get(vLabel) == null) {
+			putLabel(vLabel);
+			return getWeight(uvg.locateVertex(vLabel));
+		}
+		else {
+			return getWeight(vLabel);
+		}
 	}
 
 	/**
