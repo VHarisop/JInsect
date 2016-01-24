@@ -48,31 +48,42 @@ public class DegreeRangeCalculator {
 		Set<Edge> outEdges = uvGraph.outgoingEdgesOf(vCurr);
 		Set<Edge> inEdges = uvGraph.incomingEdgesOf(vCurr);
 
-		double minOut, minIn, maxOut, maxIn; 
-		minOut = minIn = Double.POSITIVE_INFINITY;
-		maxOut = maxIn = Double.NEGATIVE_INFINITY;
+		double minOut, minIn, maxOut, maxIn;
 
 		/* find max, min weight for outgoing edges */
-		for (Edge e: outEdges) {
-			if (minOut > e.edgeWeight()) {
-				minOut = e.edgeWeight();
-			}	
-			else if (maxOut < e.edgeWeight()) {
-				maxOut = e.edgeWeight();
+		if (outEdges.size() == 0) {
+			minOut = maxOut = 0.0;
+		}
+		else {
+			maxOut = minOut = outEdges.iterator().next().edgeWeight();
+			for (Edge e: outEdges) {
+				if (minOut > e.edgeWeight()) {
+					minOut = e.edgeWeight();
+					continue; // no way this is more than max-out
+				}
+				if (maxOut < e.edgeWeight()) {
+					maxOut = e.edgeWeight();
+				}
 			}
 		}
 
-		/* now do the same for incoming edges */
-		for (Edge e: inEdges) {
-			if (minIn > e.edgeWeight()) {
-				minIn = e.edgeWeight();
-			}
-			else if (maxIn < e.edgeWeight()) {
-				maxIn = e.edgeWeight();
+		if (inEdges.size() == 0) {
+			maxIn = minIn = 0.0;
+		}
+		else {
+			maxIn = minIn = inEdges.iterator().next().edgeWeight();
+			for (Edge e: inEdges) {
+				if (minIn > e.edgeWeight()) {
+					minIn = e.edgeWeight();
+				}
+
+				if (maxIn < e.edgeWeight()) {
+					maxIn = e.edgeWeight();
+				}
 			}
 		}
 
-		return new double[] { maxIn - minIn, maxOut - maxIn };
+		return new double[] { maxIn - minIn, maxOut - minOut };
 	}
 
 	/**
