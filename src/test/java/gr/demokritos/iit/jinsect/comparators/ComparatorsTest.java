@@ -4,21 +4,12 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.jgrapht.traverse.*;
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
 
 import gr.demokritos.iit.jinsect.documentModel.representations.NGramJGraph;
-import gr.demokritos.iit.jinsect.documentModel.representations.NGramSymJGraph;
-import gr.demokritos.iit.jinsect.structs.UniqueJVertexGraph;
-import gr.demokritos.iit.jinsect.structs.NGramVertex;
-import gr.demokritos.iit.jinsect.structs.JVertex;
-import gr.demokritos.iit.jinsect.jutils;
-import gr.demokritos.iit.jinsect.utils;
-
+import gr.demokritos.iit.jinsect.structs.*;
 
 /**
- * Unit test for simple App.
+ * Unit test for the comparators/ submodule of jinsect.
  */
 public class ComparatorsTest 
     extends TestCase
@@ -40,7 +31,30 @@ public class ComparatorsTest
     {
         return new TestSuite( ComparatorsTest.class );
     }
-	
+
+	/**
+	 * Test the correctness of {@link NGramGraphComparator}
+	 */
+	public void testNGramGraphComparator() {
+		NGramGraphComparator nggComp = new NGramGraphComparator();
+		NGramJGraph nggA = new NGramJGraph("ACTAGC");
+		NGramJGraph nggB = new NGramJGraph("ACTAGC");
+
+		GraphSimilarity gSim = nggComp.getSimilarityBetween(nggA, nggB);
+		assertEquals(1.0, gSim.SizeSimilarity, 0.001);
+		assertEquals(1.0, gSim.ValueSimilarity, 0.001);
+		assertEquals(1.0, gSim.ContainmentSimilarity, 0.001);
+		assertEquals(1.0, gSim.getOverallSimilarity(), 0.0001);
+		assertEquals(0.0, gSim.StructuralSimilarity, 0.00001);
+
+		nggB.setDataString("AGTACG");
+		gSim = nggComp.getSimilarityBetween(nggA, nggB);
+		assertEquals(1.0, gSim.SizeSimilarity, 0.0001);
+		assertTrue(gSim.ValueSimilarity < 1.0);
+		assertTrue(gSim.ContainmentSimilarity < 1.0);
+		assertEquals(0.0, gSim.StructuralSimilarity, 0.00001);
+	}
+
 	/**
 	 * Test the correctness of the similarity comparator 
 	 */

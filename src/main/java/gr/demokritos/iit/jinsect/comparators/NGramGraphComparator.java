@@ -25,11 +25,11 @@ public class NGramGraphComparator {
 
 		/* calculate overall importance first */
 		int overallImportance = 0;
-		for (int iCnt = ngA.getMinSize(); iCnt < ngA.getMaxSize(); ++iCnt) {
+		for (int iCnt = ngA.getMinSize(); iCnt <= ngA.getMaxSize(); ++iCnt) {
 			overallImportance += utils.sumFromTo(ngA.getMinSize(), iCnt);
 		}
 
-		for (int iCnt = ngA.getMinSize(); iCnt < ngA.getMaxSize(); ++iCnt) {
+		for (int iCnt = ngA.getMinSize(); iCnt <= ngA.getMaxSize(); ++iCnt) {
 			// calculate level weight
 			int levelImportance = utils.sumFromTo(ngA.getMinSize(), iCnt);
 
@@ -42,7 +42,6 @@ public class NGramGraphComparator {
 				continue;
 			}
 			
-
 			int firstEdges = uvgA.getEdgeCount();
 			int secondEdges = uvgB.getEdgeCount();
 
@@ -53,8 +52,8 @@ public class NGramGraphComparator {
 				uvgA = vgSwap;
 			}
 
-			int minEdges = (firstEdges > secondEdges) ? secondEdges : firstEdges;
-			int maxEdges = (firstEdges < secondEdges) ? secondEdges : firstEdges;
+			int minEdges = (firstEdges >= secondEdges) ? secondEdges : firstEdges;
+			int maxEdges = (firstEdges <= secondEdges) ? secondEdges : firstEdges;
 
 			for (Edge e: uvgA.edgeSet()) {
 				Edge eFound = 
@@ -66,7 +65,7 @@ public class NGramGraphComparator {
 				}
 
 				double degradation = utils.min(
-							ngA.degredationDegree(eFound), 
+							ngA.degredationDegree(e), 
 							ngB.degredationDegree(eFound));
 
 				// update containment similarity
@@ -81,7 +80,6 @@ public class NGramGraphComparator {
 					(utils.min(wA, wB) / utils.max(wA, wB)) /
 					(maxEdges * utils.max(1.0 , ngA.degredationDegree(e) + 
 										  ngB.degredationDegree(eFound)));
-
 			}
 			// update size similarity 
 			gSimLevel.SizeSimilarity += minEdges / utils.max(maxEdges, 1.0);
