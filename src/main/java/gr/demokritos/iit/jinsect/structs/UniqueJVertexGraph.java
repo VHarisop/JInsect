@@ -9,7 +9,6 @@ import java.util.Set;
 /* use JGraphT for basic graph operations */
 import org.jgrapht.graph.*;
 
-import gr.demokritos.iit.jinsect.jutils;
 import gr.demokritos.iit.jinsect.structs.calculators.*;
 
 /**
@@ -382,22 +381,24 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 * <tt>(v_code + max(v_inweight) - min(v_inweight)) * 
 	 * (v_code + max(v_outweight) - min(v_outweight)) </tt> where the 
 	 * <tt>v_code</tt> quantities are supplied by a {@link VertexCoder} 
-	 * object.
+	 * and a {@link VertexEntropy}.
 	 *
 	 * @param vWt the vertex coder to use
 	 * @return the sum of degree range codes
 	 */
 	public double getDegreeRangeCode(VertexCoder vwMap) {
-		if (degreeRangeCalc == null) {
+		if (degreeRangeCalc == null || entropyCalc == null) {
 			degreeRangeCalc = new DegreeRangeCalculator(this);
+			entropyCalc = new VertexEntropy().withGraph(this);
 		}
 		
 		double sum = 0; double[] ranges; double vW;
 		for (JVertex v: this.vertexSet()) {
 			ranges = degreeRangeCalc.getDegrees(v.getLabel());
-			vW = vwMap.get(v.getLabel());
+			vW = vwMap.getLabel(v.getLabel());
+			double weight = entropyCalc.getEntropy(v.getLabel()) + vW;
 
-			sum += (vW + ranges[0]) * (vW + ranges[1]);
+			sum += (weight + ranges[0]) * (weight + ranges[1]);
 		}
 
 		return sum;

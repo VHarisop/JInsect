@@ -14,6 +14,7 @@ import java.util.Iterator;
  * @author VHarisop
  */
 public final class jutils {
+	
 	/**
 	 * Gets the quantized value similarity between two graphs based on a map
 	 * of label - weight entries. The quantized value similarity is simply the
@@ -28,8 +29,7 @@ public final class jutils {
 											   UniqueJVertexGraph gB,
 											   VertexCoder vWeights)
 	{
-		double qValsA = 0.0;
-		double qValsB = 0.0;
+		double qValsA = 0.0, qValsB = 0.0;
 		for (JVertex vA: gA.vertexSet()) {
 			qValsA += gA.getQuantValue(vA, vWeights);
 		}
@@ -40,6 +40,25 @@ public final class jutils {
 
 		return qValsA - qValsB;
 	}
+
+	/**
+	 * Returns the degree range similarity between two graphs based on a map
+	 * of label - weight entries that provides the factors for the smoothened
+	 * degree - range quantities.
+	 *
+	 * @param gA the first graph
+	 * @param gB the second graph
+	 * @param vWeights the map of label - weight entries
+	 * @return the degree range similarity between the 2 graphs
+	 */
+	public static double getDegreeRangeSimilarity(
+			UniqueJVertexGraph gA,
+			UniqueJVertexGraph gB,
+			VertexCoder vWeights)
+	{
+		return gA.getDegreeRangeCode(vWeights) - gB.getDegreeRangeCode(vWeights);
+	}
+
 
 	/**
 	 * Gets the structural similarity of a graph over another, which is
