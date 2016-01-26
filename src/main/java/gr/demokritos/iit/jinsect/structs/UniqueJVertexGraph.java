@@ -13,8 +13,8 @@ import gr.demokritos.iit.jinsect.structs.calculators.*;
 
 /**
  * UniqueJVertexGraph is an extension to a weighted graph from
- * jgrapht that is used in JInsect. It is an directed graph with
- * weighted edges 
+ * jgrapht that is used in JInsect. It is a directed graph with
+ * weighted edges.
  *
  * @author VHarisop
  */
@@ -366,13 +366,13 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 *
 	 * @return the total weight variance
 	 */
-	public double getTotalWeightVariance() {
+	public double getWeightVariance() {
 		if (degreeVarCalc == null) {
 			degreeVarCalc = new DegreeVarianceCalculator(this);
 		}
 
 		/* get the total variance */
-		return degreeVarCalc.getTotalWeightVariance();
+		return degreeVarCalc.getWeightVariance();
 	}
 
 	/**
@@ -405,18 +405,18 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	}
 
 	/**
-	 * Calculates the average degree variance of the graph's vertices
+	 * Calculates the degree variance of the graph's vertices
 	 * as computed by {@link #degreeVarCalc}.
 	 *
-	 * @return the average degree variance of the graph
+	 * @return the degree variance of the graph
 	 */
-	public double getTotalDegreeVariance() {
+	public double getDegreeVariance() {
 		if (degreeVarCalc == null) {
 			degreeVarCalc = new DegreeVarianceCalculator(this);
 		}
 
 		/* get the total variance */
-		return degreeVarCalc.getAvgDegreeVariance();
+		return degreeVarCalc.getDegreeVariance();
 	}
 
 	/**
@@ -428,7 +428,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	public double getTotalVertexEntropy() {
 		if (entropyCalc == null) {
 			entropyCalc = (new VertexEntropy()).
-				withGraph(this).withWeight(10.0);
+				withGraph(this);
 			/* put all labels to the entropy object */
 			for (JVertex vCurr: this.vertexSet()) {
 				entropyCalc.putLabel(vCurr);
@@ -437,7 +437,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		
 		double sum = 0;
 		for (JVertex vCurr : this.vertexSet()) {
-			sum += entropyCalc.getWeight(vCurr);
+			sum += entropyCalc.getEntropy(vCurr);
 		}
 		return sum;
 	}

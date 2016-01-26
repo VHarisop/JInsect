@@ -134,13 +134,13 @@ public class DegreeVarianceCalculator {
 	}
 
 	/**
-	 * Returns the average variance of the graph's vertex indegrees and
-	 * outdegrees. The computation is cached to avoid extra overhead for
+	 * Returns the product of the graph's vertex indegree and outdegree
+	 * variances. The computation is cached to avoid extra overhead for
 	 * successive calls.
 	 *
-	 * @return the average of the graphs' vertex indegree and outdegree variances
+	 * @return the product of the graphs' vertex indegree and outdegree variances
 	 */
-	public double getAvgDegreeVariance() {
+	public double getDegreeVariance() {
 		if (!cached) {
 			calculateMeans();
 			outDegreeVariance = 0.0;
@@ -154,10 +154,20 @@ public class DegreeVarianceCalculator {
 			cached = true;
 		}
 
-		return (outDegreeVariance + inDegreeVariance) / 2;
+		/* return (in * out) / (in + out) */
+		return (outDegreeVariance * inDegreeVariance) / 
+			(outDegreeVariance + inDegreeVariance);
 	}
 
-	public double getTotalWeightVariance() {
+
+	/**
+	 * Returns the weight variance score for this graph's vertices. This score
+	 * is calculated as the product of incoming and outgoing weight variances over
+	 * their sums.
+	 *
+	 * @return the weight variance score of the graph
+	 */
+	public double getWeightVariance() {
 		if (!weightCached) {
 			calculateWeightMeans();
 			outWeightVariance = 0.0;

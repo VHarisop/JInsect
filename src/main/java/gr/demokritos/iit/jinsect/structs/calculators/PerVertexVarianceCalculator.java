@@ -2,6 +2,8 @@ package gr.demokritos.iit.jinsect.structs.calculators;
 
 import gr.demokritos.iit.jinsect.structs.*;
 
+import java.util.HashMap;
+
 /**
  * A class that is utilized for calculating a {@link UniqueJVertexGraph}'s 
  * vertex in- and out- degree variances, which can be useful in some graph
@@ -21,6 +23,11 @@ public class PerVertexVarianceCalculator {
 	protected double totalVarRatio;
 
 	/**
+	 * A hashmap to store already computed vertex - variance pairs
+	 */
+	protected HashMap<JVertex, Double> vertexVariances;
+
+	/**
 	 * Flag indicating if values have been calculated, so that
 	 * unnecessary new calculations are avoided. 
 	 */
@@ -35,41 +42,57 @@ public class PerVertexVarianceCalculator {
 	public PerVertexVarianceCalculator(UniqueJVertexGraph uvgOn) {
 		this.uvg = uvgOn;
 		cached = false;
+		vertexVariances = new HashMap<JVertex, Double>();
 	}
 
 	/**
-	 * Utility function that calculates the variances of a vertex's outgoing
-	 * and incoming edge weights and returns their ratio.
+	 * Calculates the variances of a vertex's outgoing and incoming edge 
+	 * weights and returns the ratio of minimum to maximum among the two.
 	 *
 	 * @param v the vertex on which to operate
-	 * @return the deviation between the vertex's incoming / outgoing variances
+	 * @return the ratio of the smaller to higher weight variance
 	 */
 	protected double getVarianceRatioOf(JVertex v) {
-		double outMean = uvg.outgoingWeightSumOf(v) / uvg.outDegreeOf(v);
-		double inMean = uvg.incomingWeightSumOf(v) / uvg.inDegreeOf(v);
-		double sumOut = 0, sumIn = 0, diff;
+		Double val = vertexVariances.get(v);
+		if (val != null) {
+			return val;
+		} 
+		else {
+			double outMean = uvg.outgoingWeightSumOf(v) / uvg.outDegreeOf(v);
+			double inMean = uvg.incomingWeightSumOf(v) / uvg.inDegreeOf(v);
+			double sumOut = 0, sumIn = 0, diff;
 
-		for (Edge e: uvg.outgoingEdgesOf(v)) {
-			diff = e.edgeWeight() - outMean;
-			sumOut += diff * diff;
+			for (Edge e: uvg.outgoingEdgesOf(v)) {
+				diff = e.edgeWeight() - outMean;
+				sumOut += diff * diff;
+			}
+
+			for (Edge e: uvg.incomingEdgesOf(v)) {
+				diff = e.edgeWeight() - inMean;
+				sumIn += diff * diff;
+			}
+
+			/* normalize to a small value if either of them is zero */
+			sumIn = (sumIn > 0.0) ? sumIn : 0.1;
+			sumOut = (sumOut > 0.0) ? sumOut : 0.1;
+
+			/* store new value to the hashmap before returning it */
+			val = sumIn / sumOut;
+			// val  = (sumIn < sumOut) ? sumIn / sumOut : sumOut / sumIn;
+			vertexVariances.put(v, val);
+			return val;
 		}
-
-		for (Edge e: uvg.incomingEdgesOf(v)) {
-			diff = e.edgeWeight() - inMean;
-			sumIn += diff * diff;
-		}
-
-		sumIn = (sumIn > 0.0) ? sumIn : 0.1;
-		return (sumOut / sumIn);
 	}
 
 	/**
 	 * Calculates and returns the sum of the graph's vertex incoming and outgoing
-	 * weight variance ratios.
+	 * weight variance ratios. This sum is guaranteed to be bounded between
+	 * 0 and |V(G)|, since the variance ratio of each vertex is between 0 and 1.
 	 *
 	 * @return the sum of variance ratios
 	 */
 	public double getTotalVarianceRatios() {
+		/* if result is cached, return the cached value */
 		if (cached)
 			return totalVarRatio;
 
