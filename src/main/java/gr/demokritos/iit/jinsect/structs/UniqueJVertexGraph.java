@@ -461,8 +461,10 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
     public Object clone() {
 		JVertex v1, v2;
         UniqueJVertexGraph res = new UniqueJVertexGraph();
-		res.UniqueVertices = new HashMap<String, JVertex>(this.UniqueVertices);
-        
+		
+		/* add all edges to the clone graph - all vertices will
+		 * eventually be added both to the supergraph's vertex set
+		 * and the hashmap, because of calls to the add() method */
         for (Edge eCur: this.edgeSet()) {
             try {
 				v1 = super.getEdgeSource(eCur);
@@ -470,6 +472,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 
                 res.addEdge(v1, v2, super.getEdgeWeight(eCur));
             } catch (Exception ex) {
+				ex.printStackTrace();
                 return null;
             }
 		}
