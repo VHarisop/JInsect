@@ -59,7 +59,7 @@ public class DegreeRangeCalculator {
 			for (Edge e: outEdges) {
 				if (minOut > e.edgeWeight()) {
 					minOut = e.edgeWeight();
-					continue; // no way this is more than max-out
+					continue;
 				}
 				if (maxOut < e.edgeWeight()) {
 					maxOut = e.edgeWeight();
@@ -75,6 +75,7 @@ public class DegreeRangeCalculator {
 			for (Edge e: inEdges) {
 				if (minIn > e.edgeWeight()) {
 					minIn = e.edgeWeight();
+					continue;
 				}
 
 				if (maxIn < e.edgeWeight()) {
