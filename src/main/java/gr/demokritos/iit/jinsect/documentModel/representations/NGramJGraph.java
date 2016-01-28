@@ -957,7 +957,7 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 	public Object clone() {
 		NGramJGraph gRes = new NGramJGraph(MinSize, MaxSize, CorrelationWindow);
 		gRes.DataString = DataString;
-		gRes.DegradedEdges.putAll((HashMap)this.DegradedEdges.clone());
+		gRes.DegradedEdges = new HashMap(this.DegradedEdges);
 		gRes.NGramGraphArray = new UniqueJVertexGraph[this.NGramGraphArray.length];
 		int iCnt=0;
 		for (UniqueJVertexGraph uCur : this.NGramGraphArray)

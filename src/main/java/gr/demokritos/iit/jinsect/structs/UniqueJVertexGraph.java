@@ -461,7 +461,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
     public Object clone() {
 		JVertex v1, v2;
         UniqueJVertexGraph res = new UniqueJVertexGraph();
-        res.UniqueVertices = (HashMap<String, JVertex>) this.UniqueVertices.clone();
+		res.UniqueVertices = new HashMap<String, JVertex>(this.UniqueVertices);
         
         for (Edge eCur: this.edgeSet()) {
             try {
