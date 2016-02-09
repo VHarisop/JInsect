@@ -11,8 +11,11 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import gr.demokritos.iit.jinsect.documentModel.representations.NGramJGraph;
-
+/**
+ * A utility class for reading files line by line.
+ *
+ * @author VHarisop
+ */
 public class LineReader {
 
 	/**
@@ -36,18 +39,28 @@ public class LineReader {
 	}
 
 	/**
+	 * Reads a file into a list of strings, trimming leading and trailing
+	 * whitespace for each string read.
+	 *
+	 * @return a list of strings with leading/trailing whitespace removed
+	 */
+	public List<String> getLineList() throws IOException {
+		ArrayList<String> lines = new ArrayList<String>(); String line;
+		while ((line = br.readLine()) != null) {
+			line = line.trim(); // remove whitespace
+			lines.add(line);
+		}
+		return lines;
+	}
+
+	/**
 	 * Reads a file into an array of strings, trimming leading and trailing 
 	 * whitespace for each string
 	 *
 	 * @return an array of strings with leading/trailing whitespace removed
 	 */
 	public String[] getLines() throws IOException {
-		ArrayList<String> lines = new ArrayList<String>();
-		String line;
-		while ((line = br.readLine()) != null) {
-			line = line.trim(); // remove leading and trailing whitespace
-			lines.add(line);
-		}
+		List<String> lines = getLineList();
 		return lines.toArray(new String[lines.size()]);
 	}
 
@@ -56,9 +69,23 @@ public class LineReader {
 	 * trailing whitespace for each string
 	 *
 	 * @param path the {@link java.io.File} to read the lines from
+	 * @return an array of strings containing the lines read
 	 */
 	public String[] getLines(File path) throws IOException {
 		br = new BufferedReader(new FileReader(path));
 		return getLines();
+	}
+
+	/**
+	 * Reads a given file into an array of strings, trimming leading and
+	 * trailing whitespace for each string, converting the array to a list
+	 * of strings, and returning the list to the caller.
+	 *
+	 * @param path the File to read the lines from
+	 * @return a list of strings containing the lines read
+	 */
+	public List<String> getLineList(File path) throws IOException {
+		br = new BufferedReader(new FileReader(path));
+		return getLineList();
 	}
 }

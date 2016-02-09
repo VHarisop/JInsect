@@ -1,7 +1,6 @@
 package gr.demokritos.iit.jinsect.structs;
 
 import java.util.Objects;
-import org.jgrapht.*;
 import org.jgrapht.graph.*;
 
 /**
