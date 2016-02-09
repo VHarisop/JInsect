@@ -28,10 +28,6 @@ import gr.demokritos.iit.jinsect.structs.UniqueJVertexGraph;
 import gr.demokritos.iit.jinsect.io.LineReader;
 
 import gr.demokritos.iit.jinsect.utils;
-import gr.demokritos.iit.jinsect.jutils;
-
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
 
 /** Represents the graph of a document, with vertices n-grams of the document and edges the number
  * of the n-grams' co-occurences within a given window.
@@ -39,12 +35,15 @@ import org.jgrapht.graph.*;
  * @author PCKid
  */
 public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGraph> {
+
+	static final long serialVersionUID = 1L;
+
 	/** The minimum and maximum n-gram size, and the cooccurence window.
 	 * Default values are 3, 3, 3 correspondingly.
 	 */
 	protected int MinSize = 3, MaxSize = 3, CorrelationWindow = 3;
 	protected String DataString = "";
-	protected HashMap DegradedEdges;
+	protected HashMap<Edge, Double> DegradedEdges;
 
 	/* array of UniqueJVertexGraphs for various N-gram sizes */
 	protected UniqueJVertexGraph[] NGramGraphArray;
@@ -81,14 +80,14 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 	 * @return a new NGramJGraph with the given parameters
 	 */
 	public NGramJGraph
-	(String dataString, int iMinSize, int iMaxSize, int iCorrelationWindow) 
-	{
-		MinSize = iMinSize;
-		MaxSize = iMaxSize;
-		CorrelationWindow = iCorrelationWindow;
-		setDataString(dataString);
+		(String dataString, int iMinSize, int iMaxSize, int iCorrelationWindow) 
+		{
+			MinSize = iMinSize;
+			MaxSize = iMaxSize;
+			CorrelationWindow = iCorrelationWindow;
+			setDataString(dataString);
 
-	}
+		}
 
 	/**
 	 * Creates a new instance of NGramJGraph
@@ -111,7 +110,7 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 	 * @return an array of {@link NGramJGraph} objects
 	 */
 	public static NGramJGraph[] fromFileLines(String path) 
-	throws IOException, FileNotFoundException 
+		throws IOException, FileNotFoundException 
 	{
 		return fromFileLines(new File(path));
 	}
@@ -124,12 +123,12 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 	 * @return an array of {@link NGramJGraph} objects
 	 */
 	public static NGramJGraph[] fromFileLines(File path) 
-	throws IOException, FileNotFoundException
+		throws IOException, FileNotFoundException
 	{
 		/* read lines and allocate array */
 		String[] lines = new LineReader().getLines(path);
 		NGramJGraph[] nGraphs = new NGramJGraph[lines.length]; 
-		
+
 		/* build the array of n-gram graphs */
 		for (int i = 0; i < lines.length; i++) {
 			nGraphs[i] = new NGramJGraph(lines[i]);
@@ -145,7 +144,7 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 		for (int iCnt = MinSize; iCnt <= MaxSize; iCnt++)
 			NGramGraphArray[iCnt - MinSize] = new UniqueJVertexGraph();
 		// Create degraded edge list
-		DegradedEdges = new HashMap();        
+		DegradedEdges = new HashMap<Edge, Double>();        
 	}
 
 	/** 
@@ -165,6 +164,12 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 		return iCnt;
 	}
 
+	/**
+	 * Checks if the graph is empty by checking if the edge count
+	 * of the graph of the minimum ngram size is equal to 0.
+	 *
+	 * @return true if the graph is empty, else false
+	 */
 	public boolean isEmpty() {
 		return NGramGraphArray[0].getEdgeCount() == 0;
 	}
@@ -176,7 +181,7 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 		   FileNotFoundException{        
 			   String sDataString = utils.loadFileToStringWithNewlines(sFilename);
 			   setDataString(sDataString); // Actually update
-		   }
+	}
 
 	/**
 	 * Returns graph with M-based index
@@ -206,8 +211,9 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 	 * 
 	 * @return a hashset containing the edges of the graph
 	 */
-	public HashSet getAllNodes() {
-		HashSet hRes = new HashSet(length() / (MaxSize - MinSize)); // Init set
+	public HashSet<Edge> getAllNodes() {
+		HashSet<Edge> hRes = 
+			new HashSet<Edge>(length() / (MaxSize - MinSize)); // Init set
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++)
 		{
 			for (Edge e: NGramGraphArray[iCurLvl - MinSize].edgeSet()) {
@@ -235,8 +241,10 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 	 *@param lOtherNodes The list of nodes to which sBaseNode is connected
 	 *@param hAppearenceHistogram The histogram of appearences of the terms
 	 ***/
-	public void createEdgesConnecting(UniqueJVertexGraph gGraph, String sStartNode, List lOtherNodes,
-			HashMap hAppearenceHistogram) 
+	public void createEdgesConnecting(UniqueJVertexGraph gGraph,
+			String sStartNode,
+			List<String> lOtherNodes,
+			HashMap<String, Double> hAppearenceHistogram) 
 	{
 		double dStartWeight = 0;
 		double dIncreaseWeight = 0;
@@ -260,7 +268,7 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 			}
 
 		// Otherwise for every neighbour add edge
-		Iterator iIter = lOtherNodes.iterator();
+		Iterator<String> iIter = lOtherNodes.iterator();
 
 		// Locate source node
 		JVertex vOldA = gGraph.locateVertex(vProbe);
@@ -281,12 +289,12 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 
 		// create a new cached locator
 		EdgeCachedJLocator ecl = new EdgeCachedJLocator(100);
-		
+
 
 		// For every edge
 		while (iIter.hasNext())
 		{
-			JVertex vB = new NGramVertex((String)iIter.next());
+			JVertex vB = new NGramVertex(iIter.next());
 			double dOldWeight = 0;
 			double dNewWeight = 0;
 
@@ -336,7 +344,7 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 	 *new. 0.5 means the final value is the average of the old and the new.
 	 ***/
 	public void createWeightedEdgesConnecting(UniqueJVertexGraph gGraph,
-			String sStartNode, List lOtherNodes,
+			String sStartNode, List<String> lOtherNodes,
 			double dStartWeight, double dNewWeight, double dDataImportance) {
 
 		// If no neightbours
@@ -374,11 +382,11 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 			ecl = eclLocator;
 
 		// Otherwise for every neighbour add edge
-		Iterator iIter = lOtherNodes.iterator();
+		Iterator<String> iIter = lOtherNodes.iterator();
 		// For every edge
 		while (iIter.hasNext())
 		{
-			JVertex vB = new NGramVertex((String)iIter.next());
+			JVertex vB = new NGramVertex(iIter.next());
 
 			double dOldWeight = 0;
 			double dFinalWeight = 0;
@@ -417,17 +425,17 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 		}
 	}
 
-	/***
+	/**
 	 * Creates the graph of n-grams, for all the levels specified in the MinSize, MaxSize range.
-	 ***/
-
+	 */
 	public void createGraphs() {       
 		String sUsableString = new StringBuilder().append(DataString).toString();
 
 		int iLen = DataString.length();
 		// Create token histogram.
-		HashMap hTokenAppearence = new HashMap();
-		
+		HashMap<String, Double> hTokenAppearance = 
+			new HashMap<String, Double>();
+
 		/* 1st pass. Populate histogram.
 		 * For all sizes create corresponding levels
 		 */
@@ -450,10 +458,10 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 				// Get n-gram                
 				sCurNGram = sUsableString.substring(iCurStart, iCurStart + iNGramSize);
 				// Update Histogram
-				if (hTokenAppearence.containsKey(sCurNGram))
-					hTokenAppearence.put(sCurNGram, ((Double)hTokenAppearence.get(sCurNGram)).doubleValue() + 1.0);
+				if (hTokenAppearance.containsKey(sCurNGram))
+					hTokenAppearance.put(sCurNGram, (hTokenAppearance.get(sCurNGram)).doubleValue() + 1.0);
 				else
-					hTokenAppearence.put(sCurNGram, 1.0);
+					hTokenAppearance.put(sCurNGram, 1.0);
 
 			}
 		}
@@ -483,10 +491,10 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 				/* put all preceding neighbours to an array */
 				String[] aFinalNeighbours = new String[PrecedingNeighbours.size()];
 				PrecedingNeighbours.toArray(aFinalNeighbours);
-				
+
 				/* create edges to connect preceding neighbours to current ngram */
 				createEdgesConnecting(gGraph, sCurNGram, Arrays.asList(aFinalNeighbours), 
-						hTokenAppearence);
+						hTokenAppearance);
 
 				/* add the currently examined N-Gram to the preceding neighbours */
 				PrecedingNeighbours.add(sCurNGram);
@@ -494,23 +502,23 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 				/* has preceding neighbours exceeded window length? */
 				if (PrecedingNeighbours.size() > CorrelationWindow)
 					PrecedingNeighbours.removeElementAt(0);
-					// Remove first element
+				// Remove first element
 			}
 		}        
 	}
 
-	/***
-	 *Merges the data of [dgOtherGraph] document graph to the data of this graph, 
-	 *by adding all existing edges and moving the values of those existing in both graphs
-	 *towards the new graph values based on a tendency modifier. 
-	 *The convergence tendency towards the starting value or the new value is determined 
-	 *by [fWeightPercent]. 
-	 *@param dgOtherGraph The second graph used for the merging
-	 *@param fWeightPercent The convergence tendency parameter. A value of 0.0 
+	/**
+	 * Merges the data of [dgOtherGraph] document graph to the data of this graph, 
+	 * by adding all existing edges and moving the values of those existing in both graphs
+	 * towards the new graph values based on a tendency modifier. 
+	 * The convergence tendency towards the starting value or the new value is determined 
+	 * by [fWeightPercent]. 
+	 * @param dgOtherGraph The second graph used for the merging
+	 * @param fWeightPercent The convergence tendency parameter. A value of 0.0 
 	 * means no change to existing value, 1.0 means new value is the same as 
 	 * that of the new graph. A value of 0.5 means new value is exactly between 
 	 * the old and new value (average).
-	 ***/
+	 */
 	public void mergeGraph(NGramJGraph dgOtherGraph, double fWeightPercent) {
 		// If both graphs are the same, ignore merging.
 		if (dgOtherGraph == this)
@@ -531,10 +539,10 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 				String sHead = weCurItem.getSourceLabel();
 				String sTail = weCurItem.getTargetLabel();
 				double dWeight = weCurItem.edgeWeight();
-				
+
 				lOtherNodes.clear();
 				lOtherNodes.add(sTail);
-				
+
 				// TODO: Check this
 				createWeightedEdgesConnecting(gGraph, sHead,
 						lOtherNodes, dWeight, dWeight, fWeightPercent);
@@ -542,7 +550,13 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 		}
 	}
 
-
+	/**
+	 * Computes the intersection of the graph with another graph.
+	 *
+	 * @param dgOtherGraph the graph to be intersected with
+	 * @return the graph resulting from the intersection of the
+	 * two graphs
+	 */
 	public NGramJGraph intersectGraph(NGramJGraph dgOtherGraph) {
 		// Init res graph
 		NGramJGraph gRes = new NGramJGraph(MinSize, MaxSize, CorrelationWindow);
@@ -569,13 +583,13 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 				Edge eEdge = ecl.locateEdgeInGraph(gGraph, vHead, vTail);
 				if (eEdge != null) {
 					try {
-						List l = new ArrayList();
+						List<String> l = new ArrayList<String>();
 						l.add(vTail.getLabel());
 
 						double dTargetWeight = 0.5 * (curWeight + eEdge.edgeWeight());
 						createWeightedEdgesConnecting(gNewGraph, 
-										vHead.getLabel(), l, 
-										dTargetWeight, dTargetWeight, 1.0);
+								vHead.getLabel(), l, 
+								dTargetWeight, dTargetWeight, 1.0);
 					}
 					catch (Exception ex) {
 						ex.printStackTrace();
@@ -586,10 +600,11 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 		return gRes;
 	}
 
-	/** Returns the difference (inverse of the intersection) graph between the current graph 
+	/** 
+	 * Returns the difference (inverse of the intersection) graph between the current graph 
 	 * and a given graph.
-	 *@param dgOtherGraph The graph to compare to.
-	 *@return A NGramJGraph that is the difference between the current graph and the given graph.
+	 * @param dgOtherGraph The graph to compare to.
+	 * @return A NGramJGraph that is the difference between the current graph and the given graph.
 	 */
 	public NGramJGraph inverseIntersectGraph(NGramJGraph dgOtherGraph) {
 
@@ -617,10 +632,10 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 			{
 				// If the edge is contained in the merged graph
 				Edge eEdge = eclLocator.locateDirectedEdgeInGraph(gUnion,
-									gIntersection.getEdgeSource(weCurItem),
-									gIntersection.getEdgeTarget(weCurItem));
-									
-				
+						gIntersection.getEdgeSource(weCurItem),
+						gIntersection.getEdgeTarget(weCurItem));
+
+
 				if (eEdge != null) {
 					try {
 						gUnion.removeEdge(eEdge);
@@ -637,10 +652,11 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 
 	}
 
-	/** Returns both the intersection and the difference (inverse of the intersection)
+	/** 
+	 * Returns both the intersection and the difference (inverse of the intersection)
 	 * graph between the current graph and a given graph.
-	 *@param dgOtherGraph The graph to use for intersection and difference.
-	 *@return A DocumentNGramDistroGraph array of two elements. The first is the intersection between
+	 * @param dgOtherGraph The graph to use for intersection and difference.
+	 * @return A DocumentNGramDistroGraph array of two elements. The first is the intersection between
 	 * the current graph and the given graph and the second is the difference of the graphs.
 	 * The edge distributions are kept from the original graphs.
 	 */
@@ -657,8 +673,6 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 			dgUnion = (NGramJGraph)clone();
 			dgUnion.merge(dgOtherGraph, 0);
 		}
-
-
 
 		NGramJGraph[] res = new NGramJGraph[2];
 
@@ -680,11 +694,11 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 				continue;
 
 			for (Edge weCurItem: gIntersection.edgeSet()) {
-				
+
 				// If the edge is contained in the merged graph
 				Edge eEdge = eclLocator.locateDirectedEdgeInGraph(gUnion,
-										gIntersection.getEdgeSource(weCurItem),
-										gIntersection.getEdgeTarget(weCurItem));
+						gIntersection.getEdgeSource(weCurItem),
+						gIntersection.getEdgeTarget(weCurItem));
 				if (eEdge != null) {
 					try {
 						gUnion.removeEdge(eEdge);
@@ -713,12 +727,13 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 		return CorrelationWindow;
 	}
 
-	/***
+	/**
 	 * Returns a functions of [element graph edges max],[number of neighbours], where
 	 * [element graph edges max] refers to the maximum weight of the edges including [sNode],
 	 * and [number of neightbours] is its number of neighbours in the graph.
-	 *@param sNode The node object the Coexistence Importance of which we calculate
-	 ***/
+	 *
+	 * @param sNode The node object the Coexistence Importance of which we calculate
+	 */
 	public double calcCoexistenceImportance(String sNode) {
 		NGramVertex v = new NGramVertex(sNode);
 
@@ -739,7 +754,7 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 				Set<Edge> lEdges = gCurLevel.edgesOf(vNode);
 				int iTempNeighbours = lEdges.size();
 				iNoOfNeighbours = utils.max(iTempNeighbours, iNoOfNeighbours);
-				
+
 				for (Edge weEdge: lEdges) {
 					double dWeight = weEdge.edgeWeight();
 					dMaxEdgeWeight = utils.max(dWeight, dMaxEdgeWeight);
@@ -775,19 +790,21 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 					gCurLevel.removeVertex(vCur);
 				}
 				catch (Exception e) {
-				// Ignore
+					// nonfatal, continue
+					e.printStackTrace();
 				}
 			}
 		}        
 	}
 
-	/***
-	 *Removes an item (node) from all graphs.
-	 *@param sItem The item to remove.
-	 ***/
+	/**
+	 * Removes an item (node) from all graphs.
+	 *
+	 * @param sItem The label of the node to remove.
+	 */
 	public void deleteItem(String sItem) {
 		// From all levels
-		for (int iNGramSize=MinSize; iNGramSize <= MaxSize; iNGramSize++) {
+		for (int iNGramSize = MinSize; iNGramSize <= MaxSize; iNGramSize++) {
 			UniqueJVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
 			// Vertex v = utils.locateVertexInGraph(gCurLevel, sItem);
 			JVertex v = null;
@@ -828,53 +845,63 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 		createGraphs(); // Update graphs        
 	}
 
+	/**
+	 * Simple getter for the graph's data string
+	 *
+	 * @return the data string represented by the graph
+	 */
 	public String getDataString() {
 		return DataString;
 	}
 
-	// Serialization
+	/**
+	 * Serializes the object.
+	 */
 	private void writeObject(ObjectOutputStream out)
 		throws IOException {
-			
-			// Write Fields
-			out.writeInt(MinSize);
-			out.writeInt(MaxSize);
-			out.writeInt(CorrelationWindow);
-			out.writeObject(DataString);
 
-			// Save all graphs on all levels
-			// For each graph
-			for (int iCnt=MinSize; iCnt <= MaxSize; iCnt++) {
-				out.writeObject(getGraphLevelByNGramSize(iCnt));
-			}
-			// Update degradationn
-			out.writeObject(DegradedEdges);
+		// Write Fields
+		out.writeInt(MinSize);
+		out.writeInt(MaxSize);
+		out.writeInt(CorrelationWindow);
+		out.writeObject(DataString);
+
+		// Save all graphs on all levels
+		// For each graph
+		for (int iCnt = MinSize; iCnt <= MaxSize; iCnt++) {
+			out.writeObject(getGraphLevelByNGramSize(iCnt));
 		}
+		// Update degradationn
+		out.writeObject(DegradedEdges);
+	}
 
+	/**
+	 * Reads a serialized object
+	 */
+	@SuppressWarnings("unchecked")
 	private void readObject(ObjectInputStream in)
-		throws IOException, ClassNotFoundException {
-			try {
-				// Read Fields
-				MinSize = in.readInt();
-				MaxSize = in.readInt();
-				CorrelationWindow = in.readInt();
-				DataString = (String)in.readObject();
+	throws IOException, ClassNotFoundException {
+	try {
+		// Read Fields
+		MinSize = in.readInt();
+		MaxSize = in.readInt();
+		CorrelationWindow = in.readInt();
+		DataString = (String)in.readObject();
 
-				// Create array of graphs
-				NGramGraphArray = new UniqueJVertexGraph[MaxSize - MinSize + 1];
-				// For each graph
-				for (int iCnt=MinSize; iCnt <= MaxSize; iCnt++) {
-					UniqueJVertexGraph g = (UniqueJVertexGraph)in.readObject();
-					this.NGramGraphArray[iCnt - MinSize] = 
-						(UniqueJVertexGraph)in.readObject();
-				}
-				// Load degradation
-				DegradedEdges = (HashMap)in.readObject();
-
-			} catch (Exception e) {
-				throw new IOException(e.getMessage());
-			}
+		// Create array of graphs
+		NGramGraphArray = new UniqueJVertexGraph[MaxSize - MinSize + 1];
+		// For each graph
+		for (int iCnt=MinSize; iCnt <= MaxSize; iCnt++) {
+			this.NGramGraphArray[iCnt - MinSize] = 
+				(UniqueJVertexGraph)in.readObject();
 		}
+		// Load degradation
+		DegradedEdges = (HashMap<Edge, Double>)in.readObject();
+
+	} catch (Exception e) {
+		throw new IOException(e.getMessage());
+	}
+	}
 
 	public void degrade(NGramJGraph dgOtherGraph) {
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
@@ -890,15 +917,15 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 				JVertex vHead = gOtherGraph.getEdgeSource(weCurItem);
 				JVertex vTail = gOtherGraph.getEdgeTarget(weCurItem);
 				Edge eEdge = gGraph.getEdge(vHead, vTail);
-				
+
 				if (eEdge != null)
 					try
 					{
 						if (DegradedEdges.containsKey(eEdge))
 							DegradedEdges.put(eEdge,
-									((Double)DegradedEdges.get(eEdge)).doubleValue() + 1);
+									(DegradedEdges.get(eEdge)).doubleValue() + 1);
 						else
-							DegradedEdges.put(eEdge, (double)1.0);
+							DegradedEdges.put(eEdge, 1.0);
 					}
 				catch (Exception e)
 				{
@@ -909,14 +936,21 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 		}        
 	}
 
-	public double degredationDegree(Edge e) {
+	/**
+	 * Returns the degradation degree of a specified edge.
+	 *
+	 * @param e the edge whose degradation degree is requested
+	 * @return the degradation degree of the edge, or 0 if it
+	 * is not degraded
+	 */
+	public double degradationDegree(Edge e) {
 		if (DegradedEdges.containsKey(e))
-			return ((Double)DegradedEdges.get(e)).doubleValue();
+			return (DegradedEdges.get(e)).doubleValue();
 		else
 			return 0;
 	}
 
-	public String toCooccurenceText(Map mCooccurenceMap) {
+	public String toCooccurenceText(Map<String, String> mCooccurenceMap) {
 		StringBuffer sb = new StringBuffer();
 		// For every graph level
 		for (int iCnt=MinSize; iCnt <= MaxSize; iCnt++) {
@@ -927,11 +961,11 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 				// If the edge is already in the map
 				if (mCooccurenceMap.containsKey(eCur.toString()))
 					// Get its ID
-					sCooccurenceID = (String)mCooccurenceMap.get(((Edge)eCur).toString());
+					sCooccurenceID = mCooccurenceMap.get(eCur.toString());
 				else {
 					// else create a new ID based on current time and put it in the map.
 					sCooccurenceID = String.valueOf(mCooccurenceMap.size() + 1);
-					mCooccurenceMap.put(((Edge)eCur).toString(), sCooccurenceID);
+					mCooccurenceMap.put(eCur.toString(), sCooccurenceID);
 				}
 
 				// Add the ID as many times as the co-occurences
@@ -945,19 +979,11 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 		return sb.toString();
 	}
 
-	public static void main(String args[]) {
-		NGramJGraph ngs = new NGramJGraph(3,3,2);
-		ngs.setDataString("abcdef");
-		//ngs.setDataString("This is");
-
-		System.out.println(jutils.graphToDot(ngs.getGraphLevel(0), true));
-	}
-
 	@Override
 	public Object clone() {
 		NGramJGraph gRes = new NGramJGraph(MinSize, MaxSize, CorrelationWindow);
 		gRes.DataString = DataString;
-		gRes.DegradedEdges = new HashMap(this.DegradedEdges);
+		gRes.DegradedEdges = new HashMap<Edge, Double>(this.DegradedEdges);
 		gRes.NGramGraphArray = new UniqueJVertexGraph[this.NGramGraphArray.length];
 		int iCnt=0;
 		for (UniqueJVertexGraph uCur : this.NGramGraphArray)
@@ -971,11 +997,12 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 		mergeGraph(dgOtherObject, fWeightPercent);
 	}
 
-	/** Returns all edges not existent in another graph. 
-	 *@param dgOtherGraph The graph to use for intersection and difference.
-	 *@return A NGramJGraph containing all edges from this graph not existing in the
+	/** 
+	 * Returns all edges not existent in another graph. 
+	 * @param dgOtherGraph The graph to use for intersection and difference.
+	 * @return A NGramJGraph containing all edges from this graph not existing in the
 	 * other given graph (edge distros are not used).
-	 * The edge distributions are kept from this graphs.
+	 * The edge distributions are kept from this graph.
 	 */
 	public NGramJGraph allNotIn(NGramJGraph dgOtherGraph) {
 		// TODO: Order by edge count for optimization
@@ -997,13 +1024,11 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 					eclLocator.locateDirectedEdgeInGraph(gOtherGraphLevel,
 							gCloneLevel.getEdgeSource(weCurItem),
 							gCloneLevel.getEdgeTarget(weCurItem));
-				
+
 				if (eEdge != null)
 					try {
 						gCloneLevel.removeEdge(weCurItem);
 						eclLocator.resetCache();
-						// Refresh edge iterator
-						// iIter = gCloneLevel.edgeSet().iterator();
 					} catch (Exception ex) {
 						// Non-lethal exception. Continue.
 						ex.printStackTrace();
@@ -1011,10 +1036,6 @@ public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGr
 			}
 		}
 
-		// DEBUG LINES
-		//System.err.println(String.format("(%s) Cache success: %4.3f", 
-		//        this.getClass().getName(), eclLocator.getSuccessRatio()));
-		//////////////
 		return dgClone;
 	}
 
