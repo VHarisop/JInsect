@@ -1,6 +1,5 @@
 package gr.demokritos.iit.jinsect.documentModel.representations;
 
-import gr.demokritos.iit.jinsect.structs.UniqueJVertexGraph;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,9 +70,6 @@ public final class GraphUtils {
 
 		/* create a base graph, store the intersection of all graphs in it */
 		NGramJGraph nggBase = (NGramJGraph) graphs[0].clone();
-		for (UniqueJVertexGraph uvg: nggBase.NGramGraphArray) {
-			assert(uvg != null) : "Graph was null!";
-		}
 		for (int index = 1; index < graphs.length; ++index) {
 			nggBase = nggBase.intersectGraph(graphs[index]);
 		}

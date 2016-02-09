@@ -47,5 +47,25 @@ public class NGramTest
 			ex.printStackTrace();
 			assertTrue(false); // fail
 		}
-	}	
+	}
+	
+	/**
+	 * Make sure the array version of {@link GraphUtils}'s methods does not
+	 * return nulls.
+	 */
+	public void testUtils() {
+		String fPath = "/testFile01.txt";
+		assertNotNull("Test file missing", getClass().getResource(fPath));
+		try {
+			File res = new File(getClass().getResource(fPath).toURI());
+			NGramJGraph[] ngrams = NGramJGraph.fromFileLines(res);
+			assertNotNull(ngrams);
+			assertTrue(GraphUtils.removeNoise(ngrams).length == 10);
+			assertNotNull(GraphUtils.mergeGraphs(ngrams));
+		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+			assertTrue(false);
+		}
+	}
 }
