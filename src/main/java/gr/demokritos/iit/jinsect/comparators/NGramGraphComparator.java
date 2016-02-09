@@ -65,8 +65,8 @@ public class NGramGraphComparator {
 				}
 
 				double degradation = utils.min(
-							ngA.degredationDegree(e), 
-							ngB.degredationDegree(eFound));
+						ngA.degradationDegree(e),
+						ngB.degradationDegree(eFound));
 
 				// update containment similarity
 				gSimLevel.ContainmentSimilarity += 
@@ -78,8 +78,8 @@ public class NGramGraphComparator {
 				// update value similarity
 				gSimLevel.ValueSimilarity += 
 					(utils.min(wA, wB) / utils.max(wA, wB)) /
-					(maxEdges * utils.max(1.0 , ngA.degredationDegree(e) + 
-										  ngB.degredationDegree(eFound)));
+					(maxEdges * utils.max(1.0 , ngA.degradationDegree(e) + 
+										  ngB.degradationDegree(eFound)));
 			}
 			// update size similarity 
 			gSimLevel.SizeSimilarity += minEdges / utils.max(maxEdges, 1.0);
