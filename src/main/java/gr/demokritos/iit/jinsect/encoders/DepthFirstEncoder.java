@@ -1,12 +1,8 @@
 package gr.demokritos.iit.jinsect.encoders;
 
-import java.lang.UnsupportedOperationException;
 import java.util.*;
 
 import gr.demokritos.iit.jinsect.structs.*;
-
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
 
 public class DepthFirstEncoder 
 extends BaseGraphEncoder implements GraphEncoding {

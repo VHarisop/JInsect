@@ -3,22 +3,12 @@ package gr.demokritos.iit.jinsect.encoders;
 import java.lang.UnsupportedOperationException;
 import java.util.*;
 
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
-
 import gr.demokritos.iit.jinsect.structs.Edge;
 import gr.demokritos.iit.jinsect.structs.JVertex;
 import gr.demokritos.iit.jinsect.structs.UniqueJVertexGraph;
 
 public class CanonicalCoder 
 extends BaseGraphEncoder implements GraphEncoding, Iterable<String> {
-
-	// 2 strings, one for each pass
-	private String fwdEncodedString = "";
-	private String bwdEncodedString = "";
-
-	// default separator for DFS coding
-	private String SEPARATOR = "";
 
 	/**
 	 * Initializes only the unvisited set with a tree set structure that
@@ -164,7 +154,7 @@ extends BaseGraphEncoder implements GraphEncoding, Iterable<String> {
 			private int curInd = 0;
 			private int finalInd = unvisited.size(); // size of treemap
 			
-			private Deque<JVertex> alrSeen = new ArrayDeque();
+			private Deque<JVertex> alrSeen = new ArrayDeque<JVertex>();
 			private Iterator<JVertex> fwdIter = unvisited.iterator();
 
 			@Override
