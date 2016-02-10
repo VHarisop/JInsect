@@ -1,9 +1,7 @@
 package gr.demokritos.iit.jinsect.structs;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
@@ -27,9 +25,23 @@ import java.util.TreeMap;
  */
 public class EdgeCachedJLocator {
 	protected int CacheMaxSize;
-	protected HashMap<String, TreeMap> Cache;
-	protected TreeMap CacheAccess;
-	protected HashMap ElementAccessTime;
+
+	/**
+	 * A string - to - map cache that maps vertex labels to
+	 * their edge mappings.
+	 */
+	protected HashMap<String, TreeMap<String, Edge>> Cache;
+
+	/**
+	 * A time - to - string mapping that maps access time to vertex labels.
+	 */
+	protected TreeMap<Long, String> CacheAccess;
+
+	/**
+	 * A string - to - time mapping that maps vertex labels to access times.
+	 */
+	protected HashMap<String, Long> ElementAccessTime;
+
 	protected long TimeCnt = Long.MIN_VALUE;
 	protected long lHits = 0, lMisses = 0;
 
@@ -40,9 +52,9 @@ public class EdgeCachedJLocator {
 	public EdgeCachedJLocator(int iCacheMaxSize) {
 		CacheMaxSize = iCacheMaxSize;
 
-		Cache = new HashMap<String, TreeMap>();
-		CacheAccess = new TreeMap();
-		ElementAccessTime = new HashMap();
+		Cache = new HashMap<String, TreeMap<String, Edge>>();
+		CacheAccess = new TreeMap<Long, String>();
+		ElementAccessTime = new HashMap<String, Long>();
 	}
 
 	/** 
@@ -54,7 +66,11 @@ public class EdgeCachedJLocator {
 	 * @param vTail A vertex with the desired label for the tail of the edge.
 	 * @return The edge, if found, otherwise null.
 	 */
-	public final Edge locateDirectedEdgeInGraph(UniqueJVertexGraph gGraph, JVertex vHead, JVertex vTail) {
+	public final Edge locateDirectedEdgeInGraph(
+			UniqueJVertexGraph gGraph,
+			JVertex vHead,
+			JVertex vTail) 
+	{
 		Edge eRes = null;
 
 		/* get the vertices */
@@ -63,13 +79,7 @@ public class EdgeCachedJLocator {
 		if ((vHead == null) || (vTail == null))
 			return null;
 
-		vHead = locateVertexInGraph(gGraph, vHead);
-		if (vHead == null)
-			return null;
-		vTail = locateVertexInGraph(gGraph, vTail);
-		if (vTail == null)
-			return null;
-
+		/* get their labels */
 		String sHead = vHead.getLabel();
 		String sTail = vTail.getLabel();
 
@@ -89,7 +99,7 @@ public class EdgeCachedJLocator {
 				resetCache();
 			}
 
-			hOutVertices = new TreeMap();
+			hOutVertices = new TreeMap<String, Edge>();
 			// cache all outgoing edges and vertices
 			for (Edge e : sEdges) {
 				hOutVertices.put(e.getTargetLabel(), e);
@@ -119,8 +129,8 @@ public class EdgeCachedJLocator {
 			// Keep doing the following
 			while (true) {
 				// Check if the oldest element has been reused
-				String sVertexLabel = (String)CacheAccess.get(CacheAccess.firstKey());
-				if ((Long)ElementAccessTime.get(sVertexLabel) > (Long)CacheAccess.firstKey())
+				String sVertexLabel = CacheAccess.get(CacheAccess.firstKey());
+				if (ElementAccessTime.get(sVertexLabel) > CacheAccess.firstKey())
 				{
 					// If it has, remove the older time reference
 					CacheAccess.remove(CacheAccess.firstKey());
@@ -176,9 +186,9 @@ public class EdgeCachedJLocator {
 	 * @return A list of outgoing edges from <code>vHead</code>. If no such edges exist returns an
 	 * empty list.
 	 */
-	public final List getOutgoingEdges(UniqueJVertexGraph gGraph, JVertex vHead) {
+	public final List<Edge> getOutgoingEdges(UniqueJVertexGraph gGraph, JVertex vHead) {
 		JVertex vNode = gGraph.locateVertex(vHead.getLabel());
-		ArrayList lRes = new ArrayList();
+		ArrayList<Edge> lRes = new ArrayList<Edge>();
 		if (vNode != null) {
 
 			List<JVertex> neighbours = gGraph.getAdjacentVertices(vNode);
@@ -188,15 +198,13 @@ public class EdgeCachedJLocator {
 				if (eCur != null)
 					lRes.add(eCur);
 			}
-
-			return lRes;
 		}
-		else {
-			return new ArrayList();
-		}
+		return lRes;
 	}    
 
-	/** Clears the cache. */
+	/** 
+	 * Clears the cache of the locator.
+	 */
 	public void resetCache() {
 		Cache.clear();
 		ElementAccessTime.clear();
@@ -205,20 +213,25 @@ public class EdgeCachedJLocator {
 		TimeCnt = Long.MIN_VALUE;
 	}
 
-	/**Updates cache as needed, if the edges of any vertex already contained within the cache are changed.
-	 *@param e The new edge.
+	/**
+	 * Updates the cache if the edges of any vertex already contained
+	 * within the cache are changed.
+	 *
+	 * @param e the new edge
 	 */
 	public void addedEdge(Edge e) {
 		// Check cache
-		TreeMap hOutVertices = Cache.get(e.getSourceLabel());
+		TreeMap<String, Edge> hOutVertices = Cache.get(e.getSourceLabel());
 		if (hOutVertices == null)
 			return; // Not cached
 		else
 			hOutVertices.put(e.getTargetLabel(), e); // Update cache
 	}
 
-	/** Returns the success ratio of the cache.
-	 *@return The ratio of hits (number of hits / number of total cache accesses) of the cache.
+	/** 
+	 * Returns the success ratio of the cache, which is the ratio of the number
+	 * of hits over the number of cache accesses.
+	 * @return the ratio of hits.
 	 */
 	public double getSuccessRatio() {
 		return (double)lHits / (lHits + lMisses);

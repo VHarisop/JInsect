@@ -4,8 +4,11 @@ import java.util.Objects;
 import org.jgrapht.graph.*;
 
 /**
- * Simple alias class for DefaultWeightedEdge in order 
- * to keep compatibility unbroken.
+ * Simple proxy class for DefaultWeightedEdge in order 
+ * to keep compatibility with JGraphT and provide a few
+ * custom methods.
+ *
+ * @author VHarisop
  */
 public class Edge extends DefaultWeightedEdge
 {
@@ -26,7 +29,7 @@ public class Edge extends DefaultWeightedEdge
 	
 	/**
 	 * Simple getter for the label of the source object.
-	 * @return a <tt>String</tt> representing the source object.
+	 * @return the source object's label
 	 */
 	public String getSourceLabel() {
 		return String.valueOf(getSource());
@@ -34,7 +37,7 @@ public class Edge extends DefaultWeightedEdge
 	
 	/**
 	 * Simple getter for the label of the target object.
-	 * @return a <tt>String</tt> representing the target object.
+	 * @return the label that the target object represents
 	 */
 	public String getTargetLabel() {
 		return String.valueOf(getTarget());
@@ -45,7 +48,8 @@ public class Edge extends DefaultWeightedEdge
 	 * source and target labels connected via an arrow showing
 	 * the edge's direction. 
 	 * 
-	 * @return a string with the edge labels
+	 * @return a string with the edge labels and an arrow indicating
+	 * the orientation of the edge
 	 */
 	public String getLabels() {
 		return getSourceLabel() + "->" + getTargetLabel();
@@ -59,6 +63,10 @@ public class Edge extends DefaultWeightedEdge
 		return super.getWeight();
 	}
 
+	/**
+	 * Override superclass string representation by adding info for
+	 * the edge's weight in square brackets.
+	 */
 	@Override 
 	public String toString() {
 		return super.toString() + "[" + String.valueOf(getWeight()) + "]";
@@ -69,6 +77,12 @@ public class Edge extends DefaultWeightedEdge
 		return Objects.hash(getSource(), getTarget());
 	}
 
+	/**
+	 * In JInsect's scope, two edges are considered equal if they connect
+	 * the same vertices and have the same orientation. It is useful not to
+	 * include the weights in this method, since it makes some retrieval tasks
+	 * easier using java classes like HashMap / TreeMap.
+	 */
 	@Override
 	public boolean equals(Object oOther) {
 		if (!(oOther instanceof Edge)) 

@@ -3,7 +3,7 @@ package gr.demokritos.iit.jinsect.structs;
 import java.util.Objects;
 
 /**
- * Simple class implementing {@link Vertex} for n-grams.
+ * Simple class implementing {@link JVertex} for n-grams.
  * The label is the ngram itself, which is provided by the
  * default constructor.
  *
@@ -24,10 +24,20 @@ public class NGramVertex implements JVertex {
 		label = ngram;
 	}
 
+	/**
+	 * Simple getter for the vertex's label.
+	 *
+	 * @return the label of the vertex
+	 */
 	public String getLabel() {
 		return label;
 	}
 
+	/**
+	 * Assigns a new label to the vertex.
+	 *
+	 * @param newLabel the new label
+	 */
 	public void setLabel(String newLabel) {
 		label = newLabel;
 	}
@@ -48,7 +58,6 @@ public class NGramVertex implements JVertex {
 		
 		//If other object is an instance of NGramVertex,
 		//their labels are used for comparison
-		 
 		return this.getLabel().equals(((NGramVertex) o).getLabel());
 
 	}
