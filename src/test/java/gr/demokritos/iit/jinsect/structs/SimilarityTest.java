@@ -98,10 +98,10 @@ public class SimilarityTest
 		addEdge(uvgB, "D", "A", 3.0);
 		addEdge(uvgB, "D", "B", 2.0);
 
-		double dgA = uvgA.getDegreeRangeCode(vCoder),
-			   dgB = uvgB.getDegreeRangeCode(vCoder);
+		double dgA = uvgA.getWeightRangeCode(vCoder),
+			   dgB = uvgB.getWeightRangeCode(vCoder);
 
-		double sim = jutils.getDegreeRangeSimilarity(uvgA, uvgB, vCoder);
+		double sim = jutils.getWeightRangeSimilarity(uvgA, uvgB, vCoder);
 		assertEquals(sim, dgA - dgB, 0.0001);
 	}
 

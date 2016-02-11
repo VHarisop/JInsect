@@ -61,7 +61,7 @@ public class DegreeRangeTest
 		addEdge(uvg, "C", "B", 3.0);
 
 		// create a new calculator on this object
-		DegreeRangeCalculator drc = new DegreeRangeCalculator(uvg);
+		WeightRangeCalculator drc = new WeightRangeCalculator(uvg);
 		double[] degs;
 
 		// degree ranges of A 
