@@ -23,9 +23,9 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 {
 
 	/**
-	 * A {@link VertexEntropy} object to encode the vertices of the graph.
+	 * A {@link EntropyCalculator} object to encode the vertices of the graph.
 	 */
-	public VertexEntropy entropyCalc;
+	public EntropyCalculator entropyCalc;
 
 	/**
 	 * A {@link DegreeVarianceCalculator} that operates on the vertices
@@ -40,9 +40,9 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	public PerVertexVarianceCalculator perVertexVarCalc;
 
 	/**
-	 * A {@link DegreeRangeCalculator} that operates on this graph's vertices.
+	 * A {@link WeightRangeCalculator} that operates on this graph's vertices.
 	 */
-	public DegreeRangeCalculator degreeRangeCalc;
+	public WeightRangeCalculator degreeRangeCalc;
 
 	static final long serialVersionUID = 1L;
     public HashMap<String, JVertex> UniqueVertices;
@@ -374,36 +374,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		/* get the total variance */
 		return degreeVarCalc.getWeightVariance();
 	}
-
-	/**
-	 * Calculates the degree range code, which is defined as the sum 
-	 * of the graph's vertex code + degree ranges. These are the quantities
-	 * <tt>(v_code + max(v_inweight) - min(v_inweight)) * 
-	 * (v_code + max(v_outweight) - min(v_outweight)) </tt> where the 
-	 * <tt>v_code</tt> quantities are supplied by a {@link VertexCoder} 
-	 * and a {@link VertexEntropy}.
-	 *
-	 * @param vWt the vertex coder to use
-	 * @return the sum of degree range codes
-	 */
-	public double getDegreeRangeCode(VertexCoder vwMap) {
-		if (degreeRangeCalc == null || entropyCalc == null) {
-			degreeRangeCalc = new DegreeRangeCalculator(this);
-			entropyCalc = new VertexEntropy().withGraph(this);
-		}
-		
-		double sum = 0; double[] ranges; double vW;
-		for (JVertex v: this.vertexSet()) {
-			ranges = degreeRangeCalc.getDegrees(v.getLabel());
-			vW = vwMap.getLabel(v.getLabel());
-			double weight = entropyCalc.getEntropy(v.getLabel()) + vW;
-
-			sum += (weight + ranges[0]) * (weight + ranges[1]);
-		}
-
-		return sum;
-	}
-
+	
 	/**
 	 * Calculates the degree variance of the graph's vertices
 	 * as computed by {@link #degreeVarCalc}.
@@ -420,6 +391,36 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	}
 
 	/**
+	 * Calculates the vertex weight range code, which is defined as the sum 
+	 * of the graph's vertex code + weight ranges. These are the quantities
+	 * <tt>(v_code + max(v_inweight) - min(v_inweight)) * 
+	 * (v_code + max(v_outweight) - min(v_outweight)) </tt> where the 
+	 * <tt>v_code</tt> quantities are supplied by a {@link VertexCoder} 
+	 * and a {@link VertexEntropy}.
+	 *
+	 * @param vWt the vertex coder to use
+	 * @return the sum of weight range codes
+	 */
+	public double getWeightRangeCode(VertexCoder vwMap) {
+		if (degreeRangeCalc == null || entropyCalc == null) {
+			degreeRangeCalc = new WeightRangeCalculator(this);
+			entropyCalc = new EntropyCalculator(this);
+		}
+		
+		double sum = 0; double[] ranges; double vW;
+		for (JVertex v: this.vertexSet()) {
+			ranges = degreeRangeCalc.getDegrees(v.getLabel());
+			vW = vwMap.getLabel(v.getLabel());
+			double weight = entropyCalc.getEntropy(v.getLabel()) + vW;
+
+			sum += (weight + ranges[0]) * (weight + ranges[1]);
+		}
+
+		return sum;
+	}
+
+
+	/**
 	 * Gets the sum of the vertex entropy for the vertices
 	 * of this graph. 
 	 *
@@ -427,19 +428,9 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 */
 	public double getTotalVertexEntropy() {
 		if (entropyCalc == null) {
-			entropyCalc = (new VertexEntropy()).
-				withGraph(this);
-			/* put all labels to the entropy object */
-			for (JVertex vCurr: this.vertexSet()) {
-				entropyCalc.putLabel(vCurr);
-			}
+			entropyCalc = new EntropyCalculator(this);
 		}
-		
-		double sum = 0;
-		for (JVertex vCurr : this.vertexSet()) {
-			sum += entropyCalc.getEntropy(vCurr);
-		}
-		return sum;
+		return entropyCalc.getTotalVertexEntropy();
 	}
 
 	/**
@@ -452,7 +443,6 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		if (perVertexVarCalc == null) {
 			perVertexVarCalc = new PerVertexVarianceCalculator(this);
 		}
-
 		/* get the total var diff */
 		return perVertexVarCalc.getTotalVarianceRatios();
 	}

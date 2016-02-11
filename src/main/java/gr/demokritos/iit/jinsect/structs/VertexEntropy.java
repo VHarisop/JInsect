@@ -133,6 +133,15 @@ public class VertexEntropy extends HashMap<String, Double> {
 	}
 
 	/**
+	 * Simple getter for the graph this object operates on.
+	 *
+	 * @return the underlying UniqueJVertexGraph
+	 */
+	public UniqueJVertexGraph getGraph() {
+		return this.uvg;
+	}
+
+	/**
 	 * Returns the weight associated with the label of a vertex.
 	 *
 	 * @param v the vertex for which the weight is requested

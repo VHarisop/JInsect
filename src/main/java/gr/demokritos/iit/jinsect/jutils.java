@@ -42,21 +42,21 @@ public final class jutils {
 	}
 
 	/**
-	 * Returns the degree range similarity between two graphs based on a map
-	 * of label - weight entries that provides the factors for the smoothened
-	 * degree - range quantities.
+	 * Returns the vertex weight range similarity between two graphs based on a
+	 * map of label - weight entries that provides the factors for the smoothened
+	 * weight - range quantities.
 	 *
 	 * @param gA the first graph
 	 * @param gB the second graph
 	 * @param vWeights the map of label - weight entries
-	 * @return the degree range similarity between the 2 graphs
+	 * @return the weight range similarity between the 2 graphs
 	 */
-	public static double getDegreeRangeSimilarity(
+	public static double getWeightRangeSimilarity(
 			UniqueJVertexGraph gA,
 			UniqueJVertexGraph gB,
 			VertexCoder vWeights)
 	{
-		return gA.getDegreeRangeCode(vWeights) - gB.getDegreeRangeCode(vWeights);
+		return gA.getWeightRangeCode(vWeights) - gB.getWeightRangeCode(vWeights);
 	}
 
 

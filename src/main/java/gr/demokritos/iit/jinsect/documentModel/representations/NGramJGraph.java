@@ -34,7 +34,9 @@ import gr.demokritos.iit.jinsect.utils;
  *
  * @author PCKid
  */
-public class NGramJGraph implements Serializable, Cloneable, IMergeable<NGramJGraph> {
+public class NGramJGraph 
+implements Serializable, Cloneable, IMergeable<NGramJGraph>, NGramGraph
+{
 
 	static final long serialVersionUID = 1L;
 

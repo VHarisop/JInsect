@@ -4,7 +4,11 @@ import gr.demokritos.iit.jinsect.structs.*;
 import java.util.HashMap;
 import java.util.Set;
 
-public class DegreeRangeCalculator {
+/**
+ * A calculator that computes the incoming and outgoing edge weight range
+ * for the vertices of a {@link UniqueJVertexGraph}. 
+ */
+public class WeightRangeCalculator {
 	/**
 	 * A mapping of vertex labels to in-degree ranges.
 	 */
@@ -26,7 +30,7 @@ public class DegreeRangeCalculator {
 	 *
 	 * @param uvg the graph to operate on
 	 */
-	public DegreeRangeCalculator(UniqueJVertexGraph uvg) {
+	public WeightRangeCalculator(UniqueJVertexGraph uvg) {
 		this.uvGraph = uvg;
 
 		/* initialize new mappings with initial capacity equal
@@ -34,14 +38,18 @@ public class DegreeRangeCalculator {
 		inWeightMap = new HashMap<String, Double>(uvg.vertexSet().size());
 		outWeightMap = new HashMap<String, Double>(uvg.vertexSet().size());
 
-		/* populate the maps */
+		/* Always populate the maps, or else calls to getDegree will 
+		 * return wrong results! */
 		populateMaps();
 	}
 
 	/**
 	 * Utility function that calculates and returns the range
 	 * of the incoming and outgoing edges. The return value 
-	 * is double containing [inRange, outRange]
+	 * is a double containing [inRange, outRange].
+	 *
+	 * @param JVertex the vertex to compute the range for
+	 * @return an array containing the incoming and outgoing ranges
 	 */
 	private double[] calculateRange(JVertex vCurr) {
 		// get both edge sets
@@ -67,6 +75,7 @@ public class DegreeRangeCalculator {
 			}
 		}
 
+		/* find maximum and minimum weight for incoming edges */
 		if (inEdges.size() == 0) {
 			maxIn = minIn = 0.0;
 		}
@@ -88,7 +97,7 @@ public class DegreeRangeCalculator {
 	}
 
 	/**
-	 * Calculates the in and out degree ranges for all vertices
+	 * Calculates the in and out weight ranges for all vertices
 	 * and stores them in their respective hash maps to enable 
 	 * efficient retrieval. 
 	 */
