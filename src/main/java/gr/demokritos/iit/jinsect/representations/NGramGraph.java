@@ -1,4 +1,4 @@
-package gr.demokritos.iit.jinsect.documentModel.representations;
+package gr.demokritos.iit.jinsect.representations;
 
 import gr.demokritos.iit.jinsect.structs.UniqueJVertexGraph;
 import gr.demokritos.iit.jinsect.structs.Edge;

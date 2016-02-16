@@ -1,4 +1,4 @@
-package gr.demokritos.iit.jinsect.documentModel.representations;
+package gr.demokritos.iit.jinsect.representations;
 
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -240,7 +240,7 @@ public class NGramGaussJGraph extends NGramJGraph {
 		// For every edge
 		while (iIter.hasNext())
 		{
-			JVertex vB = new NGramVertex((String)iIter.next());
+			JVertex vB = new NGramVertex(iIter.next());
 
 			double dOldWeight = 0;
 			double dNewWeight = 0;

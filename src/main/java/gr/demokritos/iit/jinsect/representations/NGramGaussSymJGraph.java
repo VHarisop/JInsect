@@ -1,17 +1,11 @@
-package gr.demokritos.iit.jinsect.documentModel.representations;
+package gr.demokritos.iit.jinsect.representations;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
-import gr.demokritos.iit.jinsect.structs.EdgeCachedJLocator;
-import gr.demokritos.iit.jinsect.structs.Edge;
-import gr.demokritos.iit.jinsect.structs.UniqueJVertexGraph;
-import gr.demokritos.iit.jinsect.structs.JVertex;
-import gr.demokritos.iit.jinsect.structs.NGramVertex;
-import gr.demokritos.iit.jinsect.utils;
-import gr.demokritos.iit.jinsect.jutils;
+import gr.demokritos.iit.jinsect.structs.*;
 
 
 /**
@@ -21,8 +15,13 @@ import gr.demokritos.iit.jinsect.jutils;
  */
 public class NGramGaussSymJGraph extends NGramGaussJGraph {
 
-    static final double Visibility = 3.0; // The width of the actual window, as a factor over the
-                                          // given window
+	static final long serialVersionUID = 1L;
+
+	/**
+	 * The width of the actual window, as a factor over the given window
+	 */
+    static final double Visibility = 3.0;
+
     /** 
 	 * Creates a new instance of NGramGaussSymJGraph 
 	 * using the default parameters.
@@ -84,7 +83,8 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
         
         int iLen = DataString.length();
         // Create token histogram.
-        HashMap hTokenAppearence = new HashMap();
+        HashMap<String, Double> hTokenAppearence =
+			new HashMap<String, Double>();
         // 1st pass. Populate histogram.
         ///////////////////////////////
         // For all sizes create corresponding levels
@@ -97,7 +97,7 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
             
             // The String has a size of at least [iNGramSize]
             String sCurNGram = null;
-            LinkedList lNGramSequence = new LinkedList();
+            LinkedList<String> lNGramSequence = new LinkedList<String>();
             UniqueJVertexGraph gGraph = getGraphLevelByNGramSize(iNGramSize);
             
             for (int iCurStart = 0; iCurStart < iLen; iCurStart++)
@@ -108,11 +108,14 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
                     break;
                 
                 // Get n-gram                
-                sCurNGram = sUsableString.substring(iCurStart, iCurStart + iNGramSize);
+                sCurNGram = 
+					sUsableString.substring(iCurStart, iCurStart + iNGramSize);
                 
                 // Update Histogram
                 if (hTokenAppearence.containsKey(sCurNGram))
-                    hTokenAppearence.put(sCurNGram, ((Double)hTokenAppearence.get(sCurNGram)).doubleValue() + 1.0);
+                    hTokenAppearence.put(
+						sCurNGram,
+						(hTokenAppearence.get(sCurNGram)).doubleValue() + 1.0);
                 else
                     hTokenAppearence.put(sCurNGram, 1.0);
                 
@@ -121,11 +124,18 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
                 // Update graph
                 int iListSize = lNGramSequence.size();
                 int iTo = (iListSize - 1) >= 0 ? iListSize - 1 : 0;
-                int iFrom = (iListSize - (int)(CorrelationWindow * Visibility) - 1) >= 0 ? 
-                    iListSize - (int)(CorrelationWindow * Visibility) - 1 : 0;
-                createSymEdgesConnecting(gGraph, sCurNGram, 
-                        gr.demokritos.iit.jinsect.utils.reverseList(lNGramSequence.subList(iFrom, iTo)), hTokenAppearence);
-                
+				int iTemp = iListSize - (int)(CorrelationWindow * Visibility);
+                int iFrom = iTemp - 1 >= 0 ? iTemp - 1 : 0;
+
+				List<String> revList = 
+					new LinkedList<String>(lNGramSequence.subList(iFrom, iTo));
+				Collections.reverse(revList);
+
+                createSymEdgesConnecting(
+						gGraph,
+						sCurNGram,
+                        revList,
+						hTokenAppearence);
             }
         }
     }
@@ -141,8 +151,11 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
      * based on distance from the <code>sStartNode</code>.
      *@param hAppearenceHistogram The histogram of appearences of the terms
     ***/
-    public void createSymEdgesConnecting(UniqueJVertexGraph gGraph, String sStartNode, List lOtherNodes,
-            HashMap hAppearenceHistogram) {
+    public void createSymEdgesConnecting(
+			UniqueJVertexGraph gGraph,
+			String sStartNode,
+			List<String> lOtherNodes,
+            HashMap<String, Double> hAppearenceHistogram) {
         double dStartWeight = 0;
         double dIncreaseWeight = 0;
         
@@ -163,7 +176,7 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
             }
         
         // Otherwise for every neighbour add edge
-        Iterator iIter = lOtherNodes.iterator();
+        Iterator<String> iIter = lOtherNodes.iterator();
         
         // Locate source node
 		JVertex vOldA = gGraph.locateVertex(sStartNode);
@@ -269,8 +282,11 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
      *@param lOtherNodes The list of nodes to which sBaseNode is connected
      *@param hAppearenceHistogram The histogram of appearences of the terms
     ***/
-    public void createEdgesConnecting(UniqueJVertexGraph gGraph, String sStartNode, List lOtherNodes,
-            HashMap hAppearenceHistogram) {
+    public void createEdgesConnecting(
+			UniqueJVertexGraph gGraph,
+			String sStartNode, 
+			List<String> lOtherNodes,
+            HashMap<String, Double> hAppearenceHistogram) {
         double dStartWeight = 0;
         double dIncreaseWeight = 0;
         
@@ -291,7 +307,7 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
             }
         
         // Otherwise for every neighbour add edge
-        Iterator iIter = lOtherNodes.iterator();
+        Iterator<String> iIter = lOtherNodes.iterator();
         
         // Locate source node
         JVertex vOldA = gGraph.locateVertex(sStartNode);
@@ -320,7 +336,7 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
         // For every edge
         while (iIter.hasNext())
         {
-			JVertex vB = new NGramVertex((String)iIter.next());
+			JVertex vB = new NGramVertex(iIter.next());
             
             double dOldWeight = 0;
             double dNewWeight = 0;
@@ -330,7 +346,8 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
             
 			if (eclLocator == null)
                 eclLocator = new EdgeCachedJLocator(10);
-            Edge weCorrectEdge = eclLocator.locateDirectedEdgeInGraph(gGraph, vA, vB);
+            Edge weCorrectEdge = 
+				eclLocator.locateDirectedEdgeInGraph(gGraph, vA, vB);
             
             if (weCorrectEdge == null)
                 // Not found. Using Start weight
