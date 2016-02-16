@@ -1,6 +1,6 @@
 package gr.demokritos.iit.jinsect.comparators;
 
-import gr.demokritos.iit.jinsect.documentModel.representations.NGramJGraph;
+import gr.demokritos.iit.jinsect.representations.NGramJGraph;
 import gr.demokritos.iit.jinsect.structs.*;
 import gr.demokritos.iit.jinsect.jutils;
 import gr.demokritos.iit.jinsect.utils;

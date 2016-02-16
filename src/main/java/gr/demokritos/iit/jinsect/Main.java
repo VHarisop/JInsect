@@ -1,6 +1,6 @@
 package gr.demokritos.iit.jinsect;
 
-import gr.demokritos.iit.jinsect.documentModel.representations.NGramJGraph;
+import gr.demokritos.iit.jinsect.representations.NGramJGraph;
 
 class Main {
 	

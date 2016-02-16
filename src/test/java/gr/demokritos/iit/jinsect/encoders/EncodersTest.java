@@ -8,8 +8,8 @@ import org.jgrapht.traverse.*;
 import org.jgrapht.*;
 import org.jgrapht.graph.*;
 
-import gr.demokritos.iit.jinsect.documentModel.representations.NGramJGraph;
-import gr.demokritos.iit.jinsect.documentModel.representations.NGramSymJGraph;
+import gr.demokritos.iit.jinsect.representations.NGramJGraph;
+import gr.demokritos.iit.jinsect.representations.NGramSymJGraph;
 import gr.demokritos.iit.jinsect.structs.*;
 import gr.demokritos.iit.jinsect.jutils;
 import gr.demokritos.iit.jinsect.utils;

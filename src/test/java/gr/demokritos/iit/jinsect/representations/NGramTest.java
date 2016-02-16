@@ -1,4 +1,4 @@
-package gr.demokritos.iit.jinsect.documentModel.representations;
+package gr.demokritos.iit.jinsect.representations;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

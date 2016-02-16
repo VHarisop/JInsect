@@ -6,7 +6,7 @@ import junit.framework.TestSuite;
 
 import java.lang.Math;
 
-import gr.demokritos.iit.jinsect.documentModel.representations.NGramJGraph;
+import gr.demokritos.iit.jinsect.representations.NGramJGraph;
 import gr.demokritos.iit.jinsect.jutils;
 
 
