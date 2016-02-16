@@ -58,16 +58,7 @@ public final class OrderedWeightComparator
 			}
 			else {
 				return sA.substring(0, 1).compareTo(sB.substring(0, 1));
-				/* char cA = sA.charAt(0), cB = sB.charAt(0);
-				if (cA < cB) 
-					return -1;
-				else if (cA == cB)
-					return 0;
-				else // cA > cB 
-					return 1;
-
 				// return sA.compareTo(sB);
-				*/
 			}
 		} while (true);
 	}

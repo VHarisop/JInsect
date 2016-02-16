@@ -74,11 +74,12 @@ public class OrderedWeightCalculator {
 	}
 
 	/**
-	 * Returns the sorted list of ordered vertex - weight pairs.
+	 * Returns the sorted list of ordered vertex - weight pairs in a
+	 * non modifiable view.
 	 *
-	 * @return the sorted list of pairs
+	 * @return an unmodifiable sorted list of pairs
 	 */
 	public List<Pair<JVertex, Double>> getOrderedPairs() {
-		return orderedPairs;
+		return Collections.unmodifiableList(orderedPairs);
 	}
 }
