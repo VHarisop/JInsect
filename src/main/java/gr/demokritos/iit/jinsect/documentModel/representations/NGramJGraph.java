@@ -35,7 +35,7 @@ import gr.demokritos.iit.jinsect.utils;
  * @author PCKid
  */
 public class NGramJGraph 
-implements Serializable, Cloneable, IMergeable<NGramJGraph>, NGramGraph
+implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 {
 
 	static final long serialVersionUID = 1L;
@@ -510,25 +510,29 @@ implements Serializable, Cloneable, IMergeable<NGramJGraph>, NGramGraph
 	}
 
 	/**
-	 * Merges the data of [dgOtherGraph] document graph to the data of this graph, 
-	 * by adding all existing edges and moving the values of those existing in both graphs
-	 * towards the new graph values based on a tendency modifier. 
-	 * The convergence tendency towards the starting value or the new value is determined 
-	 * by [fWeightPercent]. 
+	 * Merges the data of [dgOtherGraph] document graph to the data of this
+	 * graph by adding all existing edges and moving the values of those
+	 * existing in both graphs towards the new graph values based on a tendency
+	 * modifier. 
+	 * The convergence tendency towards the starting value or the new value
+	 * is determined by [fWeightPercent]. 
 	 * @param dgOtherGraph The second graph used for the merging
 	 * @param fWeightPercent The convergence tendency parameter. A value of 0.0 
 	 * means no change to existing value, 1.0 means new value is the same as 
 	 * that of the new graph. A value of 0.5 means new value is exactly between 
 	 * the old and new value (average).
 	 */
-	public void mergeGraph(NGramJGraph dgOtherGraph, double fWeightPercent) {
+	public void mergeGraph(NGramGraph dgOtherGraph, double fWeightPercent) {
 		// If both graphs are the same, ignore merging.
 		if (dgOtherGraph == this)
 			return;
 
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
-			UniqueJVertexGraph gGraph = getGraphLevelByNGramSize(iCurLvl);
-			UniqueJVertexGraph gOtherGraph = dgOtherGraph.getGraphLevelByNGramSize(iCurLvl);
+			UniqueJVertexGraph gGraph =
+				getGraphLevelByNGramSize(iCurLvl);
+			UniqueJVertexGraph gOtherGraph =
+				dgOtherGraph.getGraphLevelByNGramSize(iCurLvl);
+
 			// Check if other graph has corresponding level
 			if (gOtherGraph == null)
 				// If not, ignore level
@@ -559,7 +563,7 @@ implements Serializable, Cloneable, IMergeable<NGramJGraph>, NGramGraph
 	 * @return the graph resulting from the intersection of the
 	 * two graphs
 	 */
-	public NGramJGraph intersectGraph(NGramJGraph dgOtherGraph) {
+	public NGramGraph intersectGraph(NGramGraph dgOtherGraph) {
 		// Init res graph
 		NGramJGraph gRes = new NGramJGraph(MinSize, MaxSize, CorrelationWindow);
 
@@ -588,7 +592,9 @@ implements Serializable, Cloneable, IMergeable<NGramJGraph>, NGramGraph
 						List<String> l = new ArrayList<String>();
 						l.add(vTail.getLabel());
 
-						double dTargetWeight = 0.5 * (curWeight + eEdge.edgeWeight());
+						double dTargetWeight = 
+							0.5 * (curWeight + eEdge.edgeWeight());
+
 						createWeightedEdgesConnecting(gNewGraph, 
 								vHead.getLabel(), l, 
 								dTargetWeight, dTargetWeight, 1.0);
@@ -603,24 +609,29 @@ implements Serializable, Cloneable, IMergeable<NGramJGraph>, NGramGraph
 	}
 
 	/** 
-	 * Returns the difference (inverse of the intersection) graph between the current graph 
-	 * and a given graph.
+	 * Returns the difference (inverse of the intersection) graph between
+	 * the current graph and a given graph.
 	 * @param dgOtherGraph The graph to compare to.
 	 * @return A NGramJGraph that is the difference between the current graph and the given graph.
 	 */
-	public NGramJGraph inverseIntersectGraph(NGramJGraph dgOtherGraph) {
+	public NGramGraph inverseIntersectGraph(NGramGraph dgOtherGraph) {
 
 		// Get the union (merged) graph
 		NGramJGraph dgUnion = (NGramJGraph)clone();
 		dgUnion.mergeGraph(dgOtherGraph, 0);
 
 		// Get the intersection graph
-		NGramJGraph dgIntersection = intersectGraph(dgOtherGraph);
+		NGramGraph dgIntersection = intersectGraph(dgOtherGraph);
 
 		// For every level
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
-			UniqueJVertexGraph gUnion = dgUnion.getGraphLevelByNGramSize(iCurLvl);
-			UniqueJVertexGraph gIntersection = dgIntersection.getGraphLevelByNGramSize(iCurLvl);
+			/* get union and intersection graphs for the
+			 * current n-gram level */
+			UniqueJVertexGraph gUnion = 
+				dgUnion.getGraphLevelByNGramSize(iCurLvl);
+			UniqueJVertexGraph gIntersection = 
+				dgIntersection.getGraphLevelByNGramSize(iCurLvl);
+
 			// TODO: Order by edge count for optimization
 			EdgeCachedJLocator eclLocator = new EdgeCachedJLocator(10);
 
@@ -655,38 +666,39 @@ implements Serializable, Cloneable, IMergeable<NGramJGraph>, NGramGraph
 	}
 
 	/** 
-	 * Returns both the intersection and the difference (inverse of the intersection)
-	 * graph between the current graph and a given graph.
+	 * Returns both the intersection and the difference (inverse of the
+	 * intersection) graph between the current graph and a given graph.
 	 * @param dgOtherGraph The graph to use for intersection and difference.
-	 * @return A DocumentNGramDistroGraph array of two elements. The first is the intersection between
-	 * the current graph and the given graph and the second is the difference of the graphs.
-	 * The edge distributions are kept from the original graphs.
+	 * @return An array of two elements. The first is the intersection between
+	 * the current graph and the given graph and the second is the difference
+	 * of the graphs. The edge distributions are kept from the original graphs.
 	 */
-	public NGramJGraph[] intersectAndDeltaGraph(NGramJGraph dgOtherGraph) {
-
-		NGramJGraph dgUnion = null;
-		// Initialize union using the biggest graph
-		// and get the union (merged) graph
+	public NGramGraph[] intersectAndDeltaGraph(NGramGraph dgOtherGraph) {
+		NGramGraph dgUnion = null;
+		// Initialize union using the biggest graph and get the merged one
 		if (dgOtherGraph.length() > length()) {
-			dgUnion = (NGramJGraph)dgOtherGraph.clone();
+			dgUnion = (NGramGraph) dgOtherGraph.clone();
 			dgUnion.merge(this, 0);
 		}
 		else {
-			dgUnion = (NGramJGraph)clone();
+			dgUnion = (NGramGraph) clone();
 			dgUnion.merge(dgOtherGraph, 0);
 		}
 
-		NGramJGraph[] res = new NGramJGraph[2];
+		NGramGraph[] res = new NGramGraph[2];
 
 		// Get the intersection graph
-		NGramJGraph dgIntersection = intersectGraph(dgOtherGraph);
+		NGramGraph dgIntersection = intersectGraph(dgOtherGraph);
 		res[0] = dgIntersection;
 
 		// For every level
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
-			UniqueJVertexGraph gUnion = dgUnion.getGraphLevelByNGramSize(iCurLvl);
+			/* get union and intersection graph for each n-gram level */
+			UniqueJVertexGraph gUnion = 
+				dgUnion.getGraphLevelByNGramSize(iCurLvl);
 			UniqueJVertexGraph gIntersection =
 				dgIntersection.getGraphLevelByNGramSize(iCurLvl);
+
 			// TODO: Order by edge count for optimization
 			EdgeCachedJLocator eclLocator = new EdgeCachedJLocator(100);
 
@@ -742,6 +754,12 @@ implements Serializable, Cloneable, IMergeable<NGramJGraph>, NGramGraph
 		return calcCoexistenceImportance(v);
 	}
 
+	/**
+	 * Calculates the coexistence importance of a vertex in the graph.
+	 *
+	 * @param vNode the vertex to calculate coexistence importance for
+	 * @return the vertex' coexistence importance
+	 */
 	public double calcCoexistenceImportance(JVertex vNode) {
 		double dRes = 0.0;
 
@@ -768,14 +786,21 @@ implements Serializable, Cloneable, IMergeable<NGramJGraph>, NGramGraph
 		dRes = -200000.0; // Very low value
 		if (dMaxEdgeWeight > 0) {
 			if (iNoOfNeighbours > 0)
-				dRes = Math.log10(Math.pow(2 * dMaxEdgeWeight, 2.5) / Math.max(1.0, Math.pow(iNoOfNeighbours / 2, 2)));
+				dRes = Math.log10(Math.pow(2 * dMaxEdgeWeight, 2.5) /
+					Math.max(1.0, Math.pow(iNoOfNeighbours / 2, 2)));
 			else
 				dRes = Math.log10(Math.pow(2 * dMaxEdgeWeight, 2.5));                
 		}
-
 		return dRes;
 	}
 
+	/**
+	 * Prunes vertices from the graph based on a coexistence importance
+	 * threshold - vertices with coexistence importance below that threshold
+	 * are removed.
+	 *
+	 * @param dMinCoexistenceImportance the minimum coexistence importance
+	 */
 	public void prune(double dMinCoexistenceImportance) {
 		for (int iNGramSize=MinSize; iNGramSize <= MaxSize; iNGramSize++) {
 			UniqueJVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
@@ -982,11 +1007,13 @@ implements Serializable, Cloneable, IMergeable<NGramJGraph>, NGramGraph
 	}
 
 	@Override
-	public Object clone() {
+	public NGramGraph clone() {
 		NGramJGraph gRes = new NGramJGraph(MinSize, MaxSize, CorrelationWindow);
 		gRes.DataString = DataString;
-		gRes.DegradedEdges = new HashMap<Edge, Double>(this.DegradedEdges);
-		gRes.NGramGraphArray = new UniqueJVertexGraph[this.NGramGraphArray.length];
+		gRes.DegradedEdges = 
+			new HashMap<Edge, Double>(this.DegradedEdges);
+		gRes.NGramGraphArray = 
+			new UniqueJVertexGraph[this.NGramGraphArray.length];
 		int iCnt=0;
 		for (UniqueJVertexGraph uCur : this.NGramGraphArray)
 			gRes.NGramGraphArray[iCnt++] = (UniqueJVertexGraph)uCur.clone();
@@ -994,28 +1021,35 @@ implements Serializable, Cloneable, IMergeable<NGramJGraph>, NGramGraph
 		return gRes;
 	}
 
-	/** See the <i>mergeGraph</i> member for details. Implements the merge interface. */
-	public void merge(NGramJGraph dgOtherObject, double fWeightPercent) {
+	/** 
+	 * See the <i>mergeGraph</i> member for details. 
+	 * Implements the merge interface.
+	 */
+	public void merge(NGramGraph dgOtherObject, double fWeightPercent) {
 		mergeGraph(dgOtherObject, fWeightPercent);
 	}
 
 	/** 
 	 * Returns all edges not existent in another graph. 
 	 * @param dgOtherGraph The graph to use for intersection and difference.
-	 * @return A NGramJGraph containing all edges from this graph not existing in the
-	 * other given graph (edge distros are not used).
+	 * @return A NGramJGraph containing all edges from this graph
+	 * not existing in the other given graph (edge distros are not used).
 	 * The edge distributions are kept from this graph.
 	 */
-	public NGramJGraph allNotIn(NGramJGraph dgOtherGraph) {
+	public NGramGraph allNotIn(NGramGraph dgOtherGraph) {
 		// TODO: Order by edge count for optimization
 		EdgeCachedJLocator eclLocator = new EdgeCachedJLocator(Math.max(length(),
 					dgOtherGraph.length()));
 		// Clone this graph
-		NGramJGraph dgClone = (NGramJGraph)clone();
+		NGramGraph dgClone = (NGramGraph)clone();
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
-			UniqueJVertexGraph gCloneLevel = dgClone.getGraphLevelByNGramSize(iCurLvl);
-			UniqueJVertexGraph gOtherGraphLevel = dgOtherGraph.getGraphLevelByNGramSize(iCurLvl);
-			// If this level does not exist in other graph, then keep it and continue.
+			UniqueJVertexGraph gCloneLevel = 
+				dgClone.getGraphLevelByNGramSize(iCurLvl);
+			UniqueJVertexGraph gOtherGraphLevel = 
+				dgOtherGraph.getGraphLevelByNGramSize(iCurLvl);
+
+			// If this level does not exist in other graph, then keep
+			// it and continue.
 			if (gOtherGraphLevel == null)
 				continue;
 
@@ -1027,7 +1061,7 @@ implements Serializable, Cloneable, IMergeable<NGramJGraph>, NGramGraph
 							gCloneLevel.getEdgeSource(weCurItem),
 							gCloneLevel.getEdgeTarget(weCurItem));
 
-				if (eEdge != null)
+				if (eEdge != null) {
 					try {
 						gCloneLevel.removeEdge(weCurItem);
 						eclLocator.resetCache();
@@ -1035,6 +1069,7 @@ implements Serializable, Cloneable, IMergeable<NGramJGraph>, NGramGraph
 						// Non-lethal exception. Continue.
 						ex.printStackTrace();
 					}
+				}
 			}
 		}
 

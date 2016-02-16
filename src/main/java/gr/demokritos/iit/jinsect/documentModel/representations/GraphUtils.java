@@ -25,13 +25,13 @@ public final class GraphUtils {
 	 * @param toMerge the array of graphs to merge
 	 * @return the graph that results from merging all graphs in the array
 	 */
-	public static NGramJGraph mergeGraphs(NGramJGraph[] toMerge) {
+	public static NGramGraph mergeGraphs(NGramGraph[] toMerge) {
 		if (toMerge.length == 0) 
 			return null;
 
 		/* make a shallow copy of the first graph to be used
 		 * as a basis for merging */
-		NGramJGraph nggInit = (NGramJGraph) toMerge[0].clone();
+		NGramGraph nggInit = (NGramGraph) toMerge[0].clone();
 		double lr = 0.5;
 		for (int index = 1; index < toMerge.length; ++index) {
 			/* update "learning" rate */
@@ -43,16 +43,16 @@ public final class GraphUtils {
 	}
 
 	/**
-	 * Merges a list of {@link NGramJGraph} objects.
-	 * @see #mergeGraphs(NGramJGraph[])
+	 * Merges a list of {@link NGramGraph} objects.
+	 * @see #mergeGraphs(NGramGraph[])
 	 */
-	public static NGramJGraph mergeGraphs(List<NGramJGraph> toMerge) {
+	public static NGramGraph mergeGraphs(List<NGramGraph> toMerge) {
 		if ((toMerge == null) || (toMerge.size() == 0)) {
 			return null;
 		}
 
 		/* proxy call to merge graphs with array parameter */
-		return mergeGraphs(toMerge.toArray(new NGramJGraph[toMerge.size()]));
+		return mergeGraphs(toMerge.toArray(new NGramGraph[toMerge.size()]));
 	}
 
 	/**
@@ -64,18 +64,18 @@ public final class GraphUtils {
 	 * @param graphs the array of graphs to be filtered
 	 * @return the array of noise-filtered graphs
 	 */
-	public static NGramJGraph[] removeNoise(NGramJGraph[] graphs) {
+	public static NGramGraph[] removeNoise(NGramGraph[] graphs) {
 		if (graphs.length == 0)
 			return null;
 
 		/* create a base graph, store the intersection of all graphs in it */
-		NGramJGraph nggBase = (NGramJGraph) graphs[0].clone();
+		NGramGraph nggBase = (NGramGraph) graphs[0].clone();
 		for (int index = 1; index < graphs.length; ++index) {
 			nggBase = nggBase.intersectGraph(graphs[index]);
 		}
 
 		/* create a new array, store the filtered versions there */
-		NGramJGraph[] filtered = new NGramJGraph[graphs.length];
+		NGramGraph[] filtered = new NGramGraph[graphs.length];
 		for (int index = 0; index < filtered.length; ++index) {
 			filtered[index] = graphs[index].allNotIn(nggBase);
 		}
@@ -84,7 +84,7 @@ public final class GraphUtils {
 	}
 
 	/**
-	 * Performs noise filtering on a list of {@link NGramJGraph} objects by
+	 * Performs noise filtering on a list of {@link NGramGraph} objects by
 	 * computing their intersection first and then applying the all-not-in 
 	 * operator on each graph of the initial list. Returns <tt>null</tt> if 
 	 * the list is empty or has zero size.
@@ -92,18 +92,18 @@ public final class GraphUtils {
 	 * @param graphs the list of graphs to be filtered
 	 * @return the list of noise-filtered graphs
 	 */
-	public static List<NGramJGraph> removeNoise(List<NGramJGraph> graphs) {
+	public static List<NGramGraph> removeNoise(List<NGramGraph> graphs) {
 		if ((graphs == null) || (graphs.size() == 0))
 			return null;
 
 		/* create a base graph and store the intersection of graphs in it */
-		NGramJGraph nggBase = (NGramJGraph) graphs.get(0).clone();
+		NGramGraph nggBase = (NGramGraph) graphs.get(0).clone();
 		for (int index = 1; index < graphs.size(); ++index) {
 			nggBase = nggBase.intersectGraph(graphs.get(index));
 		}
 
 		/* create a new list, store filtered versions there */
-		List<NGramJGraph> filtered = new ArrayList<NGramJGraph>(graphs.size());
+		List<NGramGraph> filtered = new ArrayList<NGramGraph>(graphs.size());
 		for (int index = 0; index < graphs.size(); ++index) {
 			filtered.add(index, graphs.get(index).allNotIn(nggBase));
 		}

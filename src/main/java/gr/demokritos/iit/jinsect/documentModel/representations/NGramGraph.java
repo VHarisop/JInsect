@@ -13,8 +13,7 @@ import java.util.HashSet;
  *
  * @author VHarisop
  */
-public interface NGramGraph {
-
+public interface NGramGraph extends Cloneable {
 	/**
 	 * Computes an indication of the size of an n-gram graph based on the
 	 * edge count of its contained graphs.
@@ -110,5 +109,67 @@ public interface NGramGraph {
 	 * @param sFilename the name of the file containing the data string
 	 */
 	public void loadDataStringFromFile(String sFilename)
-		throws IOException, FileNotFoundException; 
+		throws IOException, FileNotFoundException;
+
+	/**
+	 * Computes the intersection of the graph with another graph.
+	 *
+	 * @param otherGraph the graph to intersect with
+	 * @return the graph resulting from the intersection
+	 */
+	public NGramGraph intersectGraph(NGramGraph otherGraph);
+
+	/**
+	 * Returns the difference (inverse of the intersection) graph between
+	 * the current graph and another given graph.
+	 *
+	 * @param otherGraph the graph to compare against
+	 * @return a NGramGraph that is the difference between the current and
+	 * the given graph
+	 */
+	public NGramGraph inverseIntersectGraph(NGramGraph otherGraph);
+
+	/**
+	 * Returns both the intersection and difference (inverse of the intersection)
+	 * graph between the current graph and a given graph.
+	 *
+	 * @param otherGraph the graph to be used for intersection and difference
+	 * @return an array of two elements, of which the first is the intersection
+	 * graph and the second the difference of the two graphs.
+	 */
+	public NGramGraph[] intersectAndDeltaGraph(NGramGraph otherGraph);
+
+	/**
+	 * Merges the graph with another specified graph using a specified
+	 * tendency for weighting the merged edges.
+	 *
+	 * @param otherGraph the graph to merge with
+	 * @param weightPercent the weighing tendency
+	 */
+	public void merge(NGramGraph otherGraph, double weightPercent);
+
+	/**
+	 * Prunes the graph's vertices whose coexistence importance is below a
+	 * specified threshold.
+	 *
+	 * @param minCoexistenceImportance the coexistence importance threshold
+	 */
+	public void prune(double minCoexistenceImportance);
+
+	/**
+	 * Computes the graph that consists of all vertices and edges that are
+	 * not in another specified graph.
+	 *
+	 * @param otherGraph the other graph
+	 * @return the graph that consists of vertices and edges not in the other
+	 * graph
+	 */
+	public NGramGraph allNotIn(NGramGraph otherGraph);
+
+	/**
+	 * Creates a clone of this object.
+	 *
+	 * @return a clone of the object
+	 */
+	public NGramGraph clone();
 }
