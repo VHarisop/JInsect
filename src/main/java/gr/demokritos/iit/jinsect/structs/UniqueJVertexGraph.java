@@ -44,7 +44,16 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 */
 	public WeightRangeCalculator degreeRangeCalc;
 
+	/**
+	 * A {@link OrderedWeightCalculator} that operates on this graph's vertices.
+	 */
+	public OrderedWeightCalculator ordWeightCalc;
+
 	static final long serialVersionUID = 1L;
+
+	/**
+	 * A map of label to vertex correspondences for this graph.
+	 */
     public HashMap<String, JVertex> UniqueVertices;
 
 	/**
@@ -445,6 +454,19 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		}
 		/* get the total var diff */
 		return perVertexVarCalc.getTotalVarianceRatios();
+	}
+
+	/**
+	 * Calculates this graph's ordered (weight, vertex) pairs via
+	 * {@link #ordWeightCalc} and returns them to the caller.
+	 *
+	 * @return the list of ordered weight pairs of this graph
+	 */
+	public List<Pair<JVertex, Double>> getOrderedWeightPairs() {
+		if (null == ordWeightCalc) {
+			ordWeightCalc = new OrderedWeightCalculator(this);
+		}
+		return ordWeightCalc.getOrderedPairs();
 	}
 	  
 	@Override
