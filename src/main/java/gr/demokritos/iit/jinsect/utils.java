@@ -14,20 +14,20 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Hashtable;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import javax.swing.JFrame;
+
 import gr.demokritos.iit.jinsect.algorithms.nlp.PorterStemmer;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.TreeSet;
+
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.html.HTML.Tag;
 import javax.swing.text.html.HTMLEditorKit.ParserCallback;
@@ -40,37 +40,10 @@ import javax.swing.text.html.parser.ParserDelegator;
 public final class utils {
 	public static long Count = 0;
 	public static long Sum = 0;
-
-	/** Math.max reimplemented.
-	*/
-	public final static double max(double Num1, double Num2)
-	{
-		return (Num1 > Num2) ? Num1 : Num2;
-	}
-
-	public final static int max(int numA, int numB) {
-		return (numA > numB) ? numA : numB;
-	}
-
-	public final static int min(int numA, int numB) {
-		return (numA < numB) ? numA : numB;
-	}
-
-	/** Math.min reimplemented.
-	*/
-	public final static double min(double Num1, double Num2)
-	{
-		return -max(-Num1, -Num2);
-	}
-
-	/** Math.abs reimplemented.
-	*/
-	public final static double abs(double dNum) {
-		return (dNum > 0)?dNum:-dNum;
-	}
-
-	/** Testbench function. Not to be used.
-	*/
+	
+	/** 
+	 * Testbench function. Not to be used.
+	 */
 	public static void main(String[] args) throws Exception {
 		String[] s = "This is a test. 1 2 3 4-5.".split("(\\s|\\p{Punct})+");
 		List<String> alTest = Arrays.asList(s);
@@ -87,126 +60,91 @@ public final class utils {
 				(lMillis / 1000) % 60);
 	}
 
-	/** Repeatedly randomizes a given list.
+	/**
+	 * Repeatedly randomizes a given list.
 	 *
 	 * @param l The input list to randomize.
 	 * @param repeat The times to perform randomization. Higher values allow
 	 * more shuffling.
 	 */
-	public static final void shuffleList(List l, int repeat) {
+	public static final void shuffleList(List<?> l, int repeat) {
 		for (int iCnt = 0 ; iCnt < repeat; iCnt++)
 			shuffleList(l);
 	}
 
-	/** Randomizes the order of items in a given list.
-	 *@param l The input list that will be modified.
+	/**
+	 * Randomizes the order of items in a given list.
+	 * @param l The input list that will be modified.
 	 */
-	public static final void shuffleList(List l) {
-		// DEBUG LINES
-		// int iSwapCount = 0;
-		// double dSwapDistance = 0;
-		//////////////
-
+	public static final void shuffleList(List<?> l) {
 		Random d = new Random();
-
-		for (int iCnt = 0; iCnt < l.size() - 1; iCnt++) {
-			for (int iSwapPos = iCnt + 1; iSwapPos < l.size(); iSwapPos++) {
-				// Randomly
-				if (d.nextBoolean())
-				{
-					// Swap files
-					Object oTemp = l.get(iSwapPos);
-					l.set(iSwapPos, l.get(iCnt));
-					l.set(iCnt, oTemp);
-					continue;
-
-					// DEBUG LINES
-					// iSwapCount++;
-					// dSwapDistance = (dSwapDistance + Math.abs(iSwapPos - iCnt)) / 2;
-					//////////////
-				}            
-			}
-		}
-
-		// Reverse
-		for (int iCnt = l.size() - 1; iCnt > 0 ; iCnt--) {
-			for (int iSwapPos = iCnt - 1; iSwapPos > 0; iSwapPos--) {
-				// Randomly
-				if (d.nextBoolean())
-				{
-					// Swap files
-					Object oTemp = l.get(iSwapPos);
-					l.set(iSwapPos, l.get(iCnt));
-					l.set(iCnt, oTemp);
-
-					// DEBUG LINES
-					// iSwapCount++;
-					// dSwapDistance = (dSwapDistance + Math.abs(iSwapPos - iCnt)) / 2;
-					//////////////
-				}            
-			}
-		}
-
-		// DEBUG LINES
-		// System.out.println(String.format("Position Distance:%2.2f\tSwap Count:%d", dSwapDistance, iSwapCount));
-		/////////////
+		Collections.shuffle(l, d);
 	}
 
-	/** Splits a given string to its words, without stemming. Words are considered to be everything, 
-	 * but sequences of whitespace and punctuation.
-	 *@param sStr The input string.
-	 *@return An array of String containing the words of the given string.
+	/**Splits a given string to its words, without stemming. Words
+	 * are considered to be everything but sequences of whitespace
+	 * and punctuation.
+	 *
+	 * @param sStr The input string.
+	 * @return An array of String containing the words of the given string.
 	 */
 	public static final String[] splitToWords(String sStr) {
 		return splitToWords(sStr, false); // Do NOT stem
 	}
 
-	/** Splits a given string to its words, without stemming. Words are considered to be everything, 
-	 * but sequences of whitespace and punctuation.
-	 *@param sStr The input string.
-	 *@param bStem True if stemming should be performed to the input words, otherwise false.
-	 *@return An array of String containing the (possibly stemmed) words of the given string.
+	/**
+	 * Splits a given string to its words, without stemming. Words
+	 * are considered to be everything but sequences of whitespace
+	 * and punctuation.
+	 *
+	 * @param sStr The input string.
+	 * @param bStem True if stemming should be performed to the input words,
+	 * otherwise false.
+	 * @return An array of String containing the (possibly stemmed) words of the given string.
 	 */
 	public static final String[] splitToWords(String sStr, boolean bStem) {
 		PorterStemmer sStem = new PorterStemmer();
 		// Removed conversion to lowercase
 		//        String [] sRes = sStr.toLowerCase().split("(\\s|\\p{Punct})+");
 		String [] sRes = sStr.split("(\\s|\\p{Punct})+");
-		if (bStem)
-			for (int iCnt=0; iCnt < sRes.length; iCnt++)
+		if (bStem) {
+			for (int iCnt = 0; iCnt < sRes.length; iCnt++) {
 				if (!sRes[iCnt].trim().equals(""))
 					try {
 						sRes[iCnt] = sStem.stem(sRes[iCnt]);
 					}
-		catch (Exception e)
-		{
-			// Stem failed. Ignore.
-			// System.out.println("Word '" + sRes[iCnt] + "' could not be stemmed.");
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
 		}
 
 		return sRes;
 	}
 
-	/** Calculates the logarithm of a number using a given base.
-	 *@param dNumber The number whose logarithm is meant to be calculated.
-	 *@param dBase The base of the logarithm.
-	 *@return The logarithm base <code>dBase</code> of <code>dNumber</code>.
+	/**
+	 * Calculates the logarithm of a number using a given base.
+	 * @param dNumber The number whose logarithm is meant to be calculated.
+	 * @param dBase The base of the logarithm.
+	 * @return The logarithm base <tt>dBase</tt> of <tt>dNumber</tt>.
 	 */
 	public static final double logX(double dNumber, double dBase) {
-		return  Math.log(dNumber)/Math.log(dBase);
+		return Math.log(dNumber)/Math.log(dBase);
 	}
 
-	/** Creates a formatted string representation of an iterable object, sorting
+	/**
+	 * Creates a formatted string representation of an iterable object, sorting
 	 * the string representation of its parts at the output.
-	 *@param iIterable The iterable object.
-	 *@param sSeparator The separator to use for elements.
-	 *@return The ordered string representation of the iterable object.
+	 * @param iIterable The iterable object.
+	 * @param sSeparator The separator to use for elements.
+	 * @return The ordered string representation of the iterable object.
 	 */
-	public static final String printSortIterable(Iterable iIterable, 
-			String sSeparator) {
+	public static final String
+	printSortIterable(Iterable<?> iIterable, String sSeparator) {
 		// Init buffer
 		StringBuffer sOut = new StringBuffer();
-		Iterator iIter = iIterable.iterator();
+		Iterator<?> iIter = iIterable.iterator();
 		// Use treeset to sort
 		TreeSet<String> tsItems = new TreeSet<String>();
 		while (iIter.hasNext()) {
@@ -222,16 +160,18 @@ public final class utils {
 		return sOut.toString();
 	}
 
-	/** Creates a formatted string representation of an iterable
+	/**
+	 * Creates a formatted string representation of an iterable
 	 * object using a given separator.
-	 *@param iIterable The (possibly nested) iterable object.
-	 *@param sSeparator The separator to use for elements of the same level.
-	 *@return The string representation of the (possibly nested) iterable object.
+	 * @param iIterable The (possibly nested) iterable object.
+	 * @param sSeparator The separator to use for elements of the same level.
+	 * @return The string representation of the (possibly nested)
+	 * iterable object.
 	 */
-	public static final String printIterable(Iterable iIterable, String sSeparator) {
+	public static final String
+	printIterable(Iterable<?> iIterable, String sSeparator) {
 		StringBuffer sbRes = new StringBuffer();
-
-		Iterator iIter = iIterable.iterator();
+		Iterator<?> iIter = iIterable.iterator();
 		while (iIter.hasNext()) {
 			Object oNext = iIter.next();
 			sbRes.append(oNext.toString());
@@ -243,8 +183,9 @@ public final class utils {
 	}
 
 
-	/** Returns the system encoding String.
-	 *@return A String indicating the System default encoding.
+	/**
+	 * Returns the system encoding String.
+	 * @return A String indicating the System default encoding.
 	 */
 	public static String getSystemEncoding() {
 		String defaultEncoding = new InputStreamReader(
@@ -270,19 +211,22 @@ public final class utils {
 
 	}
 
-	/** The sign function.
-	 *@param dNum The input number.
-	 *@return 1 if the input number is positive, -1 if negative and zero otherwise.
+	/** 
+	 * The sign function.
+	 * @param dNum The input number.
+	 * @return 1 if the input number is positive, -1 if negative
+	 * and zero otherwise.
 	 */
 	public static double sign(double dNum) {
 		return dNum == 0.0 ? dNum : dNum / Math.abs(dNum);
 
 	}
 
-	/** Calculates the product of two lists.
-	 *@param oA The first list.
-	 *@param oB The second list.
-	 *@return The product of the elements of the two lists as a new list of lists.
+	/**
+	 * Calculates the product of two lists.
+	 * @param oA The first list.
+	 * @param oB The second list.
+	 * @return The product of the elements of the two lists as a new list of lists.
 	 */
 	private static final List getListProduct(Object oA, Object oB) {
 		// Join list of lists
@@ -331,8 +275,9 @@ public final class utils {
 		return (List)aRes;
 	}
 
-	/** Bubble-sorts an array of comparable items.
-	 *@param aArr An array of {@link Comparable} objects.
+	/**
+	 * Bubble-sorts an array of comparable items.
+	 * @param aArr An array of {@link Comparable} objects.
 	 */
 	public static final void bubbleSortArray(Comparable[] aArr) {
 		boolean bChanged = true;
@@ -352,17 +297,18 @@ public final class utils {
 	}
 
 	/**
-	 *Parses the command line expecting values of either
-	 *`-switch` or
-	 *`-key=value`
-	 *and returns corresponding {@link Hashtable}, with switches as keys
-	 *and `TRUE` as value, or `key` as keys and `value` as values
-	 *@param sCommands The command line array of Strings.
-	 *@return The described hashtable.
+	 * Parses the command line expecting values of either
+	 * `-switch` or
+	 * `-key=value`
+	 * and returns corresponding {@link Hashtable}, with switches as keys
+	 * and `TRUE` as value, or `key` as keys and `value` as values
+	 * @param sCommands The command line array of Strings.
+	 * @return The described hashtable.
 	 */
-	public static Hashtable parseCommandLineSwitches(String[] sCommands) {
-		Hashtable hRes = new Hashtable();
-		Iterator iStr = Arrays.asList(sCommands).iterator();
+	public static Hashtable<String, String>
+	parseCommandLineSwitches(String[] sCommands) {
+		Hashtable<String, String> hRes = new Hashtable<String, String>();
+		Iterator<String> iStr = Arrays.asList(sCommands).iterator();
 		while (iStr.hasNext()) {
 			String sToken = (String)iStr.next();
 			String sType, sVal;
@@ -370,36 +316,39 @@ public final class utils {
 				// Switch
 				if (sToken.contains("=")) {
 					// Parameter
-					sType = (sToken.split("=")[0]).substring(1); // Take part before '=' as key, omitting dash.
-					sVal = sToken.split("=")[1]; // Take part after '=' as value
+					// Part before '=' is key, omitting dash
+					sType = (sToken.split("=")[0]).substring(1);
+					// Part after '=' is value
+					sVal = sToken.split("=")[1];
 				}
 				else
 				{
-					// Simple switch
-					sType = sToken.substring(1); // Omit dash
+					// Simple switch. Omit dash
+					sType = sToken.substring(1);
 					sVal = "TRUE";
 				}
 
 				hRes.put(sType, sVal);
 			}
 		}
-
 		return hRes;
 	}
 
-	/** Given a {@link Hashtable} and a given option string, this function returns either the
-	 *option set in the hashtable, or a given default if the option has not been set.
-	 *@param hSwitches The hashtable of switches (see also <code>parseCommandLineSwitches</code>).
-	 *@param sOption The name of the option of interest.
-	 *@param sDefault The default value to be used if the option has not been set.
-	 *@return The value of the switch, or the default value if no value has been set.
+	/**
+	 * Given a {@link Hashtable} and a given option string, this function returns either the 
+	 * option set in the hashtable, or a given default if the option has not been set. 
+	 * @param hSwitches The hashtable of switches (see also <code>parseCommandLineSwitches</code>).
+	 * @param sOption The name of the option of interest.
+	 * @param sDefault The default value to be used if the option has not been set.
+	 * @return The value of the switch, or the default value if no value has been set.
 	 */
-	public static String getSwitch(Hashtable hSwitches, String sOption, String sDefault) {
-		Iterator iIter = hSwitches.keySet().iterator();
+	public static String
+	getSwitch(Hashtable<String, String> hSwitches, String sOption, String sDefault) {
+		Iterator<String> iIter = hSwitches.keySet().iterator();
 		while (iIter.hasNext()) {
-			String sCurSwitch = (String)iIter.next();
+			String sCurSwitch = iIter.next();
 			if (sCurSwitch.equals(sOption))
-				return (String)hSwitches.get(sCurSwitch);
+				return hSwitches.get(sCurSwitch);
 		}
 		return sDefault;
 	}
@@ -415,18 +364,24 @@ public final class utils {
 		return iRes;
 	}
 
-	public double getHistogramTotal(HashMap hHist) {
-		Iterator iIter = hHist.values().iterator();
+	/**
+	 * Gets the sum of the values in a histogram.
+	 *
+	 * @param the histogram to sum from
+	 * @return the sum of the histogram's values.
+	 */
+	public double getHistogramTotal(HashMap<?, Double> hHist) {
 		double dSum = 0.0;
-		while (iIter.hasNext()) {
-			dSum += ((Double)iIter.next()).doubleValue();
+		for (Double d: hHist.values()) {
+			dSum += d.doubleValue();
 		}
 		return dSum;
 	}    
 
-	/** Loads the contents of a file into a string, <i>without preserving newlines</i>. 
-	 *@param sFilename The filename of the file to load.
-	 *@return A String containing the contents of the given file.
+	/**
+	 * Loads the contents of a file into a string, <i>without preserving newlines</i>. 
+	 * @param sFilename The filename of the file to load.
+	 * @return A String containing the contents of the given file.
 	 */
 	public static String loadFileToString(String sFilename) {
 		StringBuffer sb = new StringBuffer();
@@ -445,9 +400,10 @@ public final class utils {
 		return sb.toString();
 	}
 
-	/** Loads the contents of a file into a string, <i>without preserving newlines</i>. 
-	 *@param sFilename The filename of the file to load.
-	 *@return A String containing the contents of the given file.
+	/**
+	 * Loads the contents of a file into a string, <i>without preserving newlines</i>. 
+	 * @param sFilename The filename of the file to load.
+	 * @return A String containing the contents of the given file.
 	 */
 	public static String loadFileToString(String sFilename, int iMaxLen) {
 		StringBuffer sb = new StringBuffer();
@@ -467,9 +423,10 @@ public final class utils {
 		return sb.toString();
 	}
 
-	/** Loads the contents of a file into a string, preserving newlines. 
-	 *@param sFilename The filename of the file to load.
-	 *@return A String containing the contents of the given file.
+	/**
+	 * Loads the contents of a file into a string, preserving newlines. 
+	 * @param sFilename The filename of the file to load.
+	 * @return A String containing the contents of the given file.
 	 */
 	public static String loadFileToStringWithNewlines(String sFilename) {
 		StringBuffer sb = new StringBuffer();
@@ -489,11 +446,12 @@ public final class utils {
 		return sb.toString();
 	}
 
-	/** Loads the contents of a set of files into a string, by calling repeatedly
+	/**
+	 * Loads the contents of a set of files into a string, by calling repeatedly
 	 * <code>loadFileToString</code>. Each file is separated from another by a 
 	 * zero character (char(0)).
-	 *@param ssFiles The set of string filenames to load.
-	 *@return A String containing the concatenation of the contents of the 
+	 * @param ssFiles The set of string filenames to load.
+	 * @return A String containing the concatenation of the contents of the 
 	 * given files.
 	 */
 	public static String loadFileSetToString(Set<String> ssFiles) {
@@ -505,12 +463,13 @@ public final class utils {
 		return sbRes.toString();
 	}
 
-	/** Loads the contents of a set of files into a string, by calling repeatedly
+	/**
+	 * Loads the contents of a set of files into a string, by calling repeatedly
 	 * the <code>loadFile</code> function of a {@link IFileLoader}. 
 	 * Each file is separated from another by a zero character (char(0)).
-	 *@param ssFiles The set of string filenames to load.
-	 *@param lLoader The loader to use for loading the files
-	 *@return A String containing the concatenation of the contents of the 
+	 * @param ssFiles The set of string filenames to load.
+	 * @param lLoader The loader to use for loading the files
+	 * @return A String containing the concatenation of the contents of the 
 	 * given files.
 	 */
 	public static String loadFileSetToString(Set<String> ssFiles, 
@@ -523,10 +482,11 @@ public final class utils {
 		return sbRes.toString();
 	}
 
-	/**Repeats a given string a specified number of times.
-	 *@param sStr The string to repeat.
-	 *@param iTimes The times to repeat the string.
-	 *@return A string containing the given string concatenated the specified number of times.
+	/**
+	 * Repeats a given string a specified number of times.
+	 * @param sStr The string to repeat.
+	 * @param iTimes The times to repeat the string.
+	 * @return A string containing the given string concatenated the specified number of times.
 	 */
 	public static final String repeatString(String sStr, int iTimes) {
 		StringBuffer sb = new StringBuffer();
@@ -536,18 +496,20 @@ public final class utils {
 		return sb.toString();
 	}
 
-	/** Returns the factorial <pre>1*2*...*(n-1)*n</pre>.
-	 *@param n The highest number of the factorial.
-	 *@return The factorial.
+	/**
+	 * Returns the factorial <pre>1*2*...*(n-1)*n</pre>.
+	 * @param n The highest number of the factorial.
+	 * @return The factorial.
 	 */
 	public static final double factorial(int n) {
 		return factorial(1, n);
 	}
 
-	/** Returns the factorial <pre>m*(m+1)*...*(n-1)*n</pre>.
-	 *@param m The lowest number of the factorial.
-	 *@param n The highest number of the factorial.
-	 *@return The factorial.
+	/**
+	 * Returns the factorial <pre>m*(m+1)*...*(n-1)*n</pre>.
+	 * @param m The lowest number of the factorial.
+	 * @param n The highest number of the factorial.
+	 * @return The factorial.
 	 */
 	public static final double factorial(int m, int n) {
 		if ((m < 0) || (n < 0))
@@ -564,6 +526,12 @@ public final class utils {
 		return dRes;
 	}
 
+	/**
+	 * Returns a reversed version of a given string.
+	 *
+	 * @param source the string to reverse
+	 * @return the reversed string
+	 */
 	public static String reverseString(String source) {
 		int i, len = source.length();
 		StringBuffer dest = new StringBuffer(len);
@@ -573,35 +541,36 @@ public final class utils {
 		return dest.toString();
 	}
 
-	/** Returns a reversed (by means of item index) version of a given list.
-	 *@param l The list to reverse.
-	 *@return The reversed list.
+	/** 
+	 * Returns a reversed (by means of item index) version of a given list.
+	 *
+	 * @param l The list to reverse.
+	 * @return The reversed list.
 	 */
-	public static List reverseList(List l) {
-		LinkedList lRes = new LinkedList();
-		int iListSize = l.size();
-		for (int iCnt=0; iCnt < iListSize; iCnt++) {
-			lRes.add(l.get(iListSize - iCnt - 1));
-		}
-
+	public static List<?> reverseList(List<?> l) {
+		LinkedList<?> lRes = new LinkedList<Object>(l);
+		Collections.reverse(lRes);
 		return lRes;
 	}
 
-	/** Returns the portion of filename after the last directory separator. If there is no file name there, an empty string
-	 * is returned.
-	 *@param sFilepath The path to the file.
-	 *@return The filename stripped of directories.
+	/**
+	 * Returns the portion of filename after the last directory separator.
+	 * If there is no file name there, an empty string is returned.
+	 *
+	 * @param sFilepath The path to the file.
+	 * @return The filename stripped of directories.
 	 */
 	public static final String getFilenameOnly(String sFilepath) {
 		return new File(sFilepath).getName();
 	}
 
-	/** Returns the index of the constructor of a class, given its 
+	/**
+	 * Returns the index of the constructor of a class, given its 
 	 * parameter count.
-	 *@param sClassName The class name of interest.
-	 *@param iParams The parameter count to look for.
-	 *@return The index of the constructor in the 
-	 *Class.forName(sClassName).getConstructors() array.
+	 * @param sClassName The class name of interest.
+	 * @param iParams The parameter count to look for.
+	 * @return The index of the constructor in the
+	 * Class.forName(sClassName).getConstructors() array.
 	 */
 	public static final int getConstructor(String sClassName, int iParams) {
 		int iCnt = -1;
@@ -696,22 +665,5 @@ public final class utils {
 		}
 		return sbRes.toString();
 	}
-
-}
-
-/** A default {@link WindowAdapter} class, terminating the application according to EXIT_ON_CLOSE.
-*/
-class WindowDefaultAdapter extends WindowAdapter {
-	@Override
-		public void windowClosing(WindowEvent e) {
-			((JFrame)e.getComponent()).setVisible(false);
-			((JFrame)e.getComponent()).dispose();
-		}
-
-	@Override
-		public void windowClosed(WindowEvent e) {
-			if (JFrame.EXIT_ON_CLOSE > 0)
-				System.exit(0);
-		}
 
 }

@@ -773,11 +773,11 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 				// Keep max neighbours number
 				Set<Edge> lEdges = gCurLevel.edgesOf(vNode);
 				int iTempNeighbours = lEdges.size();
-				iNoOfNeighbours = utils.max(iTempNeighbours, iNoOfNeighbours);
+				iNoOfNeighbours = Math.max(iTempNeighbours, iNoOfNeighbours);
 
 				for (Edge weEdge: lEdges) {
 					double dWeight = weEdge.edgeWeight();
-					dMaxEdgeWeight = utils.max(dWeight, dMaxEdgeWeight);
+					dMaxEdgeWeight = Math.max(dWeight, dMaxEdgeWeight);
 				}
 			}
 		}
