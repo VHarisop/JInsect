@@ -1,4 +1,4 @@
-package gr.demokritos.iit.jinsect.structs;
+package gr.demokritos.iit.jinsect.encoders;
 
 import java.util.Map;
 import java.util.HashMap;

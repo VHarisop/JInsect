@@ -6,6 +6,8 @@ import junit.framework.TestSuite;
 
 import java.lang.Math;
 
+import gr.demokritos.iit.jinsect.encoders.VertexCoder;
+
 /**
  * Unit test for simple App.
  */

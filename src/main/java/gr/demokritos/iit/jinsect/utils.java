@@ -1,59 +1,21 @@
-/*
- * utils.java
- *
- */
-
 package gr.demokritos.iit.jinsect;
 
-import gr.demokritos.iit.jinsect.storage.IFileLoader;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.Random;
-import java.util.Set;
-
 import gr.demokritos.iit.jinsect.algorithms.nlp.PorterStemmer;
+import gr.demokritos.iit.jinsect.storage.IFileLoader;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.TreeSet;
+import java.io.*;
+import java.util.*;
 
-import javax.swing.text.MutableAttributeSet;
-import javax.swing.text.html.HTML.Tag;
-import javax.swing.text.html.HTMLEditorKit.ParserCallback;
-import javax.swing.text.html.parser.ParserDelegator;
-
-/** A class including a set of useful, general purpose functions.
+/** 
+ * A class including a set of useful, general purpose functions.
  *
  * @author ggianna
  */
 public final class utils {
-	public static long Count = 0;
-	public static long Sum = 0;
-	
-	/** 
-	 * Testbench function. Not to be used.
-	 */
-	public static void main(String[] args) throws Exception {
-		String[] s = "This is a test. 1 2 3 4-5.".split("(\\s|\\p{Punct})+");
-		List<String> alTest = Arrays.asList(s);
-		shuffleList(alTest);
-		System.out.println(alTest.toString());
-	}    
-
-	/** Converts milliseconds to a string representation of x hours, y min, z sec.
-	 *@param lMillis The long number of milliseconds.
-	 *@return The formated string.
+	/**
+	 * Converts milliseconds to a string representation of x hours, y min, z sec.
+	 * @param lMillis The long number of milliseconds.
+	 * @return The formated string.
 	 */
 	public static final String millisToMinSecString(long lMillis) {
 		return String.format("%d hours %d min %d sec", lMillis / (1000 * 60 * 60), (lMillis / (1000 * 60)) % 60, 
@@ -109,13 +71,14 @@ public final class utils {
 		String [] sRes = sStr.split("(\\s|\\p{Punct})+");
 		if (bStem) {
 			for (int iCnt = 0; iCnt < sRes.length; iCnt++) {
-				if (!sRes[iCnt].trim().equals(""))
+				if (!sRes[iCnt].trim().equals("")) {
 					try {
 						sRes[iCnt] = sStem.stem(sRes[iCnt]);
 					}
-				catch (Exception e)
-				{
-					e.printStackTrace();
+					catch (Exception e)
+					{
+						e.printStackTrace();
+					}
 				}
 			}
 		}
@@ -195,9 +158,10 @@ public final class utils {
 
 	}
 
-	/** Converts a string to UTF-8 encoding.
-	 *@param sStr The input string.
-	 *@return A UTF-8 encoded version of the input string.
+	/**
+	 * Converts a string to UTF-8 encoding.
+	 * @param sStr The input string.
+	 * @return A UTF-8 encoded version of the input string.
 	 */
 	public static String toUTF8(String sStr) {
 		byte[] baBytes = sStr.getBytes();
@@ -230,34 +194,34 @@ public final class utils {
 	 */
 	private static final List getListProduct(Object oA, Object oB) {
 		// Join list of lists
-		ArrayList aRes = new ArrayList();
-		List lAList, lBList;
+		ArrayList<Object> aRes = new ArrayList<Object>();
+		List<Object> lAList, lBList;
 
 		// If unary, create unary list, else use existing list
 		if (!(oA instanceof List)) {
-			lAList = new ArrayList();
+			lAList = new ArrayList<Object>();
 			lAList.add(oA);
 		}
 		else
-			lAList = (List)oA;
+			lAList = (List<Object>)oA;
 		if (!(oB instanceof List)) {
-			lBList = new ArrayList();
+			lBList = new ArrayList<Object>();
 			lBList.add(oB);
 		}
 		else
-			lBList = (List)oB;
+			lBList = (List<Object>) oB;
 
 		// For every item in A
-		Iterator iA = lAList.iterator();        
+		Iterator<Object> iA = lAList.iterator();        
 		while (iA.hasNext()) {
 			Object oANext = iA.next();
 
 			// For every item in B
-			Iterator iB = lBList.iterator();
+			Iterator<Object> iB = lBList.iterator();
 			while (iB.hasNext()) {
 				Object oBNext = iB.next();
 
-				ArrayList lTemp = new ArrayList();
+				ArrayList<Object> lTemp = new ArrayList<Object>();
 				if (oANext instanceof List)
 					lTemp.addAll((List)oANext);
 				else
@@ -353,11 +317,11 @@ public final class utils {
 		return sDefault;
 	}
 
-	/***
-	 *Returns the sum of a sequence of numbers in a specified range
-	 *@param iStart The minimum term of the sequence
-	 *@param iEnd The maximum term of the sequence
-	 ***/
+	/**
+	 * Returns the sum of a sequence of numbers in a specified range
+	 * @param iStart The minimum term of the sequence
+	 * @param iEnd The maximum term of the sequence
+	 */
 	public static int sumFromTo(int iStart, int iEnd) {
 		int iRes = 0;
 		for (int iCnt = iStart; iCnt <= iEnd; iRes += iCnt++);
@@ -497,36 +461,6 @@ public final class utils {
 	}
 
 	/**
-	 * Returns the factorial <pre>1*2*...*(n-1)*n</pre>.
-	 * @param n The highest number of the factorial.
-	 * @return The factorial.
-	 */
-	public static final double factorial(int n) {
-		return factorial(1, n);
-	}
-
-	/**
-	 * Returns the factorial <pre>m*(m+1)*...*(n-1)*n</pre>.
-	 * @param m The lowest number of the factorial.
-	 * @param n The highest number of the factorial.
-	 * @return The factorial.
-	 */
-	public static final double factorial(int m, int n) {
-		if ((m < 0) || (n < 0))
-			return Double.NaN;
-
-		if (n == 0)
-			return 1.0;
-
-		double dRes = 1.0;
-		for (int iCnt = m; iCnt <= n; iCnt++) {
-			dRes *= iCnt;
-		}
-
-		return dRes;
-	}
-
-	/**
 	 * Returns a reversed version of a given string.
 	 *
 	 * @param source the string to reverse
@@ -562,57 +496,6 @@ public final class utils {
 	 */
 	public static final String getFilenameOnly(String sFilepath) {
 		return new File(sFilepath).getName();
-	}
-
-	/**
-	 * Returns the index of the constructor of a class, given its 
-	 * parameter count.
-	 * @param sClassName The class name of interest.
-	 * @param iParams The parameter count to look for.
-	 * @return The index of the constructor in the
-	 * Class.forName(sClassName).getConstructors() array.
-	 */
-	public static final int getConstructor(String sClassName, int iParams) {
-		int iCnt = -1;
-		try {
-			for (iCnt=0; iCnt < Class.forName(sClassName).getConstructors().length; iCnt++)
-				if (Class.forName(sClassName).getConstructors()[iCnt].getParameterTypes().length == iParams)
-					return iCnt;
-		} catch (SecurityException ex) {
-			ex.printStackTrace(System.err);
-		} catch (ClassNotFoundException ex) {
-			ex.printStackTrace(System.err);
-		}
-		return -1;
-	}
-
-	public static String extractText(String sWholeString) throws IOException{
-		final ArrayList<String> list = new ArrayList<String>();
-		StringReader reader = new StringReader(sWholeString);
-
-		ParserDelegator parserDelegator = new ParserDelegator();
-		ParserCallback parserCallback = new ParserCallback() {
-			@Override
-				public void handleText(final char[] data, final int pos) {
-					list.add(new String(data));
-				}
-			@Override
-				public void handleStartTag(Tag tag, MutableAttributeSet attribute, int pos) { }
-			@Override
-				public void handleEndTag(Tag t, final int pos) {  }
-			@Override
-				public void handleSimpleTag(Tag t, MutableAttributeSet a, final int pos) { }
-			@Override
-				public void handleComment(final char[] data, final int pos) { }
-			@Override
-				public void handleError(final String errMsg, final int pos) { }
-		};
-		parserDelegator.parse(reader, parserCallback, true);
-
-		StringBuffer sbRes = new StringBuffer();
-		for (String sLine:list)
-			sbRes.append(sLine+"\n");
-		return sbRes.toString();
 	}
 
 	/**
@@ -665,5 +548,4 @@ public final class utils {
 		}
 		return sbRes.toString();
 	}
-
 }

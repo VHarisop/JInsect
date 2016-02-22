@@ -54,32 +54,4 @@ public class ComparatorsTest
 		assertTrue(gSim.ContainmentSimilarity < 1.0);
 		assertEquals(0.0, gSim.StructuralSimilarity, 0.00001);
 	}
-
-	/**
-	 * Test the correctness of the similarity comparator 
-	 */
-	public void testSimilarityComparator() {
-		// verify that the similarity comparator works properly
-		SimilarityComparator simComp = new SimilarityComparator();
-
-		UniqueVertexGraph uvgA = new UniqueVertexGraph();
-		UniqueVertexGraph uvgB = new UniqueVertexGraph();
-
-		JVertex v1 = new NGramVertex("A");
-		JVertex v2 = new NGramVertex("B");
-		JVertex v3 = new NGramVertex("C");
-
-		/* A: v1 ->[1.0] v2 [4.0]<- ->[2.0] v3 */
-		uvgA.addEdge(v1, v2, 1.0);
-		uvgA.addEdge(v2, v3, 2.0);
-		uvgA.addEdge(v3, v2, 4.0);
-
-		/* B: v2 ->[1.0] v3 [4.0]<- -> [2.0] v1 */
-		uvgB.addEdge(v2, v3, 1.0);
-		uvgB.addEdge(v3, v1, 2.0);
-		uvgB.addEdge(v1, v3, 4.0);	
-		
-		/* the two graphs have the same structure */
-		assertTrue(simComp.compare(uvgA, uvgB) == 0);
-	}
 }

@@ -2,9 +2,9 @@ package gr.demokritos.iit.jinsect;
 
 import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 import gr.demokritos.iit.jinsect.structs.JVertex;
-import gr.demokritos.iit.jinsect.structs.VertexCoder;
 import gr.demokritos.iit.jinsect.structs.Edge;
 import gr.demokritos.iit.jinsect.encoders.CanonicalCoder;
+import gr.demokritos.iit.jinsect.encoders.VertexCoder;
 
 import java.util.Iterator;
 
@@ -14,7 +14,6 @@ import java.util.Iterator;
  * @author VHarisop
  */
 public final class jutils {
-	
 	/**
 	 * Gets the quantized value similarity between two graphs based on a map
 	 * of label - weight entries. The quantized value similarity is simply the
@@ -99,7 +98,6 @@ public final class jutils {
 		return qA - qB;
 	}
 
-	
 	/**
 	 * Compares 2 graphs' canonical code representations with respect
 	 * to the standard lexicographic order. Returns -1 if the first graph's

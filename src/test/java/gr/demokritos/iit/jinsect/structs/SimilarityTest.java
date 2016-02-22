@@ -5,6 +5,8 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import gr.demokritos.iit.jinsect.jutils;
+import gr.demokritos.iit.jinsect.encoders.VertexCoder;
+
 import java.lang.Math;
 
 /**

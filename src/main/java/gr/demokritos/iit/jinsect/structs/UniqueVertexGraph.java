@@ -9,6 +9,7 @@ import java.util.Set;
 /* use JGraphT for basic graph operations */
 import org.jgrapht.graph.*;
 
+import gr.demokritos.iit.jinsect.encoders.VertexCoder;
 import gr.demokritos.iit.jinsect.structs.calculators.*;
 
 /**
