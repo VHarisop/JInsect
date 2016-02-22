@@ -85,6 +85,9 @@ public class Edge extends DefaultWeightedEdge
 	 */
 	@Override
 	public boolean equals(Object oOther) {
+		if (null == oOther)
+			return false;
+
 		if (!(oOther instanceof Edge)) 
 			return false;
 

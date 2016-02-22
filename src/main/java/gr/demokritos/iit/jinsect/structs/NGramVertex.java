@@ -53,6 +53,9 @@ public class NGramVertex implements JVertex {
 
 	@Override
 	public boolean equals(Object o) {
+		if (null == o)
+			return false;
+
 		if (!(o instanceof NGramVertex)) 
 			return false;
 		
