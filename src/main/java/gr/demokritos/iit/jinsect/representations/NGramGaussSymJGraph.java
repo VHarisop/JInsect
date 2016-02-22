@@ -98,7 +98,7 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
             // The String has a size of at least [iNGramSize]
             String sCurNGram = null;
             LinkedList<String> lNGramSequence = new LinkedList<String>();
-            UniqueJVertexGraph gGraph = getGraphLevelByNGramSize(iNGramSize);
+            UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iNGramSize);
             
             for (int iCurStart = 0; iCurStart < iLen; iCurStart++)
             {
@@ -152,7 +152,7 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
      *@param hAppearenceHistogram The histogram of appearences of the terms
     ***/
     public void createSymEdgesConnecting(
-			UniqueJVertexGraph gGraph,
+			UniqueVertexGraph gGraph,
 			String sStartNode,
 			List<String> lOtherNodes,
             HashMap<String, Double> hAppearenceHistogram) {
@@ -283,7 +283,7 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
      *@param hAppearenceHistogram The histogram of appearences of the terms
     ***/
     public void createEdgesConnecting(
-			UniqueJVertexGraph gGraph,
+			UniqueVertexGraph gGraph,
 			String sStartNode, 
 			List<String> lOtherNodes,
             HashMap<String, Double> hAppearenceHistogram) {

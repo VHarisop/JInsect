@@ -6,17 +6,17 @@ import gr.demokritos.iit.jinsect.jutils;
 
 /**
  * A custom similarity comparator to be used for comparing
- * {@link gr.demokritos.iit.jinsect.structs.UniqueJVertexGraph} objects
+ * {@link gr.demokritos.iit.jinsect.structs.UniqueVertexGraph} objects
  * based on their s-similarity.
  *
  * @author VHarisop
  */
 public class SimilarityComparator
-implements Comparator<UniqueJVertexGraph>
+implements Comparator<UniqueVertexGraph>
 {
 	@Override
-	public int compare(UniqueJVertexGraph uvgA,
-					   UniqueJVertexGraph uvgB)
+	public int compare(UniqueVertexGraph uvgA,
+					   UniqueVertexGraph uvgB)
 	{
 		/* get s-similarity using jutils */
 		double sSim = jutils.graphStructuralSimilarity(uvgA, uvgB);

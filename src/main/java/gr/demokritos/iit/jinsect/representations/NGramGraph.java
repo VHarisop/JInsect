@@ -1,6 +1,6 @@
 package gr.demokritos.iit.jinsect.representations;
 
-import gr.demokritos.iit.jinsect.structs.UniqueJVertexGraph;
+import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 import gr.demokritos.iit.jinsect.structs.Edge;
 
 import java.io.IOException;
@@ -69,17 +69,17 @@ public interface NGramGraph extends Cloneable {
 	 *
 	 * @param index the index of the graph. Zero (0) indicates the level that
 	 * corresponds to the minimum n-gram size.
-	 * @return the {@link UniqueJVertexGraph} of the corresponding level.
+	 * @return the {@link UniqueVertexGraph} of the corresponding level.
 	 */
-	public UniqueJVertexGraph getGraphLevel(int index);
+	public UniqueVertexGraph getGraphLevel(int index);
 
 	/**
 	 * Returns the graph level corresponding to the given n-gram size.
 	 *
 	 * @param ngramSize the n-gram size of the level
-	 * @return the {@link UniqueJVertexGraph} of the corresponding level.
+	 * @return the {@link UniqueVertexGraph} of the corresponding level.
 	 */
-	public UniqueJVertexGraph getGraphLevelByNGramSize(int ngramSize);
+	public UniqueVertexGraph getGraphLevelByNGramSize(int ngramSize);
 
 	/**
 	 * Sets the data string for this graph, clears all previous graph levels

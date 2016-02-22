@@ -3,7 +3,7 @@ package gr.demokritos.iit.jinsect.structs.calculators;
 import gr.demokritos.iit.jinsect.structs.*;
 
 /**
- * A class that is utilized for calculating a {@link UniqueJVertexGraph}'s 
+ * A class that is utilized for calculating a {@link UniqueVertexGraph}'s 
  * vertex in- and out- degree variances, which can be useful in some graph
  * similarity metric.
  *
@@ -13,7 +13,7 @@ public class DegreeVarianceCalculator {
 	/**
 	 * The graph on which the calculator will operate 
 	 */
-	protected UniqueJVertexGraph uvg;
+	protected UniqueVertexGraph uvg;
 
 	/**
 	 * The indegree mean
@@ -69,11 +69,11 @@ public class DegreeVarianceCalculator {
 
 	/**
 	 * Creates a new DegreeVarianceCalculator object that operates on a 
-	 * {@link UniqueJVertexGraph} object.
+	 * {@link UniqueVertexGraph} object.
 	 *
 	 * @param uvgOn the graph on which to operate 
 	 */
-	public DegreeVarianceCalculator(UniqueJVertexGraph uvgOn) {
+	public DegreeVarianceCalculator(UniqueVertexGraph uvgOn) {
 		this.uvg = uvgOn;
 		cached = false;
 		weightCached = false;

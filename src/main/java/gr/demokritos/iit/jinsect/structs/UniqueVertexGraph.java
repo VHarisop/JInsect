@@ -18,7 +18,7 @@ import gr.demokritos.iit.jinsect.structs.calculators.*;
  *
  * @author VHarisop
  */
-public class UniqueJVertexGraph 
+public class UniqueVertexGraph 
 extends DefaultDirectedWeightedGraph<JVertex, Edge>
 {
 
@@ -82,7 +82,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	/**
 	 * Returns a <tt>UniqueJVertexJGraph</tt> object. 
 	 */
-	public UniqueJVertexGraph() {
+	public UniqueVertexGraph() {
 		super(Edge.class);
 		UniqueVertices = new HashMap<String, JVertex>();
 	}
@@ -472,7 +472,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	@Override
     public Object clone() {
 		JVertex v1, v2;
-        UniqueJVertexGraph res = new UniqueJVertexGraph();
+        UniqueVertexGraph res = new UniqueVertexGraph();
 		
 		/* add all edges to the clone graph - all vertices will
 		 * eventually be added both to the supergraph's vertex set

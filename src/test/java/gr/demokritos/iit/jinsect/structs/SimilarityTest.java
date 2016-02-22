@@ -49,7 +49,7 @@ public class SimilarityTest
 	/**
 	 * Helper function to add many vertices at once, given their labels
 	 */
-	private void addVertices(UniqueJVertexGraph uvg, String ... labels) {
+	private void addVertices(UniqueVertexGraph uvg, String ... labels) {
 		for (String s: labels) {
 			uvg.addVertex(new NGramVertex(s));
 		}
@@ -67,15 +67,15 @@ public class SimilarityTest
 	/**
 	 * Helper function to add an edge to a graph given the vertices' labels
 	 */
-	private void addEdge(UniqueJVertexGraph uvg, String sA, String sB, double w) {
+	private void addEdge(UniqueVertexGraph uvg, String sA, String sB, double w) {
 		uvg.addEdge(new NGramVertex(sA), new NGramVertex(sB), w);
 	}
 
 	public void testGraphs() {
 		VertexCoder vCoder = new VertexCoder()
 			.withWeightValue(0.5).withStep(0.05);
-		UniqueJVertexGraph uvgA = new UniqueJVertexGraph();
-		UniqueJVertexGraph uvgB = new UniqueJVertexGraph();
+		UniqueVertexGraph uvgA = new UniqueVertexGraph();
+		UniqueVertexGraph uvgB = new UniqueVertexGraph();
 
 		/* populate them with vertices */
 		addVertices(uvgA, "A", "B", "C");

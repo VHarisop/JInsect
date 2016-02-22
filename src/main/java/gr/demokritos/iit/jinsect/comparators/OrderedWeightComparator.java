@@ -2,12 +2,12 @@ package gr.demokritos.iit.jinsect.comparators;
 
 import gr.demokritos.iit.jinsect.structs.JVertex;
 import gr.demokritos.iit.jinsect.structs.Pair;
-import gr.demokritos.iit.jinsect.structs.UniqueJVertexGraph;
+import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 
 import java.util.*;
 
 /**
- * This comparator compares {@link UniqueJVertexGraph} objects based on their
+ * This comparator compares {@link UniqueVertexGraph} objects based on their
  * ordered weight representations. Two pairs of vertex - weight lists, sorted
  * in descending order by the weights, are compared. For every pair of pairs,
  * the label is first compared lexicographically. If the labels are equal, the
@@ -16,10 +16,10 @@ import java.util.*;
  * @author VHarisop
  */
 public final class OrderedWeightComparator
-	implements Comparator<UniqueJVertexGraph> {
+	implements Comparator<UniqueVertexGraph> {
 
 	@Override
-	public int compare(UniqueJVertexGraph uvgA, UniqueJVertexGraph uvgB) {
+	public int compare(UniqueVertexGraph uvgA, UniqueVertexGraph uvgB) {
 		Iterator<Pair<JVertex, Double>> iterA = 
 			uvgA.getOrderedWeightPairs().iterator();
 

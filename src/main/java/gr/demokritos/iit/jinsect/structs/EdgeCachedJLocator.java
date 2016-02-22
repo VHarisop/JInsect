@@ -67,7 +67,7 @@ public class EdgeCachedJLocator {
 	 * @return The edge, if found, otherwise null.
 	 */
 	public final Edge locateDirectedEdgeInGraph(
-			UniqueJVertexGraph gGraph,
+			UniqueVertexGraph gGraph,
 			JVertex vHead,
 			JVertex vTail) 
 	{
@@ -161,7 +161,7 @@ public class EdgeCachedJLocator {
 	 * @param vToFind The vertex to locate.
 	 * @return The vertex, if found, otherwise null.
 	 */
-	public final JVertex locateVertexInGraph(UniqueJVertexGraph gGraph, JVertex vToFind) {
+	public final JVertex locateVertexInGraph(UniqueVertexGraph gGraph, JVertex vToFind) {
 		return gGraph.locateVertex(vToFind);
 	}
 
@@ -174,7 +174,7 @@ public class EdgeCachedJLocator {
 	 * @param vTail A vertex with the desired label for the tail or tail of the edge.
 	 * @return The edge, if found, otherwise null.
 	 */
-	public final Edge locateEdgeInGraph(UniqueJVertexGraph gGraph, JVertex vHead, JVertex vTail) {
+	public final Edge locateEdgeInGraph(UniqueVertexGraph gGraph, JVertex vHead, JVertex vTail) {
 		Edge eRes = locateDirectedEdgeInGraph(gGraph, vHead, vTail);
 		return eRes == null ? locateDirectedEdgeInGraph(gGraph, vTail, vHead) : eRes;
 	}
@@ -186,7 +186,7 @@ public class EdgeCachedJLocator {
 	 * @return A list of outgoing edges from <code>vHead</code>. If no such edges exist returns an
 	 * empty list.
 	 */
-	public final List<Edge> getOutgoingEdges(UniqueJVertexGraph gGraph, JVertex vHead) {
+	public final List<Edge> getOutgoingEdges(UniqueVertexGraph gGraph, JVertex vHead) {
 		JVertex vNode = gGraph.locateVertex(vHead.getLabel());
 		ArrayList<Edge> lRes = new ArrayList<Edge>();
 		if (vNode != null) {

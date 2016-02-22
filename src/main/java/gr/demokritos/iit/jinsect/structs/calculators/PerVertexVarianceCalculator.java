@@ -5,7 +5,7 @@ import gr.demokritos.iit.jinsect.structs.*;
 import java.util.HashMap;
 
 /**
- * A class that is utilized for calculating a {@link UniqueJVertexGraph}'s 
+ * A class that is utilized for calculating a {@link UniqueVertexGraph}'s 
  * vertex in- and out- degree variances, which can be useful in some graph
  * similarity metric.
  *
@@ -15,7 +15,7 @@ public class PerVertexVarianceCalculator {
 	/**
 	 * The graph on which the calculator will operate 
 	 */
-	protected UniqueJVertexGraph uvg;
+	protected UniqueVertexGraph uvg;
 	
 	/**
 	 * The sum of weight variance ratios
@@ -35,11 +35,11 @@ public class PerVertexVarianceCalculator {
 
 	/**
 	 * Creates a new PerVertexVarianceCalculator object that operates on a 
-	 * {@link UniqueJVertexGraph} object.
+	 * {@link UniqueVertexGraph} object.
 	 *
 	 * @param uvgOn the graph on which to operate 
 	 */
-	public PerVertexVarianceCalculator(UniqueJVertexGraph uvgOn) {
+	public PerVertexVarianceCalculator(UniqueVertexGraph uvgOn) {
 		this.uvg = uvgOn;
 		cached = false;
 		vertexVariances = new HashMap<JVertex, Double>();

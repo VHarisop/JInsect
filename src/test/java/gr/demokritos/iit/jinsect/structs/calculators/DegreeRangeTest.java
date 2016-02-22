@@ -34,7 +34,7 @@ public class DegreeRangeTest
 	 * Utility function that adds a set of vertices, created from a set
 	 * of set of strings, to a unique vertex graph.
 	 */
-	private void addVertices(UniqueJVertexGraph uvg, String ... labels) {
+	private void addVertices(UniqueVertexGraph uvg, String ... labels) {
 		for (String s: labels) {
 			uvg.add(new NGramVertex(s));
 		}
@@ -43,7 +43,7 @@ public class DegreeRangeTest
 	/**
 	 * Utility function that adds an edge with an associated weight to a graph.
 	 */
-	private void addEdge(UniqueJVertexGraph uvg, 
+	private void addEdge(UniqueVertexGraph uvg, 
 			String from, String to, double w) {
 		uvg.addEdge(new NGramVertex(from), new NGramVertex(to), w);
 	}
@@ -53,7 +53,7 @@ public class DegreeRangeTest
 	 * for all vertices.
 	 */
 	public void testDegrees() {
-		UniqueJVertexGraph uvg = new UniqueJVertexGraph();
+		UniqueVertexGraph uvg = new UniqueVertexGraph();
 		addVertices(uvg, "A", "B", "C");
 		addEdge(uvg, "A", "B", 2.0);
 		addEdge(uvg, "A", "C", 4.0);

@@ -15,7 +15,7 @@ public class EntropyCalculator {
 	/**
 	 * The UniqueJVertexGraph this object operates on.
 	 */
-	protected UniqueJVertexGraph opGraph;
+	protected UniqueVertexGraph opGraph;
 
 	/**
 	 * A cached value of total entropy.
@@ -28,7 +28,7 @@ public class EntropyCalculator {
 	 *
 	 * @param uvg the graph to operate on
 	 */
-	public EntropyCalculator(UniqueJVertexGraph uvg) {
+	public EntropyCalculator(UniqueVertexGraph uvg) {
 		vEnt = new VertexEntropy().withGraph(uvg);
 		opGraph = uvg;
 		cached = false;
@@ -39,7 +39,7 @@ public class EntropyCalculator {
 	 *
 	 * @return the underlying graph object
 	 */
-	public UniqueJVertexGraph getGraph() {
+	public UniqueVertexGraph getGraph() {
 		return opGraph;
 	}
 

@@ -6,7 +6,7 @@ import java.util.Set;
 
 /**
  * A calculator that computes the incoming and outgoing edge weight range
- * for the vertices of a {@link UniqueJVertexGraph}. 
+ * for the vertices of a {@link UniqueVertexGraph}. 
  */
 public class WeightRangeCalculator {
 	/**
@@ -22,15 +22,15 @@ public class WeightRangeCalculator {
 	/**
 	 * The underlying graph on which this object operates. 
 	 */
-	protected UniqueJVertexGraph uvGraph;
+	protected UniqueVertexGraph uvGraph;
 
 	/**
 	 * Creates a new DegreeRangeCalculator object operating on 
-	 * a given {@link UniqueJVertexGraph}.
+	 * a given {@link UniqueVertexGraph}.
 	 *
 	 * @param uvg the graph to operate on
 	 */
-	public WeightRangeCalculator(UniqueJVertexGraph uvg) {
+	public WeightRangeCalculator(UniqueVertexGraph uvg) {
 		this.uvGraph = uvg;
 
 		/* initialize new mappings with initial capacity equal
@@ -134,12 +134,12 @@ public class WeightRangeCalculator {
 
 	/**
 	 * Replaces the graph this calculator operates on with a newly
-	 * provided {@link UniqueJVertexGraph}. The maps are cleared and
+	 * provided {@link UniqueVertexGraph}. The maps are cleared and
 	 * repopulated based on the new graph.
 	 *
 	 * @param newGraph the new graph to operate on
 	 */
-	public void setGraph(UniqueJVertexGraph newGraph) {
+	public void setGraph(UniqueVertexGraph newGraph) {
 		clear();
 		this.uvGraph = newGraph;
 		populateMaps();

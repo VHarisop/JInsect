@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import gr.demokritos.iit.jinsect.structs.EdgeCachedJLocator;
-import gr.demokritos.iit.jinsect.structs.UniqueJVertexGraph;
+import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 import gr.demokritos.iit.jinsect.structs.JVertex;
 import gr.demokritos.iit.jinsect.structs.NGramVertex;
 import gr.demokritos.iit.jinsect.structs.Edge;
@@ -139,7 +139,7 @@ public class NGramGaussJGraph extends NGramJGraph {
 				continue;
 
 			List<String> PrecedingNeighbours = new ArrayList<String>();
-			UniqueJVertexGraph gGraph = getGraphLevelByNGramSize(iNGramSize);
+			UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iNGramSize);
 
 			// The String has a size of at least [iNGramSize]
 			String sCurNGram = "";
@@ -187,7 +187,7 @@ public class NGramGaussJGraph extends NGramJGraph {
 	 *@param hAppearenceHistogram The histogram of appearences of the terms
 	 ***/
 	public void createEdgesConnecting(
-		UniqueJVertexGraph gGraph,
+		UniqueVertexGraph gGraph,
 		String sStartNode,
 		List<String> lOtherNodes,
 		HashMap<String, Double> hAppearenceHistogram) 

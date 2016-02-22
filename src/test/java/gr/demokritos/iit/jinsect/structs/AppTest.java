@@ -59,8 +59,8 @@ public class AppTest
 
 	public void testSimilarities() 
 	{
-		UniqueJVertexGraph uvgA = new UniqueJVertexGraph();
-		UniqueJVertexGraph uvgB = new UniqueJVertexGraph();
+		UniqueVertexGraph uvgA = new UniqueVertexGraph();
+		UniqueVertexGraph uvgB = new UniqueVertexGraph();
 
 		JVertex v1 = new NGramVertex("A");
 		JVertex v2 = new NGramVertex("C");
@@ -84,7 +84,7 @@ public class AppTest
 	 * Helper function for testNGramJGraph that retrieves an edge based
 	 * on the labels of the vertices it connects.
 	 */
-	private Edge edgeByLabel(UniqueJVertexGraph uvg, String from, String to) {
+	private Edge edgeByLabel(UniqueVertexGraph uvg, String from, String to) {
 		JVertex vFrom = new NGramVertex(from), vTo = new NGramVertex(to);
 		return uvg.getEdge(vFrom, vTo);
 	}
@@ -95,7 +95,7 @@ public class AppTest
 		dng.setDataString("ACTACTA");
 
 		/* get the underlying graph */
-		UniqueJVertexGraph uvg = dng.getGraphLevel(0);
+		UniqueVertexGraph uvg = dng.getGraphLevel(0);
 		
 		Edge e; double delta = 0.000001;
 		
@@ -130,7 +130,7 @@ public class AppTest
 	public void testUniqueJGraph()
 	{
 		/* create a new UVJG graph */
-		UniqueJVertexGraph uvg = new UniqueJVertexGraph();
+		UniqueVertexGraph uvg = new UniqueVertexGraph();
 		JVertex v1 = new NGramVertex("A");
 		JVertex v2 = new NGramVertex("C");
 		JVertex v3 = new NGramVertex("G");

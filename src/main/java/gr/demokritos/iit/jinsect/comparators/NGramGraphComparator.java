@@ -34,8 +34,8 @@ public class NGramGraphComparator {
 			int levelImportance = utils.sumFromTo(ngA.getMinSize(), iCnt);
 
 			GraphSimilarity gSimLevel = new GraphSimilarity();
-			UniqueJVertexGraph uvgA = ngA.getGraphLevelByNGramSize(iCnt);
-			UniqueJVertexGraph uvgB = ngB.getGraphLevelByNGramSize(iCnt);
+			UniqueVertexGraph uvgA = ngA.getGraphLevelByNGramSize(iCnt);
+			UniqueVertexGraph uvgB = ngB.getGraphLevelByNGramSize(iCnt);
 
 			/* if ngB doesn't have the corresponding level, to next iteration */
 			if (uvgB == null) {
@@ -47,7 +47,7 @@ public class NGramGraphComparator {
 
 			if (firstEdges > secondEdges) {
 				/* swap the graphs */
-				UniqueJVertexGraph vgSwap = uvgB;
+				UniqueVertexGraph vgSwap = uvgB;
 				uvgB = uvgA;
 				uvgA = vgSwap;
 			}

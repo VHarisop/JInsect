@@ -19,9 +19,9 @@ public class VertexEntropy extends HashMap<String, Double> {
 	protected double weight = 1.0;
 
 	/**
-	 * The {@link UniqueJVertexGraph} this object operates on.
+	 * The {@link UniqueVertexGraph} this object operates on.
 	 */
-	protected UniqueJVertexGraph uvg;
+	protected UniqueVertexGraph uvg;
 
 	/**
 	 * @see java.util.HashMap#HashMap()
@@ -52,13 +52,13 @@ public class VertexEntropy extends HashMap<String, Double> {
 	}
 
 	/**
-	 * Sets the underlying {@link UniqueJVertexGraph} object that the
+	 * Sets the underlying {@link UniqueVertexGraph} object that the
 	 * encoder operates on, and returns the modified VertexEntropy object.
 	 *
 	 * @param _uvg the graph to operate on
 	 * @return the modified object
 	 */
-	public VertexEntropy withGraph(UniqueJVertexGraph _uvg) {
+	public VertexEntropy withGraph(UniqueVertexGraph _uvg) {
 		this.uvg = _uvg;
 		return this;
 	}
@@ -137,7 +137,7 @@ public class VertexEntropy extends HashMap<String, Double> {
 	 *
 	 * @return the underlying UniqueJVertexGraph
 	 */
-	public UniqueJVertexGraph getGraph() {
+	public UniqueVertexGraph getGraph() {
 		return this.uvg;
 	}
 

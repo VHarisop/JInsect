@@ -5,7 +5,7 @@ import java.util.*;
 
 import gr.demokritos.iit.jinsect.structs.Edge;
 import gr.demokritos.iit.jinsect.structs.JVertex;
-import gr.demokritos.iit.jinsect.structs.UniqueJVertexGraph;
+import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 
 public class CanonicalCoder 
 extends BaseGraphEncoder implements GraphEncoding, Iterable<String> {
@@ -36,7 +36,7 @@ extends BaseGraphEncoder implements GraphEncoding, Iterable<String> {
 	 * @param uvg the graph to be encoded
 	 * @return a new CanonicalCoder object
 	 */
-	public CanonicalCoder(UniqueJVertexGraph uvg) {
+	public CanonicalCoder(UniqueVertexGraph uvg) {
 		super(uvg);
 		unvisited.addAll(uvg.vertexSet());
 	}
@@ -48,7 +48,7 @@ extends BaseGraphEncoder implements GraphEncoding, Iterable<String> {
 	 * @param uvg the graph to be encoded
 	 * @param vFrom the vertex to start encoding from
 	 */
-	public CanonicalCoder(UniqueJVertexGraph uvg, JVertex vFrom) {
+	public CanonicalCoder(UniqueVertexGraph uvg, JVertex vFrom) {
 		super(uvg, vFrom);
 		unvisited.addAll(uvg.vertexSet());
 	}

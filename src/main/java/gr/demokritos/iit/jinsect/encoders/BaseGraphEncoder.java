@@ -9,7 +9,7 @@ import gr.demokritos.iit.jinsect.structs.*;
 
 public abstract class BaseGraphEncoder {
 
-	UniqueJVertexGraph nGraph;
+	UniqueVertexGraph nGraph;
 	JVertex vStart = null;
 
 	// sets of visited / unvisited vertices
@@ -37,7 +37,7 @@ public abstract class BaseGraphEncoder {
 	 * @param uvg the graph to be encoded
 	 * @return a new BaseGraphEncoder object
 	 */
-	public BaseGraphEncoder(UniqueJVertexGraph uvg) {
+	public BaseGraphEncoder(UniqueVertexGraph uvg) {
 		nGraph = uvg;
 
 		// initialize sets
@@ -54,7 +54,7 @@ public abstract class BaseGraphEncoder {
 	 * @param vFrom the starting vertex
 	 * @return a new BaseGraphEncoder object
 	 */
-	public BaseGraphEncoder(UniqueJVertexGraph uvg, JVertex vFrom) {
+	public BaseGraphEncoder(UniqueVertexGraph uvg, JVertex vFrom) {
 		nGraph = uvg;
 
 		// initialize sets

@@ -1,6 +1,6 @@
 package gr.demokritos.iit.jinsect;
 
-import gr.demokritos.iit.jinsect.structs.UniqueJVertexGraph;
+import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 import gr.demokritos.iit.jinsect.structs.JVertex;
 import gr.demokritos.iit.jinsect.structs.VertexCoder;
 import gr.demokritos.iit.jinsect.structs.Edge;
@@ -25,8 +25,8 @@ public final class jutils {
 	 * @param vWeights the map of label - value pairs
 	 * @return the quantized value similarity of gA over gB
 	 */
-	public static double getQuantValSimilarity(UniqueJVertexGraph gA,
-											   UniqueJVertexGraph gB,
+	public static double getQuantValSimilarity(UniqueVertexGraph gA,
+											   UniqueVertexGraph gB,
 											   VertexCoder vWeights)
 	{
 		double qValsA = 0.0, qValsB = 0.0;
@@ -52,8 +52,8 @@ public final class jutils {
 	 * @return the weight range similarity between the 2 graphs
 	 */
 	public static double getWeightRangeSimilarity(
-			UniqueJVertexGraph gA,
-			UniqueJVertexGraph gB,
+			UniqueVertexGraph gA,
+			UniqueVertexGraph gB,
 			VertexCoder vWeights)
 	{
 		return gA.getWeightRangeCode(vWeights) - gB.getWeightRangeCode(vWeights);
@@ -70,8 +70,8 @@ public final class jutils {
 	 * @param gB the second graph
 	 * @return the graph structural similarity of gA over gB
 	 */
-	public static double graphStructuralSimilarity(UniqueJVertexGraph gA,
-												   UniqueJVertexGraph gB)
+	public static double graphStructuralSimilarity(UniqueVertexGraph gA,
+												   UniqueVertexGraph gB)
 	{
 		return gA.totalNormWeight() - gB.totalNormWeight();
 	}
@@ -87,8 +87,8 @@ public final class jutils {
 	 * @param vJ the target vertex of the edge
 	 * @return the structural similarity of the edge in graph gA over gB
 	 */
-	public static double edgeStructuralSimilarity(UniqueJVertexGraph gA, 
-												  UniqueJVertexGraph gB, 
+	public static double edgeStructuralSimilarity(UniqueVertexGraph gA, 
+												  UniqueVertexGraph gB, 
 												  JVertex vI, 
 												  JVertex vJ)
 	{
@@ -110,8 +110,8 @@ public final class jutils {
 	 * @param gB the second graph
 	 * @return an integer denoting the result of the canonical codes' comparison
 	 */
-	public static int compareCanonicalCodes(UniqueJVertexGraph gA,
-											UniqueJVertexGraph gB)
+	public static int compareCanonicalCodes(UniqueVertexGraph gA,
+											UniqueVertexGraph gB)
 	{
 		String currA, currB;
 
@@ -151,7 +151,7 @@ public final class jutils {
 	 * as a directed graph or not.
 	 * @return The DOT formatted string representation of the graph.
 	 */
-	public static String graphToDot(UniqueJVertexGraph gTree, boolean bDirected) {
+	public static String graphToDot(UniqueVertexGraph gTree, boolean bDirected) {
 		StringBuffer sb = new StringBuffer();
 		String sConnector;
 

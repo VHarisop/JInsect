@@ -8,7 +8,7 @@ import java.util.Comparator;
 
 /**
  * A class that creates a list of weight - vertex pairs from a
- * {@link UniqueJVertexGraph} object, and sorts it by descending
+ * {@link UniqueVertexGraph} object, and sorts it by descending
  * weight order.
  *
  * @author VHarisop
@@ -17,7 +17,7 @@ public class OrderedWeightCalculator {
 	/**
 	 * The graph this calculator operates on.
 	 */
-	protected UniqueJVertexGraph graph;
+	protected UniqueVertexGraph graph;
 
 	/**
 	 * The list of weight - vertex pairs.
@@ -30,7 +30,7 @@ public class OrderedWeightCalculator {
 	 *
 	 * @param uvg the graph to operate on
 	 */
-	public OrderedWeightCalculator(UniqueJVertexGraph uvg) {
+	public OrderedWeightCalculator(UniqueVertexGraph uvg) {
 		this.graph = uvg;
 
 		/* initialize the list of pairs */

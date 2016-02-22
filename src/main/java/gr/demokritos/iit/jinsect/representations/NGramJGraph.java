@@ -23,7 +23,7 @@ import gr.demokritos.iit.jinsect.structs.EdgeCachedJLocator;
 import gr.demokritos.iit.jinsect.structs.JVertex;
 import gr.demokritos.iit.jinsect.structs.NGramVertex;
 import gr.demokritos.iit.jinsect.structs.Edge;
-import gr.demokritos.iit.jinsect.structs.UniqueJVertexGraph;
+import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 
 import gr.demokritos.iit.jinsect.io.LineReader;
 
@@ -48,7 +48,7 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 	protected HashMap<Edge, Double> DegradedEdges;
 
 	/* array of UniqueJVertexGraphs for various N-gram sizes */
-	protected UniqueJVertexGraph[] NGramGraphArray;
+	protected UniqueVertexGraph[] NGramGraphArray;
 	protected EdgeCachedJLocator eclLocator = null;
 
 	/** 
@@ -141,10 +141,10 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 
 	protected void InitGraphs() {
 		// Create array of graphs
-		NGramGraphArray = new UniqueJVertexGraph[MaxSize - MinSize + 1];
+		NGramGraphArray = new UniqueVertexGraph[MaxSize - MinSize + 1];
 		// Init array
 		for (int iCnt = MinSize; iCnt <= MaxSize; iCnt++)
-			NGramGraphArray[iCnt - MinSize] = new UniqueJVertexGraph();
+			NGramGraphArray[iCnt - MinSize] = new UniqueVertexGraph();
 		// Create degraded edge list
 		DegradedEdges = new HashMap<Edge, Double>();        
 	}
@@ -157,7 +157,7 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 	 * the document n-gram graph.
 	 */
 	public int length() {
-		Iterator<UniqueJVertexGraph> iIter = 
+		Iterator<UniqueVertexGraph> iIter = 
 			Arrays.asList(NGramGraphArray).iterator();
 
 		int iCnt = 0;
@@ -189,18 +189,18 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 	 * Returns graph with M-based index
 	 * @param iIndex The index of the graph. Zero (0) equals to the graph for 
 	 * level MinSize n-grams.
-	 * @return The {@link UniqueJVertexGraph} of the corresponding level.
+	 * @return The {@link UniqueVertexGraph} of the corresponding level.
 	 */
-	public UniqueJVertexGraph getGraphLevel(int iIndex) {
+	public UniqueVertexGraph getGraphLevel(int iIndex) {
 		return NGramGraphArray[iIndex];
 	}
 
 	/**
 	 * Returns graph with n-gram-size-based index
 	 * @param iNGramSize The n-gram size of the graph. 
-	 * @return The {@link UniqueJVertexGraph} of the corresponding level.
+	 * @return The {@link UniqueVertexGraph} of the corresponding level.
 	 */
-	public UniqueJVertexGraph getGraphLevelByNGramSize(int iNGramSize) {
+	public UniqueVertexGraph getGraphLevelByNGramSize(int iNGramSize) {
 		// Check bounds
 		if ((iNGramSize < MinSize) || (iNGramSize > MaxSize))
 			return null;
@@ -243,7 +243,7 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 	 *@param lOtherNodes The list of nodes to which sBaseNode is connected
 	 *@param hAppearenceHistogram The histogram of appearences of the terms
 	 ***/
-	public void createEdgesConnecting(UniqueJVertexGraph gGraph,
+	public void createEdgesConnecting(UniqueVertexGraph gGraph,
 			String sStartNode,
 			List<String> lOtherNodes,
 			HashMap<String, Double> hAppearenceHistogram) 
@@ -345,7 +345,7 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 	 *to the current value. 1.0 means the old value is completely replaced by the
 	 *new. 0.5 means the final value is the average of the old and the new.
 	 ***/
-	public void createWeightedEdgesConnecting(UniqueJVertexGraph gGraph,
+	public void createWeightedEdgesConnecting(UniqueVertexGraph gGraph,
 			String sStartNode, List<String> lOtherNodes,
 			double dStartWeight, double dNewWeight, double dDataImportance) {
 
@@ -478,7 +478,7 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 				continue;
 
 			Vector<String> PrecedingNeighbours = new Vector<String>();
-			UniqueJVertexGraph gGraph = getGraphLevelByNGramSize(iNGramSize);
+			UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iNGramSize);
 
 			// The String has a size of at least [iNGramSize]
 			String sCurNGram = "";
@@ -528,9 +528,9 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 			return;
 
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
-			UniqueJVertexGraph gGraph =
+			UniqueVertexGraph gGraph =
 				getGraphLevelByNGramSize(iCurLvl);
-			UniqueJVertexGraph gOtherGraph =
+			UniqueVertexGraph gOtherGraph =
 				dgOtherGraph.getGraphLevelByNGramSize(iCurLvl);
 
 			// Check if other graph has corresponding level
@@ -571,9 +571,9 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 		EdgeCachedJLocator ecl = new EdgeCachedJLocator(1000);
 
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
-			UniqueJVertexGraph gGraph = getGraphLevelByNGramSize(iCurLvl);
-			UniqueJVertexGraph gOtherGraph = dgOtherGraph.getGraphLevelByNGramSize(iCurLvl);
-			UniqueJVertexGraph gNewGraph = gRes.getGraphLevelByNGramSize(iCurLvl);
+			UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iCurLvl);
+			UniqueVertexGraph gOtherGraph = dgOtherGraph.getGraphLevelByNGramSize(iCurLvl);
+			UniqueVertexGraph gNewGraph = gRes.getGraphLevelByNGramSize(iCurLvl);
 
 			// Check if other graph has corresponding level
 			if (gOtherGraph == null)
@@ -627,9 +627,9 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
 			/* get union and intersection graphs for the
 			 * current n-gram level */
-			UniqueJVertexGraph gUnion = 
+			UniqueVertexGraph gUnion = 
 				dgUnion.getGraphLevelByNGramSize(iCurLvl);
-			UniqueJVertexGraph gIntersection = 
+			UniqueVertexGraph gIntersection = 
 				dgIntersection.getGraphLevelByNGramSize(iCurLvl);
 
 			// TODO: Order by edge count for optimization
@@ -694,9 +694,9 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 		// For every level
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
 			/* get union and intersection graph for each n-gram level */
-			UniqueJVertexGraph gUnion = 
+			UniqueVertexGraph gUnion = 
 				dgUnion.getGraphLevelByNGramSize(iCurLvl);
-			UniqueJVertexGraph gIntersection =
+			UniqueVertexGraph gIntersection =
 				dgIntersection.getGraphLevelByNGramSize(iCurLvl);
 
 			// TODO: Order by edge count for optimization
@@ -767,7 +767,7 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 		double dMaxEdgeWeight = 0;
 		// Search all levels
 		for (int iNGramSize=MinSize; iNGramSize <= MaxSize; iNGramSize++) {
-			UniqueJVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
+			UniqueVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
 			if (gCurLevel.containsVertex(vNode))                
 			{
 				// Keep max neighbours number
@@ -803,7 +803,7 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 	 */
 	public void prune(double dMinCoexistenceImportance) {
 		for (int iNGramSize=MinSize; iNGramSize <= MaxSize; iNGramSize++) {
-			UniqueJVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
+			UniqueVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
 			Vector<JVertex> vToRemove = new Vector<JVertex>();
 
 			for (JVertex vCur: gCurLevel.vertexSet()) {
@@ -832,7 +832,7 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 	public void deleteItem(String sItem) {
 		// From all levels
 		for (int iNGramSize = MinSize; iNGramSize <= MaxSize; iNGramSize++) {
-			UniqueJVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
+			UniqueVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
 			// Vertex v = utils.locateVertexInGraph(gCurLevel, sItem);
 			JVertex v = null;
 			v = gCurLevel.locateVertex(v);
@@ -853,7 +853,7 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 	public void nullify() {
 		// From all levels
 		for (int iNGramSize=MinSize; iNGramSize <= MaxSize; iNGramSize++) {
-			UniqueJVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
+			UniqueVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
 			// For all edges, set weight to zero
 			for (Edge e: gCurLevel.edgeSet()) {
 				gCurLevel.setEdgeWeight(e, 0.0);
@@ -916,11 +916,11 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 		DataString = (String)in.readObject();
 
 		// Create array of graphs
-		NGramGraphArray = new UniqueJVertexGraph[MaxSize - MinSize + 1];
+		NGramGraphArray = new UniqueVertexGraph[MaxSize - MinSize + 1];
 		// For each graph
 		for (int iCnt=MinSize; iCnt <= MaxSize; iCnt++) {
 			this.NGramGraphArray[iCnt - MinSize] = 
-				(UniqueJVertexGraph)in.readObject();
+				(UniqueVertexGraph)in.readObject();
 		}
 		// Load degradation
 		DegradedEdges = (HashMap<Edge, Double>)in.readObject();
@@ -932,8 +932,8 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 
 	public void degrade(NGramJGraph dgOtherGraph) {
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
-			UniqueJVertexGraph gGraph = getGraphLevelByNGramSize(iCurLvl);
-			UniqueJVertexGraph gOtherGraph = dgOtherGraph.getGraphLevelByNGramSize(iCurLvl);
+			UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iCurLvl);
+			UniqueVertexGraph gOtherGraph = dgOtherGraph.getGraphLevelByNGramSize(iCurLvl);
 			// Check if other graph has corresponding level
 			if (gOtherGraph == null)
 				// If not, ignore level
@@ -981,7 +981,7 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 		StringBuffer sb = new StringBuffer();
 		// For every graph level
 		for (int iCnt=MinSize; iCnt <= MaxSize; iCnt++) {
-			UniqueJVertexGraph g = getGraphLevelByNGramSize(iCnt);
+			UniqueVertexGraph g = getGraphLevelByNGramSize(iCnt);
 			// For all edges
 			for (Edge eCur: g.edgeSet()) {
 				String sCooccurenceID;
@@ -1013,10 +1013,10 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 		gRes.DegradedEdges = 
 			new HashMap<Edge, Double>(this.DegradedEdges);
 		gRes.NGramGraphArray = 
-			new UniqueJVertexGraph[this.NGramGraphArray.length];
+			new UniqueVertexGraph[this.NGramGraphArray.length];
 		int iCnt=0;
-		for (UniqueJVertexGraph uCur : this.NGramGraphArray)
-			gRes.NGramGraphArray[iCnt++] = (UniqueJVertexGraph)uCur.clone();
+		for (UniqueVertexGraph uCur : this.NGramGraphArray)
+			gRes.NGramGraphArray[iCnt++] = (UniqueVertexGraph)uCur.clone();
 
 		return gRes;
 	}
@@ -1043,9 +1043,9 @@ implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
 		// Clone this graph
 		NGramGraph dgClone = (NGramGraph)clone();
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
-			UniqueJVertexGraph gCloneLevel = 
+			UniqueVertexGraph gCloneLevel = 
 				dgClone.getGraphLevelByNGramSize(iCurLvl);
-			UniqueJVertexGraph gOtherGraphLevel = 
+			UniqueVertexGraph gOtherGraphLevel = 
 				dgOtherGraph.getGraphLevelByNGramSize(iCurLvl);
 
 			// If this level does not exist in other graph, then keep

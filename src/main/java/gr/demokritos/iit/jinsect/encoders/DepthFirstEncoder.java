@@ -20,7 +20,7 @@ extends BaseGraphEncoder implements GraphEncoding {
 	 * @param uvg the graph to be encoded
 	 * @return a new DepthFirstEncoder object
 	 */
-	public DepthFirstEncoder(UniqueJVertexGraph uvg) {
+	public DepthFirstEncoder(UniqueVertexGraph uvg) {
 		super(uvg);
 		stack = new ArrayDeque<JVertex>();
 	}
@@ -33,7 +33,7 @@ extends BaseGraphEncoder implements GraphEncoding {
 	 * @param vFrom the vertex to start encoding from
 	 * @return a new DepthFirstEncoder object
 	 */
-	public DepthFirstEncoder(UniqueJVertexGraph uvg, JVertex vFrom) {
+	public DepthFirstEncoder(UniqueVertexGraph uvg, JVertex vFrom) {
 		super(uvg, vFrom);
 		stack = new ArrayDeque<JVertex>();
 	}

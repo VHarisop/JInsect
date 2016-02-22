@@ -62,8 +62,8 @@ public class ComparatorsTest
 		// verify that the similarity comparator works properly
 		SimilarityComparator simComp = new SimilarityComparator();
 
-		UniqueJVertexGraph uvgA = new UniqueJVertexGraph();
-		UniqueJVertexGraph uvgB = new UniqueJVertexGraph();
+		UniqueVertexGraph uvgA = new UniqueVertexGraph();
+		UniqueVertexGraph uvgB = new UniqueVertexGraph();
 
 		JVertex v1 = new NGramVertex("A");
 		JVertex v2 = new NGramVertex("B");
