@@ -66,12 +66,6 @@ public class SimilarityTest
 		}
 	}
 
-	/**
-	 * Helper function to add an edge to a graph given the vertices' labels
-	 */
-	private void addEdge(UniqueVertexGraph uvg, String sA, String sB, double w) {
-		uvg.addEdge(new NGramVertex(sA), new NGramVertex(sB), w);
-	}
 
 	public void testGraphs() {
 		VertexCoder vCoder = new VertexCoder()
@@ -88,23 +82,6 @@ public class SimilarityTest
 		assertTrue(eqDouble(vCoder.get("B"), 0.55));
 		assertTrue(eqDouble(vCoder.get("C"), 0.60));
 		assertTrue(eqDouble(vCoder.get("D"), 0.65));
-
-		/* populate graphs with edges */
-		addEdge(uvgA, "B", "A", 2.0); 
-		addEdge(uvgA, "B", "C", 4.0);
-		addEdge(uvgA, "C", "A", 3.0);
-		
-		/* uvgB is a little different */
-		addEdge(uvgB, "B", "A", 2.0); 
-		addEdge(uvgB, "B", "D", 4.0);
-		addEdge(uvgB, "D", "A", 3.0);
-		addEdge(uvgB, "D", "B", 2.0);
-
-		double dgA = uvgA.getWeightRangeCode(vCoder),
-			   dgB = uvgB.getWeightRangeCode(vCoder);
-
-		double sim = jutils.getWeightRangeSimilarity(uvgA, uvgB, vCoder);
-		assertEquals(sim, dgA - dgB, 0.0001);
 	}
 
 	/* Helper function to check doubles for equality */

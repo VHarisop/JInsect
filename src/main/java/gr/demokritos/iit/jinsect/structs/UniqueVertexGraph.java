@@ -22,29 +22,6 @@ import gr.demokritos.iit.jinsect.structs.calculators.*;
 public class UniqueVertexGraph 
 extends DefaultDirectedWeightedGraph<JVertex, Edge>
 {
-
-	/**
-	 * A {@link EntropyCalculator} object to encode the vertices of the graph.
-	 */
-	public EntropyCalculator entropyCalc;
-
-	/**
-	 * A {@link DegreeVarianceCalculator} that operates on the vertices
-	 * of this graph.
-	 */
-	public DegreeVarianceCalculator degreeVarCalc;
-
-	/**
-	 * A {@link PerVertexVarianceCalculator} that operates on this graph's
-	 * vertices.
-	 */
-	public PerVertexVarianceCalculator perVertexVarCalc;
-
-	/**
-	 * A {@link WeightRangeCalculator} that operates on this graph's vertices.
-	 */
-	public WeightRangeCalculator degreeRangeCalc;
-
 	/**
 	 * A {@link OrderedWeightCalculator} that operates on this graph's vertices.
 	 */
@@ -368,93 +345,6 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		for (Edge e: eList) { sum += super.getEdgeWeight(e); }
 
 		return sum;
-	}
-
-	/**
-	 * Calculates the total weight variance of the graph's vertices
-	 * as computed by {@link #degreeVarCalc}.
-	 *
-	 * @return the total weight variance
-	 */
-	public double getWeightVariance() {
-		if (degreeVarCalc == null) {
-			degreeVarCalc = new DegreeVarianceCalculator(this);
-		}
-
-		/* get the total variance */
-		return degreeVarCalc.getWeightVariance();
-	}
-	
-	/**
-	 * Calculates the degree variance of the graph's vertices
-	 * as computed by {@link #degreeVarCalc}.
-	 *
-	 * @return the degree variance of the graph
-	 */
-	public double getDegreeVariance() {
-		if (degreeVarCalc == null) {
-			degreeVarCalc = new DegreeVarianceCalculator(this);
-		}
-
-		/* get the total variance */
-		return degreeVarCalc.getDegreeVariance();
-	}
-
-	/**
-	 * Calculates the vertex weight range code, which is defined as the sum 
-	 * of the graph's vertex code + weight ranges. These are the quantities
-	 * <tt>(v_code + max(v_inweight) - min(v_inweight)) * 
-	 * (v_code + max(v_outweight) - min(v_outweight)) </tt> where the 
-	 * <tt>v_code</tt> quantities are supplied by a {@link VertexCoder} 
-	 * and a {@link VertexEntropy}.
-	 *
-	 * @param vWt the vertex coder to use
-	 * @return the sum of weight range codes
-	 */
-	public double getWeightRangeCode(VertexCoder vwMap) {
-		if (degreeRangeCalc == null || entropyCalc == null) {
-			degreeRangeCalc = new WeightRangeCalculator(this);
-			entropyCalc = new EntropyCalculator(this);
-		}
-		
-		double sum = 0; double[] ranges; double vW;
-		for (JVertex v: this.vertexSet()) {
-			ranges = degreeRangeCalc.getDegrees(v.getLabel());
-			vW = vwMap.getLabel(v.getLabel());
-			double weight = entropyCalc.getEntropy(v.getLabel()) + vW;
-
-			sum += (weight + ranges[0]) * (weight + ranges[1]);
-		}
-
-		return sum;
-	}
-
-
-	/**
-	 * Gets the sum of the vertex entropy for the vertices
-	 * of this graph. 
-	 *
-	 * @return the sum of vertex entropies
-	 */
-	public double getTotalVertexEntropy() {
-		if (entropyCalc == null) {
-			entropyCalc = new EntropyCalculator(this);
-		}
-		return entropyCalc.getTotalVertexEntropy();
-	}
-
-	/**
-	 * Calculates the sum of this graph's vertex weight variance 
-	 * ratios via {@link #perVertexVarCalc}.
-	 *
-	 * @return the sum of vertex weight variance ratios
-	 */
-	public double getTotalVarRatios() {
-		if (perVertexVarCalc == null) {
-			perVertexVarCalc = new PerVertexVarianceCalculator(this);
-		}
-		/* get the total var diff */
-		return perVertexVarCalc.getTotalVarianceRatios();
 	}
 
 	/**

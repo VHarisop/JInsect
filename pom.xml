@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>gr.demokritos.iit.jinsect</groupId>
   <artifactId>jinsect-core</artifactId>
-  <version>1.0rc</version>
+  <version>1.0rc2</version>
   <name>JInsect</name>
   <!-- build details here -->
   <build>

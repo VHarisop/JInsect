@@ -41,25 +41,6 @@ public final class jutils {
 	}
 
 	/**
-	 * Returns the vertex weight range similarity between two graphs based on a
-	 * map of label - weight entries that provides the factors for the smoothened
-	 * weight - range quantities.
-	 *
-	 * @param gA the first graph
-	 * @param gB the second graph
-	 * @param vWeights the map of label - weight entries
-	 * @return the weight range similarity between the 2 graphs
-	 */
-	public static double getWeightRangeSimilarity(
-			UniqueVertexGraph gA,
-			UniqueVertexGraph gB,
-			VertexCoder vWeights)
-	{
-		return gA.getWeightRangeCode(vWeights) - gB.getWeightRangeCode(vWeights);
-	}
-
-
-	/**
 	 * Gets the structural similarity of a graph over another, which is
 	 * defined as the sum of the edge structural similarities for all 
 	 * edges connecting vertices in the union of the 2 graphs' edge sets.
