@@ -148,18 +148,17 @@ public final class jutils {
 			JVertex vA = gTree.getEdgeSource(e);
 			JVertex vB = gTree.getEdgeTarget(e);
 
-			String sA = "_" + vA.toString().replaceAll("\\W", "_");
-			String sB = "_" + vB.toString().replaceAll("\\W", "_");
+			/* get the labels of the vertices this
+			 * edge connects */
+			String sA = vA.toString().replaceAll("\\W", "_");
+			String sB = vB.toString().replaceAll("\\W", "_");
 			String sLabel = "";
-			if (e instanceof Edge) {
-				double dWeight = gTree.getEdgeWeight(e);
-				sLabel += String.format("%4.2f", dWeight);
-			}
-			if (e instanceof Edge)
-				sb.append("\t" + sA + " " + sConnector + " " + sB + 
-						" [label=\"" + sLabel.replaceAll("\\s+", " ") + "\"]\n");
-			else
-				sb.append("\t" + sA + " " + sConnector + " " + sB + "\n");
+
+			/* get weight of edge and add it to the connection's label */
+			double dWeight = gTree.getEdgeWeight(e);
+			sLabel += String.format("%4.2f", dWeight);
+			sb.append("\t" + sA + " " + sConnector + " " + sB +
+					" [label=\"" + sLabel.replaceAll("\\s+", " ") + "\"]\n");
 			sb.append("\t" + sA + " [label=\"" + sA + "\"] " + "\n");
 		}
 		sb.append("}");
