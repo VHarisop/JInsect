@@ -1,6 +1,5 @@
 package gr.demokritos.iit.jinsect;
 
-import gr.demokritos.iit.jinsect.algorithms.nlp.PorterStemmer;
 import gr.demokritos.iit.jinsect.storage.IFileLoader;
 
 import java.io.*;
@@ -43,7 +42,8 @@ public final class utils {
 		Collections.shuffle(l, d);
 	}
 
-	/**Splits a given string to its words, without stemming. Words
+	/**
+	 * Splits a given string to its words, without stemming. Words
 	 * are considered to be everything but sequences of whitespace
 	 * and punctuation.
 	 *
@@ -51,38 +51,7 @@ public final class utils {
 	 * @return An array of String containing the words of the given string.
 	 */
 	public static final String[] splitToWords(String sStr) {
-		return splitToWords(sStr, false); // Do NOT stem
-	}
-
-	/**
-	 * Splits a given string to its words, without stemming. Words
-	 * are considered to be everything but sequences of whitespace
-	 * and punctuation.
-	 *
-	 * @param sStr The input string.
-	 * @param bStem True if stemming should be performed to the input words,
-	 * otherwise false.
-	 * @return An array of String containing the (possibly stemmed) words of the given string.
-	 */
-	public static final String[] splitToWords(String sStr, boolean bStem) {
-		PorterStemmer sStem = new PorterStemmer();
-		// Removed conversion to lowercase
-		//        String [] sRes = sStr.toLowerCase().split("(\\s|\\p{Punct})+");
-		String [] sRes = sStr.split("(\\s|\\p{Punct})+");
-		if (bStem) {
-			for (int iCnt = 0; iCnt < sRes.length; iCnt++) {
-				if (!sRes[iCnt].trim().equals("")) {
-					try {
-						sRes[iCnt] = sStem.stem(sRes[iCnt]);
-					}
-					catch (Exception e)
-					{
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-
+		String[] sRes = sStr.split("(\\s|\\p{Punct})+");
 		return sRes;
 	}
 
