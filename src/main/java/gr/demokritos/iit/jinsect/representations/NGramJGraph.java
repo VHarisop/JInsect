@@ -1,41 +1,21 @@
 package gr.demokritos.iit.jinsect.representations;
 
-import gr.demokritos.iit.jinsect.structs.IMergeable;
+import java.io.*;
+import java.util.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
-
-import gr.demokritos.iit.jinsect.structs.EdgeCachedJLocator;
-import gr.demokritos.iit.jinsect.structs.JVertex;
-import gr.demokritos.iit.jinsect.structs.NGramVertex;
-import gr.demokritos.iit.jinsect.structs.Edge;
-import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
-
+import gr.demokritos.iit.jinsect.structs.*;
 import gr.demokritos.iit.jinsect.io.LineReader;
-
 import gr.demokritos.iit.jinsect.utils;
 
-/** Represents the graph of a document, with vertices n-grams of the document and edges the number
- * of the n-grams' co-occurences within a given window.
+/** 
+ * Represents the graph of a document, with the n-grams of the document as
+ * vertices and the number of the n-grams' co-occurences within a given window
+ * as edges.
  *
  * @author PCKid
  */
 public class NGramJGraph 
-implements Serializable, Cloneable, IMergeable<NGramGraph>, NGramGraph
+implements Serializable, Cloneable, NGramGraph
 {
 
 	static final long serialVersionUID = 1L;

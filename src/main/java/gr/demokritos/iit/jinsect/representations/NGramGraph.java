@@ -144,7 +144,10 @@ public interface NGramGraph extends Cloneable {
 	 * tendency for weighting the merged edges.
 	 *
 	 * @param otherGraph the graph to merge with
-	 * @param weightPercent the weighing tendency
+	 * @param weightPercent the convergence tendency parameter. A value of
+	 * 0.0 means no change to the existing object, 1.0 means the updated
+	 * object is the same as the new object. A value of 0.5 means the new
+	 * object is equally similar to the two source objects (averaging effect).
 	 */
 	public void merge(NGramGraph otherGraph, double weightPercent);
 
