@@ -114,7 +114,6 @@ public final class utils {
 		return sbRes.toString();
 	}
 
-
 	/**
 	 * Returns the system encoding String.
 	 * @return A String indicating the System default encoding.
@@ -152,7 +151,6 @@ public final class utils {
 	 */
 	public static double sign(double dNum) {
 		return dNum == 0.0 ? dNum : dNum / Math.abs(dNum);
-
 	}
 
 	/**
@@ -206,84 +204,6 @@ public final class utils {
 		}
 
 		return (List)aRes;
-	}
-
-	/**
-	 * Bubble-sorts an array of comparable items.
-	 * @param aArr An array of {@link Comparable} objects.
-	 */
-	public static final void bubbleSortArray(Comparable[] aArr) {
-		boolean bChanged = true;
-		Comparable a, b;
-		while (bChanged) {
-			bChanged = false;
-			for (int iCnt = 0; iCnt < aArr.length - 1; iCnt++) {
-				a = aArr[iCnt];
-				b = aArr[iCnt + 1];
-				if (a.compareTo(b) > 0) {
-					aArr[iCnt] = b;
-					aArr[iCnt + 1] = a;
-					bChanged = true;
-				}
-			}
-		}
-	}
-
-	/**
-	 * Parses the command line expecting values of either
-	 * `-switch` or
-	 * `-key=value`
-	 * and returns corresponding {@link Hashtable}, with switches as keys
-	 * and `TRUE` as value, or `key` as keys and `value` as values
-	 * @param sCommands The command line array of Strings.
-	 * @return The described hashtable.
-	 */
-	public static Hashtable<String, String>
-	parseCommandLineSwitches(String[] sCommands) {
-		Hashtable<String, String> hRes = new Hashtable<String, String>();
-		Iterator<String> iStr = Arrays.asList(sCommands).iterator();
-		while (iStr.hasNext()) {
-			String sToken = (String)iStr.next();
-			String sType, sVal;
-			if (sToken.indexOf("-")==0) {
-				// Switch
-				if (sToken.contains("=")) {
-					// Parameter
-					// Part before '=' is key, omitting dash
-					sType = (sToken.split("=")[0]).substring(1);
-					// Part after '=' is value
-					sVal = sToken.split("=")[1];
-				}
-				else
-				{
-					// Simple switch. Omit dash
-					sType = sToken.substring(1);
-					sVal = "TRUE";
-				}
-
-				hRes.put(sType, sVal);
-			}
-		}
-		return hRes;
-	}
-
-	/**
-	 * Given a {@link Hashtable} and a given option string, this function returns either the 
-	 * option set in the hashtable, or a given default if the option has not been set. 
-	 * @param hSwitches The hashtable of switches (see also <code>parseCommandLineSwitches</code>).
-	 * @param sOption The name of the option of interest.
-	 * @param sDefault The default value to be used if the option has not been set.
-	 * @return The value of the switch, or the default value if no value has been set.
-	 */
-	public static String
-	getSwitch(Hashtable<String, String> hSwitches, String sOption, String sDefault) {
-		Iterator<String> iIter = hSwitches.keySet().iterator();
-		while (iIter.hasNext()) {
-			String sCurSwitch = iIter.next();
-			if (sCurSwitch.equals(sOption))
-				return hSwitches.get(sCurSwitch);
-		}
-		return sDefault;
 	}
 
 	/**

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import gr.demokritos.iit.jinsect.structs.EdgeCachedJLocator;
+import gr.demokritos.iit.jinsect.structs.EdgeCachedLocator;
 import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 import gr.demokritos.iit.jinsect.structs.JVertex;
 import gr.demokritos.iit.jinsect.structs.NGramVertex;
@@ -20,7 +20,7 @@ import gr.demokritos.iit.jinsect.structs.Edge;
  */
 public class NGramGaussJGraph extends NGramJGraph {
 	static final long serialVersionUID = 1L;
-	public EdgeCachedJLocator eclLocator = null;
+	public EdgeCachedLocator eclLocator = null;
 
 	/** 
 	 * Creates a new instance of DocumentNGramGaussNormJGraph 
@@ -248,7 +248,7 @@ public class NGramGaussJGraph extends NGramJGraph {
 			dIncreaseWeight = dStartWeight;
 
 			if (eclLocator == null)
-				eclLocator = new EdgeCachedJLocator(10);
+				eclLocator = new EdgeCachedLocator(10);
 			Edge weCorrectEdge = 
 				eclLocator.locateDirectedEdgeInGraph(gGraph, vA, vB);
 

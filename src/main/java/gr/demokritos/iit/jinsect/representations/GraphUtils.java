@@ -9,18 +9,17 @@ import java.util.List;
  * @author VHarisop
  */
 public final class GraphUtils {
-
 	/**
 	 * Creates a blank GraphUtils object. This constructor is private, because
-	 * GraphUtils is intended to be used as a static class.
+	 * GraphUtils is intended to be used as a utility class with helper methods.
 	 */
 	private GraphUtils() {}
 
 	/**
 	 * Merges an array of {@link NGramJGraph} objects, using a copy of the first
-	 * graph of the array as the basis for the merging process. The learning
-	 * rate used for merging is the weighted average. Returns <tt>null</tt> if
-	 * the array is empty.
+	 * graph of the array as the basis for the merging process - no graph in the
+	 * array is modified. The learning rate used for merging is the weighted
+	 * average. Returns <tt>null</tt> if the array is empty.
 	 *
 	 * @param toMerge the array of graphs to merge
 	 * @return the graph that results from merging all graphs in the array
@@ -58,10 +57,11 @@ public final class GraphUtils {
 	/**
 	 * Performs noise filtering on an array of {@link NGramJGraph} objects by
 	 * computing their intersection first and then applying the all-not-in 
-	 * operator on each graph of the array. Returns <tt>null</tt> if the array
+	 * operator on each graph of the array - all the graphs in the original
+	 * array remain unmodified. Returns <tt>null</tt> if the array
 	 * is empty.
 	 *
-	 * @param graphs the array of graphs to be filtered
+	 * @param graphs an array of graphs to be filtered
 	 * @return the array of noise-filtered graphs
 	 */
 	public static NGramGraph[] removeNoise(NGramGraph[] graphs) {
@@ -86,8 +86,9 @@ public final class GraphUtils {
 	/**
 	 * Performs noise filtering on a list of {@link NGramGraph} objects by
 	 * computing their intersection first and then applying the all-not-in 
-	 * operator on each graph of the initial list. Returns <tt>null</tt> if 
-	 * the list is empty or has zero size.
+	 * operator on each graph of the initial list - all the graphs in the
+	 * original list remain unmodified. Returns <tt>null</tt> if 
+	 * the list is null or empty.
 	 *
 	 * @param graphs the list of graphs to be filtered
 	 * @return the list of noise-filtered graphs

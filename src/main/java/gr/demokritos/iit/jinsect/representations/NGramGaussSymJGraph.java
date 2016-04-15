@@ -215,7 +215,7 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
             //WeightedEdge weCorrectEdge = (WeightedEdge)jinsect.utils.locateDirectedEdgeInGraph(gGraph, vA, vB);
             
             if (eclLocator == null)
-                eclLocator = new EdgeCachedJLocator(10);
+                eclLocator = new EdgeCachedLocator(10);
             // Add one-way edge
             Edge weCorrectEdge = eclLocator.locateDirectedEdgeInGraph(gGraph, vA, vB);
             
@@ -345,7 +345,7 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
             dIncreaseWeight = dStartWeight;
             
 			if (eclLocator == null)
-                eclLocator = new EdgeCachedJLocator(10);
+                eclLocator = new EdgeCachedLocator(10);
             Edge weCorrectEdge = 
 				eclLocator.locateDirectedEdgeInGraph(gGraph, vA, vB);
             

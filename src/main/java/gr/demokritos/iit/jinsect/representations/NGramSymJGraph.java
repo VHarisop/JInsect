@@ -25,7 +25,7 @@ public class NGramSymJGraph extends NGramJGraph {
 	/**
 	 * Speeds up edge location in a given graph, by caching last searches. 
 	 */
-	public EdgeCachedJLocator eclLocator = null;
+	public EdgeCachedLocator eclLocator = null;
 
 	/**
 	 * Creates a NGramSymJGraph object with default parameters 
@@ -254,7 +254,7 @@ public class NGramSymJGraph extends NGramJGraph {
 			dIncreaseWeight = dStartWeight;
 
 			if (eclLocator == null)
-				eclLocator = new EdgeCachedJLocator(10);
+				eclLocator = new EdgeCachedLocator(10);
 			// Add one-way edge
 			Edge weCorrectEdge = 
 				eclLocator.locateDirectedEdgeInGraph(gGraph, vA, vB);

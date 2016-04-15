@@ -15,9 +15,8 @@ import gr.demokritos.iit.jinsect.utils;
  * @author PCKid
  */
 public class NGramJGraph 
-implements Serializable, Cloneable, NGramGraph
+implements Serializable, NGramGraph
 {
-
 	static final long serialVersionUID = 1L;
 
 	/** The minimum and maximum n-gram size, and the cooccurence window.
@@ -29,7 +28,7 @@ implements Serializable, Cloneable, NGramGraph
 
 	/* array of UniqueJVertexGraphs for various N-gram sizes */
 	protected UniqueVertexGraph[] NGramGraphArray;
-	protected EdgeCachedJLocator eclLocator = null;
+	protected EdgeCachedLocator eclLocator = null;
 
 	/** 
 	 * Creates a new instance of NGramJGraph with default 
@@ -62,14 +61,14 @@ implements Serializable, Cloneable, NGramGraph
 	 * @return a new NGramJGraph with the given parameters
 	 */
 	public NGramJGraph
-		(String dataString, int iMinSize, int iMaxSize, int iCorrelationWindow) 
-		{
-			MinSize = iMinSize;
-			MaxSize = iMaxSize;
-			CorrelationWindow = iCorrelationWindow;
-			setDataString(dataString);
+	(String dataString, int iMinSize, int iMaxSize, int iCorrelationWindow) 
+	{
+		MinSize = iMinSize;
+		MaxSize = iMaxSize;
+		CorrelationWindow = iCorrelationWindow;
+		setDataString(dataString);
 
-		}
+	}
 
 	/**
 	 * Creates a new instance of NGramJGraph
@@ -137,12 +136,10 @@ implements Serializable, Cloneable, NGramGraph
 	 * the document n-gram graph.
 	 */
 	public int length() {
-		Iterator<UniqueVertexGraph> iIter = 
-			Arrays.asList(NGramGraphArray).iterator();
-
 		int iCnt = 0;
-		while (iIter.hasNext())
-			iCnt += (iIter.next()).getEdgeCount();
+		for (UniqueVertexGraph uvg: NGramGraphArray) {
+			iCnt += uvg.getEdgeCount();
+		}
 		return iCnt;
 	}
 
@@ -159,10 +156,11 @@ implements Serializable, Cloneable, NGramGraph
 	/** Creates the graph based on a data string loaded from a given file.
 	 *@param sFilename The filename of the file containing the data string.
 	 */
-	public void loadDataStringFromFile(String sFilename) throws IOException,
-		   FileNotFoundException{        
-			   String sDataString = utils.loadFileToStringWithNewlines(sFilename);
-			   setDataString(sDataString); // Actually update
+	public void loadDataStringFromFile(String sFilename)
+	throws IOException, FileNotFoundException
+	{
+		String sDataString = utils.loadFileToStringWithNewlines(sFilename);
+		setDataString(sDataString); // Actually update
 	}
 
 	/**
@@ -210,19 +208,19 @@ implements Serializable, Cloneable, NGramGraph
 	 * Set a locator to optimize the edge lookup.
 	 * @param eNewLocator The locator to use.
 	 */
-	public void setLocator(EdgeCachedJLocator eNewLocator) {
+	public void setLocator(EdgeCachedLocator eNewLocator) {
 		eclLocator = eNewLocator;
 	}
 
-	/***
+	/**
 	 * Creates an edge in [gGraph] connecting [sBaseNode] to each node in the
-	 *[lOtherNodes] list of nodes. If an edge exists, its weight is increased by [iIncreaseWeight],
-	 *else its weight is set to [iStartWeight]
-	 *@param gGraph The graph to use
-	 *@param sStartNode The node from which all edges begin
-	 *@param lOtherNodes The list of nodes to which sBaseNode is connected
-	 *@param hAppearenceHistogram The histogram of appearences of the terms
-	 ***/
+	 * [lOtherNodes] list of nodes. If an edge exists, its weight is increased
+	 * by [iIncreaseWeight], else its weight is set to [iStartWeight].
+	 * @param gGraph The graph to use
+	 * @param sStartNode The node from which all edges begin
+	 * @param lOtherNodes The list of nodes to which sBaseNode is connected
+	 * @param hAppearenceHistogram The histogram of appearences of the terms
+	 **/
 	public void createEdgesConnecting(UniqueVertexGraph gGraph,
 			String sStartNode,
 			List<String> lOtherNodes,
@@ -270,7 +268,7 @@ implements Serializable, Cloneable, NGramGraph
 		}
 
 		// create a new cached locator
-		EdgeCachedJLocator ecl = new EdgeCachedJLocator(100);
+		EdgeCachedLocator ecl = new EdgeCachedLocator(100);
 
 
 		// For every edge
@@ -312,19 +310,20 @@ implements Serializable, Cloneable, NGramGraph
 
 	}
 
-	/***
+	/**
 	 * Creates an edge in [gGraph] connecting [sBaseNode] to each node in the
-	 *[lOtherNodes] list of nodes. If an edge exists, its weight is increased by [iIncreaseWeight],
-	 *else its weight is set to [iStartWeight]
-	 *@param gGraph The graph to use
-	 *@param sStartNode The node from which all edges begin
-	 *@param lOtherNodes The list of nodes to which sBaseNode is connected
-	 *@param dStartWeight The initial weight for first-occuring nodes
-	 *@param dNewWeight The new weight
-	 *@param dDataImportance The tendency towards the new value. 0.0 means no change
-	 *to the current value. 1.0 means the old value is completely replaced by the
-	 *new. 0.5 means the final value is the average of the old and the new.
-	 ***/
+	 * [lOtherNodes] list of nodes. If an edge exists, its weight is increased
+	 * by [iIncreaseWeight],
+	 * else its weight is set to [iStartWeight]
+	 * @param gGraph The graph to use
+	 * @param sStartNode The node from which all edges begin
+	 * @param lOtherNodes The list of nodes to which sBaseNode is connected
+	 * @param dStartWeight The initial weight for first-occuring nodes
+	 * @param dNewWeight The new weight
+	 * @param dDataImportance The tendency towards the new value. 0.0 means no change
+	 * to the current value. 1.0 means the old value is completely replaced by the
+	 * new. 0.5 means the final value is the average of the old and the new.
+	 **/
 	public void createWeightedEdgesConnecting(UniqueVertexGraph gGraph,
 			String sStartNode, List<String> lOtherNodes,
 			double dStartWeight, double dNewWeight, double dDataImportance) {
@@ -357,9 +356,9 @@ implements Serializable, Cloneable, NGramGraph
 			}
 		}
 
-		EdgeCachedJLocator ecl;
+		EdgeCachedLocator ecl;
 		if (eclLocator == null)
-			ecl = new EdgeCachedJLocator(100);
+			ecl = new EdgeCachedLocator(100);
 		else
 			ecl = eclLocator;
 
@@ -408,14 +407,16 @@ implements Serializable, Cloneable, NGramGraph
 	}
 
 	/**
-	 * Creates the graph of n-grams, for all the levels specified in the MinSize, MaxSize range.
+	 * Creates the graph of n-grams, for all the levels
+	 * specified in the MinSize, MaxSize range.
 	 */
 	public void createGraphs() {       
-		String sUsableString = new StringBuilder().append(DataString).toString();
+		String sUsableString =
+			new StringBuilder().append(DataString).toString();
 
 		int iLen = DataString.length();
 		// Create token histogram.
-		HashMap<String, Double> hTokenAppearance = 
+		HashMap<String, Double> hTokenAppearance =
 			new HashMap<String, Double>();
 
 		/* 1st pass. Populate histogram.
@@ -438,13 +439,15 @@ implements Serializable, Cloneable, NGramGraph
 					break;
 
 				// Get n-gram                
-				sCurNGram = sUsableString.substring(iCurStart, iCurStart + iNGramSize);
+				sCurNGram = 
+					sUsableString.substring(iCurStart, iCurStart + iNGramSize);
 				// Update Histogram
 				if (hTokenAppearance.containsKey(sCurNGram))
-					hTokenAppearance.put(sCurNGram, (hTokenAppearance.get(sCurNGram)).doubleValue() + 1.0);
+					hTokenAppearance.put(
+						sCurNGram,
+						(hTokenAppearance.get(sCurNGram)).doubleValue() + 1.0);
 				else
 					hTokenAppearance.put(sCurNGram, 1.0);
-
 			}
 		}
 
@@ -548,7 +551,7 @@ implements Serializable, Cloneable, NGramGraph
 		NGramJGraph gRes = new NGramJGraph(MinSize, MaxSize, CorrelationWindow);
 
 		// Use cached edge locator
-		EdgeCachedJLocator ecl = new EdgeCachedJLocator(1000);
+		EdgeCachedLocator ecl = new EdgeCachedLocator(1000);
 
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
 			UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iCurLvl);
@@ -613,7 +616,7 @@ implements Serializable, Cloneable, NGramGraph
 				dgIntersection.getGraphLevelByNGramSize(iCurLvl);
 
 			// TODO: Order by edge count for optimization
-			EdgeCachedJLocator eclLocator = new EdgeCachedJLocator(10);
+			EdgeCachedLocator eclLocator = new EdgeCachedLocator(10);
 
 			// Check if other graph has corresponding level
 			if (gIntersection == null)
@@ -680,7 +683,7 @@ implements Serializable, Cloneable, NGramGraph
 				dgIntersection.getGraphLevelByNGramSize(iCurLvl);
 
 			// TODO: Order by edge count for optimization
-			EdgeCachedJLocator eclLocator = new EdgeCachedJLocator(100);
+			EdgeCachedLocator eclLocator = new EdgeCachedLocator(100);
 
 			// Check if other graph has corresponding level
 			if (gIntersection == null)
@@ -709,14 +712,23 @@ implements Serializable, Cloneable, NGramGraph
 		return res;
 	}
 
+	/**
+	 * @see NGramGraph#getMinSize getMinsize
+	 */
 	public int getMinSize() {
 		return MinSize;
 	}
 
+	/**
+	 * @see NGramGraph#getMaxSize getMaxSize
+	 */
 	public int getMaxSize() {
 		return MaxSize;
 	}
 
+	/**
+	 * @see NGramGraph#getWindowSize getWindowSize
+	 */
 	public int getWindowSize() {
 		return CorrelationWindow;
 	}
@@ -822,7 +834,8 @@ implements Serializable, Cloneable, NGramGraph
 				gCurLevel.removeVertex(v);
 			}
 			catch (Exception e) {
-				e.printStackTrace(); // Probably node did not exist
+				// Most probable cause: Node did not exist
+				e.printStackTrace();
 			}
 		}        
 	}
@@ -853,7 +866,7 @@ implements Serializable, Cloneable, NGramGraph
 	}
 
 	/**
-	 * Simple getter for the graph's data string
+	 * Simple getter for the graph's data string.
 	 *
 	 * @return the data string represented by the graph
 	 */
@@ -883,31 +896,31 @@ implements Serializable, Cloneable, NGramGraph
 	}
 
 	/**
-	 * Reads a serialized object
+	 * Reads a serialized object.
 	 */
 	@SuppressWarnings("unchecked")
 	private void readObject(ObjectInputStream in)
 	throws IOException, ClassNotFoundException {
-	try {
-		// Read Fields
-		MinSize = in.readInt();
-		MaxSize = in.readInt();
-		CorrelationWindow = in.readInt();
-		DataString = (String)in.readObject();
+		try {
+			// Read Fields
+			MinSize = in.readInt();
+			MaxSize = in.readInt();
+			CorrelationWindow = in.readInt();
+			DataString = (String)in.readObject();
 
-		// Create array of graphs
-		NGramGraphArray = new UniqueVertexGraph[MaxSize - MinSize + 1];
-		// For each graph
-		for (int iCnt=MinSize; iCnt <= MaxSize; iCnt++) {
-			this.NGramGraphArray[iCnt - MinSize] = 
-				(UniqueVertexGraph)in.readObject();
+			// Create array of graphs
+			NGramGraphArray = new UniqueVertexGraph[MaxSize - MinSize + 1];
+			// For each graph
+			for (int iCnt=MinSize; iCnt <= MaxSize; iCnt++) {
+				this.NGramGraphArray[iCnt - MinSize] = 
+					(UniqueVertexGraph)in.readObject();
+			}
+			// Load degradation
+			DegradedEdges = (HashMap<Edge, Double>)in.readObject();
+
+		} catch (Exception e) {
+			throw new IOException(e.getMessage());
 		}
-		// Load degradation
-		DegradedEdges = (HashMap<Edge, Double>)in.readObject();
-
-	} catch (Exception e) {
-		throw new IOException(e.getMessage());
-	}
 	}
 
 	public void degrade(NGramJGraph dgOtherGraph) {
@@ -1018,7 +1031,7 @@ implements Serializable, Cloneable, NGramGraph
 	 */
 	public NGramGraph allNotIn(NGramGraph dgOtherGraph) {
 		// TODO: Order by edge count for optimization
-		EdgeCachedJLocator eclLocator = new EdgeCachedJLocator(Math.max(length(),
+		EdgeCachedLocator eclLocator = new EdgeCachedLocator(Math.max(length(),
 					dgOtherGraph.length()));
 		// Clone this graph
 		NGramGraph dgClone = (NGramGraph)clone();

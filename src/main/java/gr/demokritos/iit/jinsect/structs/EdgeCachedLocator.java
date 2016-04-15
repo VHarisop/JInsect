@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
-
 /**
  * Utility class for performing edge retrieval using caching.
  * Three separate caches are maintained:
@@ -23,7 +22,7 @@ import java.util.TreeMap;
  * Originally by:
  * @author ggianna
  */
-public class EdgeCachedJLocator {
+public class EdgeCachedLocator {
 	protected int CacheMaxSize;
 
 	/**
@@ -49,7 +48,7 @@ public class EdgeCachedJLocator {
 	 * Creates a new instance of EdgeCachedLocator, concerning a specific graph.
 	 * @param iCacheMaxSize The maximum number of edges to cache.
 	 */
-	public EdgeCachedJLocator(int iCacheMaxSize) {
+	public EdgeCachedLocator(int iCacheMaxSize) {
 		CacheMaxSize = iCacheMaxSize;
 
 		Cache = new HashMap<String, TreeMap<String, Edge>>();

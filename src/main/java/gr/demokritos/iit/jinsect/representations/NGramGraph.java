@@ -9,7 +9,7 @@ import java.io.FileNotFoundException;
 import java.util.HashSet;
 
 /**
- * The interface implemented by all n-gram graph representations.
+ * An interface that must be implemented by all N-Gram Graph representations.
  *
  * @author VHarisop
  */
