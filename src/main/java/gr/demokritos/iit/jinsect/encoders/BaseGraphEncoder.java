@@ -8,14 +8,12 @@ import java.util.List;
 import gr.demokritos.iit.jinsect.structs.*;
 
 public abstract class BaseGraphEncoder {
-
-	UniqueVertexGraph nGraph;
-	JVertex vStart = null;
+	protected UniqueVertexGraph nGraph;
+	protected JVertex vStart = null;
 
 	// sets of visited / unvisited vertices
-	Set<JVertex> visited = new HashSet<JVertex>();
-	Set<JVertex> unvisited = new HashSet<JVertex>();
-
+	protected Set<JVertex> visited = new HashSet<JVertex>();
+	protected Set<JVertex> unvisited = new HashSet<JVertex>();
 
 	/**
 	 * Initializes the visited / unvisited sets. Creates 2 empty
