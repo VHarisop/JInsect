@@ -1,6 +1,6 @@
 package gr.demokritos.iit.jinsect.comparators;
 
-import gr.demokritos.iit.jinsect.representations.NGramJGraph;
+import gr.demokritos.iit.jinsect.representations.*;
 import gr.demokritos.iit.jinsect.structs.*;
 import gr.demokritos.iit.jinsect.jutils;
 import gr.demokritos.iit.jinsect.utils;
@@ -20,7 +20,7 @@ public class NGramGraphComparator {
 	 * @return a {@link GraphSimilarity} object, containing all similarity
 	 * metrics between the two graphs
 	 */
-	public GraphSimilarity getSimilarityBetween(NGramJGraph ngA, NGramJGraph ngB) {
+	public GraphSimilarity getSimilarityBetween(NGramGraph ngA, NGramGraph ngB) {
 		GraphSimilarity gSim = new GraphSimilarity();
 
 		/* calculate overall importance first */

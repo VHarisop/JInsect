@@ -30,6 +30,11 @@ implements Serializable, NGramGraph
 	protected UniqueVertexGraph[] NGramGraphArray;
 	protected EdgeCachedLocator eclLocator = null;
 
+	/**
+	 * The label of the NGramGraph.
+	 */
+	protected String label = null;
+
 	/** 
 	 * Creates a new instance of NGramJGraph with default 
 	 * parameters (MinSize = MaxSize = 3, CorrelationWindow = 3)
@@ -126,6 +131,24 @@ implements Serializable, NGramGraph
 			NGramGraphArray[iCnt - MinSize] = new UniqueVertexGraph();
 		// Create degraded edge list
 		DegradedEdges = new HashMap<Edge, Double>();        
+	}
+
+	/**
+	 * Returns this NGramGraph's label.
+	 *
+	 * @return the graph's label
+	 */
+	public String getLabel() {
+		return label;
+	}
+
+	/**
+	 * Sets the graph's label.
+	 *
+	 * @param label the new label of the graph
+	 */
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 	/** 
@@ -1046,8 +1069,15 @@ implements Serializable, NGramGraph
 			if (gOtherGraphLevel == null)
 				continue;
 
+			/* 
+			 * create a copy of the edge set to avoid
+			/* ConcurrentModificationException
+			 */
+			Set<Edge> eSet = new HashSet<Edge>(gCloneLevel.edgeSet());
+
 			// For every edge of the cloned graph (using a new list of edges)
-			for (Edge weCurItem: gCloneLevel.edgeSet()) {
+			for (Edge weCurItem: eSet) {
+				// Edge weCurItem = eIter.next();
 				// If the edge is contained in the merged graph
 				Edge eEdge = 
 					eclLocator.locateDirectedEdgeInGraph(gOtherGraphLevel,

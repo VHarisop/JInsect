@@ -15,6 +15,18 @@ import java.util.HashSet;
  */
 public interface NGramGraph extends Cloneable {
 	/**
+	 * @return the label of the graph
+	 */
+	public String getLabel();
+
+	/**
+	 * Sets the label of the n-gram graph.
+	 *
+	 * @param label the new label
+	 */
+	public void setLabel(String label);
+
+	/**
 	 * Computes an indication of the size of an n-gram graph based on the
 	 * edge count of its contained graphs.
 	 *
