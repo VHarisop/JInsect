@@ -68,6 +68,11 @@ public class MergeTest
 		 * its weight should be 1.0 (new addition) */
 		eFound = uvg.getEdge(new NGramVertex("ACT"), new NGramVertex("TAC"));
 		assertEquals(1.0, eFound.edgeWeight(), 0.00001);
+
+		/* Get [AGT -> TAG] - only existed in the first graph, so its
+		 * weight should be equal to 1.0 */
+		eFound = uvg.getEdge(new NGramVertex("AGT"), new NGramVertex("TAG"));
+		assertEquals(1.0, eFound.edgeWeight(), 0.00001);
 	}
 
 	public static void testInverseIntersection() {
