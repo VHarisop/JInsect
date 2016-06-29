@@ -110,7 +110,10 @@ public class NGramTest
 			new EdgePair("he", "lo", 1.0),
 			new EdgePair(" h", "o ", 1.0),
 			new EdgePair("he", "o ", 1.0),
-			new EdgePair("el", "o ", 1.0)
+			new EdgePair("el", "o ", 1.0),
+			new EdgePair("he", " h", 1.0),
+			new EdgePair("el", " h", 1.0),
+			new EdgePair("ll", " h", 1.0)
 		};
 
 		/*
@@ -124,6 +127,7 @@ public class NGramTest
 				new String[] {ep.source, ep.target},
 				uvgBigram,
 				ep.weight));
+			assertEquals(18, uvgBigram.edgeSet().size());
 		}
 
 		/*
@@ -167,6 +171,7 @@ public class NGramTest
 				new String[] {ep.source, ep.target},
 				uvgTrigram,
 				ep.weight));
+			assertEquals(18, uvgTrigram.edgeSet().size());
 		}
 	}
 
