@@ -6,7 +6,6 @@ package gr.demokritos.iit.jinsect.structs;
  *     - ValueSimilarity
  *     - ContainmentSimilarity
  *     - SizeSimilarity
- *     - StructuralSimilarity 
  *
  * @author ggianna 
  * @author VHarisop
@@ -33,11 +32,6 @@ public class GraphSimilarity {
 	public double SizeSimilarity;
 
 	/**
-	 * Specifies the graph structural similarity. 
-	 */
-	public double StructuralSimilarity;
-
-	/**
 	 * Returns a blank GraphSimilarity object with all similarity
 	 * values initialized to 0.
 	 */
@@ -45,7 +39,6 @@ public class GraphSimilarity {
 		ValueSimilarity = 0;
 		ContainmentSimilarity = 0;
 		SizeSimilarity = 0;
-		StructuralSimilarity = 0;
 	}
 
 	/**

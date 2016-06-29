@@ -83,22 +83,15 @@ public class NGramGraphComparator {
 			// update size similarity 
 			gSimLevel.SizeSimilarity += minEdges / Math.max(maxEdges, 1.0);
 
-			// update gSim
-			double impRatio = levelImportance / overallImportance;
-
 			gSim.ValueSimilarity += 
-				gSimLevel.ValueSimilarity * impRatio;
+				(gSimLevel.ValueSimilarity * levelImportance) / overallImportance;
 
 			gSim.SizeSimilarity += 
-				gSimLevel.SizeSimilarity * impRatio;
+				(gSimLevel.SizeSimilarity * levelImportance) / overallImportance;
 
-			gSim.ContainmentSimilarity += 
-				gSimLevel.ContainmentSimilarity * impRatio;
-
-			gSim.StructuralSimilarity += 
-				jutils.graphStructuralSimilarity(uvgA, uvgB) * impRatio;
+			gSim.ContainmentSimilarity += (gSimLevel.ContainmentSimilarity *
+					levelImportance) / overallImportance;
 		}
-
 		return gSim;
 	}
 }

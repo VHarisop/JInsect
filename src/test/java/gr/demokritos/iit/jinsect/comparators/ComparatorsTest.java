@@ -45,13 +45,11 @@ public class ComparatorsTest
 		assertEquals(1.0, gSim.ValueSimilarity, 0.001);
 		assertEquals(1.0, gSim.ContainmentSimilarity, 0.001);
 		assertEquals(1.0, gSim.getOverallSimilarity(), 0.0001);
-		assertEquals(0.0, gSim.StructuralSimilarity, 0.00001);
 
 		nggB.setDataString("AGTACG");
 		gSim = nggComp.getSimilarityBetween(nggA, nggB);
 		assertEquals(1.0, gSim.SizeSimilarity, 0.0001);
 		assertTrue(gSim.ValueSimilarity < 1.0);
 		assertTrue(gSim.ContainmentSimilarity < 1.0);
-		assertEquals(0.0, gSim.StructuralSimilarity, 0.00001);
 	}
 }
