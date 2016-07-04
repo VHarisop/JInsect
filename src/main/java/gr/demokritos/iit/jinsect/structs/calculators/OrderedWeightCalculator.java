@@ -59,7 +59,7 @@ public class OrderedWeightCalculator {
 				/* first compare weights and, only if they are equal, enforce
 				 * a lexicographic ordering among vertices of same importance
 				 */
-				int ret = Double.compare(a.getSecond(), b.getSecond());
+				final int ret = Double.compare(a.getSecond(), b.getSecond());
 				if (ret == 0) {
 					String la = a.getFirst().getLabel(),
 						   lb = b.getFirst().getLabel();

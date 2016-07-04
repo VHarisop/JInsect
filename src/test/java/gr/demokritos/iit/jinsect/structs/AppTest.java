@@ -57,29 +57,6 @@ public class AppTest
 		assertTrue(v1.hashCode() == v3.hashCode());
 	}
 
-	public void testSimilarities() 
-	{
-		UniqueVertexGraph uvgA = new UniqueVertexGraph();
-		UniqueVertexGraph uvgB = new UniqueVertexGraph();
-
-		JVertex v1 = new NGramVertex("A");
-		JVertex v2 = new NGramVertex("C");
-		JVertex v3 = new NGramVertex("G");
-
-		/* add vertices to the graphs */
-		uvgA.addVertex(v1); uvgB.addVertex(v1);
-		uvgA.addVertex(v2); uvgB.addVertex(v2);
-		uvgA.addVertex(v3); uvgB.addVertex(v3);
-
-		/* add some edges */
-		uvgA.addEdge(v1, v2, 3.0);
-		uvgA.addEdge(v3, v2, 2.0);
-		uvgB.addEdge(v1, v2, 1.0);
-
-		double dSim = jutils.graphStructuralSimilarity(uvgA, uvgB);
-		assertTrue(dSim != 0.0);
-	}
-
 	/**
 	 * Helper function for testNGramJGraph that retrieves an edge based
 	 * on the labels of the vertices it connects.
@@ -162,20 +139,5 @@ public class AppTest
 		assertTrue(eqDouble(uvg.incomingWeightSumOf(v2), 4.0));
 		assertTrue(eqDouble(uvg.outgoingWeightSumOf(v3), 2.0));
 		assertTrue(eqDouble(uvg.incomingWeightSumOf(v3), 1.0));
-
-		/* assert that the normalized edge weights are computed properly */
-		assertTrue(eqDouble(uvg.getNormalizedEdgeWeight(v1, v2), 0.33333333333));
-		assertTrue(eqDouble(uvg.getNormalizedEdgeWeight(v2, v3), 0.50000000000));
-		assertTrue(eqDouble(uvg.getNormalizedEdgeWeight(v3, v2), 0.33333333333));
 	}
-
-
-
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
-    }
 }

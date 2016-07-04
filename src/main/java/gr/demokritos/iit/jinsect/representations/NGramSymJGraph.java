@@ -186,7 +186,7 @@ public class NGramSymJGraph extends NGramJGraph {
 	 * based on distance from the <code>sStartNode</code>.
 	 * @param hAppearenceHistogram The histogram of appearences of the terms
 	 */
-	public void createSymEdgesConnecting(
+	private void createSymEdgesConnecting(
 			UniqueVertexGraph gGraph,
 			String sStartNode, 
 			List<String> lOtherNodes,

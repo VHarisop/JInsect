@@ -81,7 +81,7 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
     public void createGraphs() {       
         String sUsableString = new StringBuilder().append(DataString).toString();
         
-        int iLen = DataString.length();
+        final int iLen = DataString.length();
         // Create token histogram.
         HashMap<String, Double> hTokenAppearence =
 			new HashMap<String, Double>();
@@ -95,11 +95,8 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
                 // then Ignore
                 continue;
             
-            // The String has a size of at least [iNGramSize]
-            String sCurNGram = null;
             LinkedList<String> lNGramSequence = new LinkedList<String>();
             UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iNGramSize);
-            
             for (int iCurStart = 0; iCurStart < iLen; iCurStart++)
             {
                 // If reached end
@@ -108,7 +105,7 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
                     break;
                 
                 // Get n-gram                
-                sCurNGram = 
+                final String sCurNGram =
 					sUsableString.substring(iCurStart, iCurStart + iNGramSize);
                 
                 // Update Histogram
@@ -122,10 +119,10 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
                 // Update list of n-grams
                 lNGramSequence.add(sCurNGram);
                 // Update graph
-                int iListSize = lNGramSequence.size();
-                int iTo = (iListSize - 1) >= 0 ? iListSize - 1 : 0;
-				int iTemp = iListSize - (int)(CorrelationWindow * Visibility);
-                int iFrom = iTemp - 1 >= 0 ? iTemp - 1 : 0;
+                final int iListSize = lNGramSequence.size();
+                final int iTo = (iListSize - 1) >= 0 ? iListSize - 1 : 0;
+				final int iTemp = iListSize - (int)(CorrelationWindow * Visibility);
+                final int iFrom = iTemp - 1 >= 0 ? iTemp - 1 : 0;
 
 				List<String> revList = 
 					new LinkedList<String>(lNGramSequence.subList(iFrom, iTo));
@@ -193,7 +190,6 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
             catch (Exception e) {
                 // Not added. Ignore.
             }
-            
         }
             
         //////////!!!!!!!!!!!!/////////
