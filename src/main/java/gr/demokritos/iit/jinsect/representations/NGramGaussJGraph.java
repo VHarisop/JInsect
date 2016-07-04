@@ -88,10 +88,10 @@ public class NGramGaussJGraph extends NGramJGraph {
 	 * importance, by scaling the neighbouring weight by a Gaussian function of distance.
 	 ***/
 
-	public void createGraphs() {       
-		String sUsableString = new StringBuilder().append(DataString).toString();
+	private void createGraphs() {       
+		final String sUsableString = new StringBuilder().append(DataString).toString();
 
-		int iLen = DataString.length();
+		final int iLen = DataString.length();
 		// Create token histogram.
 		HashMap<String, Double> hTokenAppearence = 
 			new HashMap<String, Double>();
@@ -105,8 +105,6 @@ public class NGramGaussJGraph extends NGramJGraph {
 				// then Ignore
 				continue;
 
-			// The String has a size of at least [iNGramSize]
-			String sCurNGram = null;
 			for (int iCurStart = 0; iCurStart < iLen; iCurStart++)
 			{
 				// If reached end
@@ -115,7 +113,8 @@ public class NGramGaussJGraph extends NGramJGraph {
 					break;
 
 				// Get n-gram                
-				sCurNGram = sUsableString.substring(iCurStart, iCurStart + iNGramSize);
+				final String sCurNGram =
+					sUsableString.substring(iCurStart, iCurStart + iNGramSize);
 
 				// Update Histogram
 				if (hTokenAppearence.containsKey(sCurNGram))
@@ -141,7 +140,6 @@ public class NGramGaussJGraph extends NGramJGraph {
 			List<String> PrecedingNeighbours = new ArrayList<String>();
 			UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iNGramSize);
 
-			// The String has a size of at least [iNGramSize]
 			String sCurNGram = "";
 			for (int iCurStart = 0; iCurStart < iLen; iCurStart++)
 			{
@@ -151,8 +149,7 @@ public class NGramGaussJGraph extends NGramJGraph {
 					break;
 
 				// Get n-gram                
-				sCurNGram = 
-					sUsableString.substring(iCurStart, iCurStart + iNGramSize);
+				sCurNGram = sUsableString.substring(iCurStart, iCurStart + iNGramSize);
 				
 				String[] aFinalNeighbours;
 				aFinalNeighbours = new String[PrecedingNeighbours.size()];
@@ -167,7 +164,7 @@ public class NGramGaussJGraph extends NGramJGraph {
 				if (PrecedingNeighbours.size() > CorrelationWindow * 3)
 					PrecedingNeighbours.remove(0); // remove first element
 			}
-			int iNeighboursLen = PrecedingNeighbours.size();
+			final int iNeighboursLen = PrecedingNeighbours.size();
 			if (iNeighboursLen > 0) {
 				createEdgesConnecting(gGraph,
 						sCurNGram,
@@ -177,16 +174,17 @@ public class NGramGaussJGraph extends NGramJGraph {
 		}        
 	}
 
-	/***
+	/**
 	 * Creates an edge in [gGraph] connecting [sBaseNode] to each node in the
-	 *[lOtherNodes] list of nodes. If an edge exists, its weight is increased by [iIncreaseWeight],
-	 *else its weight is set to [iStartWeight]
-	 *@param gGraph The graph to use
-	 *@param sStartNode The node from which all edges begin
-	 *@param lOtherNodes The list of nodes to which sBaseNode is connected
-	 *@param hAppearenceHistogram The histogram of appearences of the terms
-	 ***/
-	public void createEdgesConnecting(
+	 * [lOtherNodes] list of nodes. If an edge exists, its weight is increased by [iIncreaseWeight],
+	 * else its weight is set to [iStartWeight]
+	 * @param gGraph The graph to use
+	 * @param sStartNode The node from which all edges begin
+	 * @param lOtherNodes The list of nodes to which sBaseNode is connected
+	 * @param hAppearenceHistogram The histogram of appearences of the terms
+	 *
+	 */
+	private void createEdgesConnecting(
 		UniqueVertexGraph gGraph,
 		String sStartNode,
 		List<String> lOtherNodes,

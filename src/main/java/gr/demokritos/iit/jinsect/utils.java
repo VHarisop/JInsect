@@ -356,10 +356,10 @@ public final class utils {
 	 * @return the reversed string
 	 */
 	public static String reverseString(String source) {
-		int i, len = source.length();
+		final int len = source.length();
 		StringBuffer dest = new StringBuffer(len);
 
-		for (i = (len - 1); i >= 0; i--)
+		for (int i = (len - 1); i >= 0; i--)
 			dest.append(source.charAt(i));
 		return dest.toString();
 	}
@@ -398,19 +398,20 @@ public final class utils {
 		String sVowels = "aeiuoy ";
 		String sConsonants = "qwrtpsdf jklhzxcvbnm ";
 		StringBuffer sbRes = new StringBuffer();
-		int iLen = (int)(7.0 +
+		final int iLen = (int)(7.0 +
 				(3.0 * new Random().nextGaussian()));
 
 		// Randomly initialize to vowel or consonant
 		boolean bVowel = new Random().nextBoolean();
 		for (int iCharCnt=0; iCharCnt<iLen; iCharCnt++) {
-			int iStart;
 			if (bVowel) {
-				iStart = Math.abs(new Random().nextInt()) % (sVowels.length() - 1);
+				final int iStart =
+					Math.abs(new Random().nextInt()) % (sVowels.length() - 1);
 				sbRes.append(sVowels.substring(iStart, iStart + 1));
 			}
 			else {
-				iStart = Math.abs(new Random().nextInt()) % (sConsonants.length() - 1);
+				final int iStart =
+					Math.abs(new Random().nextInt()) % (sConsonants.length() - 1);
 				sbRes.append(sConsonants.substring(iStart, iStart + 1));
 			}
 			bVowel = !bVowel;
@@ -426,13 +427,13 @@ public final class utils {
 	public static String getAbnormalString() {
 		String sAlphabet = "aeiuoy qwrtpsdfjklhzxcvbnm1234567890!@#";
 		StringBuffer sbRes = new StringBuffer();
-		int iLen = (int)(12.0 +
+		final int iLen = (int)(12.0 +
 				(11.0 * new Random().nextGaussian()));
 
 		// Randomly generate from alphabet
 		for (int iCharCnt=0; iCharCnt<iLen; iCharCnt++) {
-			int iStart;
-			iStart = Math.abs(new Random().nextInt()) % (sAlphabet.length() - 1);
+			final int iStart =
+				Math.abs(new Random().nextInt()) % (sAlphabet.length() - 1);
 			sbRes.append(sAlphabet.substring(iStart, iStart + 1));
 		}
 		return sbRes.toString();

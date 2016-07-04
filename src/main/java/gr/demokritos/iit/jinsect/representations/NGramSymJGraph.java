@@ -117,11 +117,9 @@ public class NGramSymJGraph extends NGramJGraph {
 		return nGraphs;
 	}
 
-	public void createGraphs() {       
-		String sUsableString = new StringBuilder().append(DataString).toString();
-
-		// Use preprocessor if available
-		int iLen = DataString.length();
+	private void createGraphs() {       
+		final String sUsableString = new StringBuilder().append(DataString).toString();
+		final int iLen = DataString.length();
 		// Create token histogram.
 		HashMap<String, Double> hTokenAppearence = 
 			new HashMap<String, Double>();
@@ -135,8 +133,6 @@ public class NGramSymJGraph extends NGramJGraph {
 				// then Ignore
 				continue;
 
-			// The String has a size of at least [iNGramSize]
-			String sCurNGram = null;
 			LinkedList<String> lNGramSequence = new LinkedList<String>();
 			UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iNGramSize);
 			for (int iCurStart = 0; iCurStart < iLen; iCurStart++)
@@ -147,7 +143,7 @@ public class NGramSymJGraph extends NGramJGraph {
 					break;
 
 				// Get n-gram                
-				sCurNGram = 
+				final String sCurNGram = 
 					sUsableString.substring(iCurStart, iCurStart + iNGramSize);
 
 				// Update Histogram
@@ -160,9 +156,9 @@ public class NGramSymJGraph extends NGramJGraph {
 				// Update list of n-grams
 				lNGramSequence.add(sCurNGram);
 				// Update graph
-				int iListSize = lNGramSequence.size();
-				int iTo = (iListSize - 1) >= 0 ? iListSize - 1 : 0;
-				int iFrom = (iListSize - CorrelationWindow - 1) >= 0 ? 
+				final int iListSize = lNGramSequence.size();
+				final int iTo = (iListSize - 1) >= 0 ? iListSize - 1 : 0;
+				final int iFrom = (iListSize - CorrelationWindow - 1) >= 0 ? 
 					iListSize - CorrelationWindow - 1 : 0;
 
 				/**
@@ -244,7 +240,7 @@ public class NGramSymJGraph extends NGramJGraph {
 
 		// For every edge that touches vA
 		while (iIter.hasNext()) {
-			String label = (String)iIter.next();
+			final String label = iIter.next();
 			JVertex vB = new NGramVertex(label);
 
 			double dOldWeight = 0;

@@ -19,7 +19,7 @@ import gr.demokritos.iit.jinsect.structs.calculators.*;
  *
  * @author VHarisop
  */
-public class UniqueVertexGraph 
+public final class UniqueVertexGraph
 extends DefaultDirectedWeightedGraph<JVertex, Edge>
 {
 	/**

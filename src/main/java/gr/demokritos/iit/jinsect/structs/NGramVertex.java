@@ -9,7 +9,7 @@ import java.util.Objects;
  *
  * @author VHarisop
  */
-public class NGramVertex implements JVertex {
+public final class NGramVertex implements JVertex {
 	/**
 	 * The label of the vertex.
 	 */

@@ -244,7 +244,7 @@ implements Serializable, NGramGraph
 	 * @param lOtherNodes The list of nodes to which sBaseNode is connected
 	 * @param hAppearenceHistogram The histogram of appearences of the terms
 	 **/
-	public void createEdgesConnecting(UniqueVertexGraph gGraph,
+	private void createEdgesConnecting(UniqueVertexGraph gGraph,
 			String sStartNode,
 			List<String> lOtherNodes,
 			HashMap<String, Double> hAppearenceHistogram) 
@@ -349,7 +349,8 @@ implements Serializable, NGramGraph
 	 **/
 	public void createWeightedEdgesConnecting(UniqueVertexGraph gGraph,
 			String sStartNode, List<String> lOtherNodes,
-			double dStartWeight, double dNewWeight, double dDataImportance) {
+			final double dStartWeight, final double dNewWeight,
+			double dDataImportance) {
 
 		// If no neightbours
 		if (lOtherNodes != null)
@@ -433,11 +434,11 @@ implements Serializable, NGramGraph
 	 * Creates the graph of n-grams, for all the levels
 	 * specified in the MinSize, MaxSize range.
 	 */
-	public void createGraphs() {       
-		String sUsableString =
+	private void createGraphs() {       
+		final String sUsableString =
 			new StringBuilder().append(DataString).toString();
 
-		int iLen = DataString.length();
+		final int iLen = DataString.length();
 		// Create token histogram.
 		HashMap<String, Double> hTokenAppearance =
 			new HashMap<String, Double>();
@@ -452,8 +453,6 @@ implements Serializable, NGramGraph
 				// then Ignore
 				continue;
 
-			// The String has a size of at least [iNGramSize]
-			String sCurNGram = null;
 			for (int iCurStart = 0; iCurStart < iLen; iCurStart++)
 			{
 				// If reached end
@@ -461,8 +460,8 @@ implements Serializable, NGramGraph
 					// then break
 					break;
 
-				// Get n-gram                
-				sCurNGram = 
+				// Get n-gram
+				final String sCurNGram =
 					sUsableString.substring(iCurStart, iCurStart + iNGramSize);
 				// Update Histogram
 				if (hTokenAppearance.containsKey(sCurNGram))
@@ -486,16 +485,15 @@ implements Serializable, NGramGraph
 			Vector<String> PrecedingNeighbours = new Vector<String>();
 			UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iNGramSize);
 
-			// The String has a size of at least [iNGramSize]
-			String sCurNGram = "";
 			for (int iCurStart = 0; iCurStart < iLen; iCurStart++)
 			{
 				// If reached end, break
 				if (iLen < iCurStart + iNGramSize)
 					break;
 
-				// Get n-gram                
-				sCurNGram = sUsableString.substring(iCurStart, iCurStart + iNGramSize);
+				// Get n-gram
+				final String sCurNGram =
+					sUsableString.substring(iCurStart, iCurStart + iNGramSize);
 				/* put all preceding neighbours to an array */
 				String[] aFinalNeighbours = new String[PrecedingNeighbours.size()];
 				PrecedingNeighbours.toArray(aFinalNeighbours);
@@ -548,9 +546,9 @@ implements Serializable, NGramGraph
 			ArrayList<String> lOtherNodes = new ArrayList<String>();
 			for (Edge weCurItem: gOtherGraph.edgeSet())
 			{
-				String sHead = weCurItem.getSourceLabel();
-				String sTail = weCurItem.getTargetLabel();
-				double dWeight = weCurItem.edgeWeight();
+				final String sHead = weCurItem.getSourceLabel();
+				final String sTail = weCurItem.getTargetLabel();
+				final double dWeight = weCurItem.edgeWeight();
 
 				lOtherNodes.clear();
 				lOtherNodes.add(sTail);
@@ -590,7 +588,7 @@ implements Serializable, NGramGraph
 			for (Edge e: gOtherGraph.edgeSet()) {
 				JVertex vHead = gOtherGraph.getEdgeSource(e);
 				JVertex vTail = gOtherGraph.getEdgeTarget(e);
-				double curWeight = e.edgeWeight();
+				final double curWeight = e.edgeWeight();
 
 				Edge eEdge = ecl.locateEdgeInGraph(gGraph, vHead, vTail);
 				if (eEdge != null) {
@@ -598,7 +596,7 @@ implements Serializable, NGramGraph
 						List<String> l = new ArrayList<String>();
 						l.add(vTail.getLabel());
 
-						double dTargetWeight = 
+						final double dTargetWeight = 
 							0.5 * (curWeight + eEdge.edgeWeight());
 
 						createWeightedEdgesConnecting(gNewGraph, 
@@ -787,11 +785,11 @@ implements Serializable, NGramGraph
 			{
 				// Keep max neighbours number
 				Set<Edge> lEdges = gCurLevel.edgesOf(vNode);
-				int iTempNeighbours = lEdges.size();
+				final int iTempNeighbours = lEdges.size();
 				iNoOfNeighbours = Math.max(iTempNeighbours, iNoOfNeighbours);
 
 				for (Edge weEdge: lEdges) {
-					double dWeight = weEdge.edgeWeight();
+					final double dWeight = weEdge.edgeWeight();
 					dMaxEdgeWeight = Math.max(dWeight, dMaxEdgeWeight);
 				}
 			}

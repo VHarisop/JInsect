@@ -282,7 +282,7 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
      *@param lOtherNodes The list of nodes to which sBaseNode is connected
      *@param hAppearenceHistogram The histogram of appearences of the terms
     ***/
-    public void createEdgesConnecting(
+    private void createEdgesConnecting(
 			UniqueVertexGraph gGraph,
 			String sStartNode, 
 			List<String> lOtherNodes,

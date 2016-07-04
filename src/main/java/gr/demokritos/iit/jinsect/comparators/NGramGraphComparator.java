@@ -31,7 +31,7 @@ public class NGramGraphComparator {
 
 		for (int iCnt = ngA.getMinSize(); iCnt <= ngA.getMaxSize(); ++iCnt) {
 			// calculate level weight
-			int levelImportance = utils.sumFromTo(ngA.getMinSize(), iCnt);
+			final int levelImportance = utils.sumFromTo(ngA.getMinSize(), iCnt);
 
 			GraphSimilarity gSimLevel = new GraphSimilarity();
 			UniqueVertexGraph uvgA = ngA.getGraphLevelByNGramSize(iCnt);
@@ -42,8 +42,8 @@ public class NGramGraphComparator {
 				continue;
 			}
 			
-			int firstEdges = uvgA.getEdgeCount();
-			int secondEdges = uvgB.getEdgeCount();
+			final int firstEdges = uvgA.getEdgeCount();
+			final int secondEdges = uvgB.getEdgeCount();
 
 			if (firstEdges > secondEdges) {
 				/* swap the graphs */
@@ -52,8 +52,8 @@ public class NGramGraphComparator {
 				uvgA = vgSwap;
 			}
 
-			int minEdges = (firstEdges >= secondEdges) ? secondEdges : firstEdges;
-			int maxEdges = (firstEdges <= secondEdges) ? secondEdges : firstEdges;
+			final int minEdges = (firstEdges >= secondEdges) ? secondEdges : firstEdges;
+			final int maxEdges = (firstEdges <= secondEdges) ? secondEdges : firstEdges;
 
 			for (Edge e: uvgA.edgeSet()) {
 				Edge eFound = 
@@ -64,7 +64,7 @@ public class NGramGraphComparator {
 					continue;
 				}
 
-				double degradation = Math.min(
+				final double degradation = Math.min(
 						ngA.degradationDegree(e),
 						ngB.degradationDegree(eFound));
 
@@ -72,8 +72,8 @@ public class NGramGraphComparator {
 				gSimLevel.ContainmentSimilarity += 
 					1.0 / (minEdges * Math.max(1.0, degradation));
 
-				double wA = e.edgeWeight();
-				double wB = eFound.edgeWeight();
+				final double wA = e.edgeWeight();
+				final double wB = eFound.edgeWeight();
 
 				// update value similarity
 				gSimLevel.ValueSimilarity += 

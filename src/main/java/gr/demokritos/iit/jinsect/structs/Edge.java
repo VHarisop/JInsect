@@ -10,7 +10,7 @@ import org.jgrapht.graph.*;
  *
  * @author VHarisop
  */
-public class Edge extends DefaultWeightedEdge
+public final class Edge extends DefaultWeightedEdge
 {
 	private static final long serialVersionUID = 1L;
 
