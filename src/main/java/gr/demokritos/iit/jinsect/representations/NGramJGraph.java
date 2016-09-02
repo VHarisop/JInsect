@@ -192,7 +192,7 @@ implements Serializable, NGramGraph
 	 * level MinSize n-grams.
 	 * @return The {@link UniqueVertexGraph} of the corresponding level.
 	 */
-	public UniqueVertexGraph getGraphLevel(int iIndex) {
+	public final UniqueVertexGraph getGraphLevel(int iIndex) {
 		return NGramGraphArray[iIndex];
 	}
 
@@ -201,7 +201,7 @@ implements Serializable, NGramGraph
 	 * @param iNGramSize The n-gram size of the graph. 
 	 * @return The {@link UniqueVertexGraph} of the corresponding level.
 	 */
-	public UniqueVertexGraph getGraphLevelByNGramSize(int iNGramSize) {
+	public final UniqueVertexGraph getGraphLevelByNGramSize(int iNGramSize) {
 		// Check bounds
 		if ((iNGramSize < MinSize) || (iNGramSize > MaxSize))
 			return null;
@@ -214,7 +214,7 @@ implements Serializable, NGramGraph
 	 * 
 	 * @return a hashset containing the edges of the graph
 	 */
-	public HashSet<Edge> getAllNodes() {
+	public final HashSet<Edge> getAllNodes() {
 		HashSet<Edge> hRes = 
 			new HashSet<Edge>(length() / (MaxSize - MinSize)); // Init set
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++)
@@ -736,21 +736,21 @@ implements Serializable, NGramGraph
 	/**
 	 * @see NGramGraph#getMinSize getMinsize
 	 */
-	public int getMinSize() {
+	public final int getMinSize() {
 		return MinSize;
 	}
 
 	/**
 	 * @see NGramGraph#getMaxSize getMaxSize
 	 */
-	public int getMaxSize() {
+	public final int getMaxSize() {
 		return MaxSize;
 	}
 
 	/**
 	 * @see NGramGraph#getWindowSize getWindowSize
 	 */
-	public int getWindowSize() {
+	public final int getWindowSize() {
 		return CorrelationWindow;
 	}
 
@@ -891,7 +891,7 @@ implements Serializable, NGramGraph
 	 *
 	 * @return the data string represented by the graph
 	 */
-	public String getDataString() {
+	public final String getDataString() {
 		return DataString;
 	}
 
