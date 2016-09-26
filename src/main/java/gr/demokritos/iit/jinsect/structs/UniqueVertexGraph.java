@@ -152,9 +152,10 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 */
 	public List<JVertex> getAdjacentVertices(JVertex vFrom) {
 		List<JVertex> adjacentVertices = new ArrayList<JVertex>();
-		for (Edge e: super.outgoingEdgesOf(vFrom)) {
-			adjacentVertices.add(super.getEdgeTarget(e));
-		}
+		super.outgoingEdgesOf(vFrom).stream()
+			.forEach(e -> {
+				adjacentVertices.add(super.getEdgeTarget(e));
+			});
 
 		return Collections.unmodifiableList(adjacentVertices);
 	}
@@ -206,12 +207,9 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 * @return the sum of the edge set or 0 if the set is empty 
 	 */
 	private double sumWeights(Set<Edge> eList) {
-		double sum = 0;
-		
-		/* sum all the edge weights */
-		for (Edge e: eList) { sum += super.getEdgeWeight(e); }
-
-		return sum;
+		return eList.stream()
+			.mapToDouble(e -> super.getEdgeWeight(e))
+			.sum();
 	}
 
 	/**

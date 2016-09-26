@@ -5,22 +5,15 @@
   <artifactId>jinsect-core</artifactId>
   <version>1.0rc3</version>
   <name>JInsect</name>
+
+  <!-- 1.8 source for fancy features -->
+  <properties>
+	<maven.compiler.source>1.8</maven.compiler.source>
+	<maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
+
   <!-- build details here -->
   <build>
-  <!-- plugins required -->
-    <plugins>
-	  <plugin>
-		 <groupId>org.apache.maven.plugins</groupId>
-		 <artifactId>maven-compiler-plugin</artifactId>
-		 <version>3.5.1</version>
-		 <configuration>
-			<source>1.7</source>
-			<target>1.7</target>
-		  <debug>true</debug>
-		</configuration>
-	  </plugin>
-	</plugins>
-
     <!-- resources for our tests -->
     <resources>
 	  <resource>

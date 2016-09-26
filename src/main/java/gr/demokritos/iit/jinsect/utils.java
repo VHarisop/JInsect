@@ -4,6 +4,7 @@ import gr.demokritos.iit.jinsect.storage.IFileLoader;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.*;
 
 /** 
  * A class including a set of useful, general purpose functions.
@@ -212,9 +213,7 @@ public final class utils {
 	 * @param iEnd The maximum term of the sequence
 	 */
 	public static int sumFromTo(int iStart, int iEnd) {
-		int iRes = 0;
-		for (int iCnt = iStart; iCnt <= iEnd; iRes += iCnt++);
-		return iRes;
+		return IntStream.rangeClosed(iStart, iEnd).sum();
 	}
 
 	/**
@@ -224,11 +223,10 @@ public final class utils {
 	 * @return the sum of the histogram's values.
 	 */
 	public double getHistogramTotal(HashMap<?, Double> hHist) {
-		double dSum = 0.0;
-		for (Double d: hHist.values()) {
-			dSum += d.doubleValue();
-		}
-		return dSum;
+		return hHist.values()
+			.stream()
+			.mapToDouble(v -> v.doubleValue())
+			.sum();
 	}    
 
 	/**
@@ -345,7 +343,6 @@ public final class utils {
 		StringBuffer sb = new StringBuffer();
 		for (int iCnt=0; iCnt < iTimes; iCnt++)
 			sb.append(sStr);
-
 		return sb.toString();
 	}
 
@@ -358,7 +355,6 @@ public final class utils {
 	public static String reverseString(String source) {
 		final int len = source.length();
 		StringBuffer dest = new StringBuffer(len);
-
 		for (int i = (len - 1); i >= 0; i--)
 			dest.append(source.charAt(i));
 		return dest.toString();
