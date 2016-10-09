@@ -32,7 +32,7 @@ public class GenericGraphTest
     }
 
 	/* Helper function to add an undefined number of vertices
-	 * to a GenericGraph, given their wanted labels. */
+	 * to a GenericGraph, given their desired labels. */
 	private void addVertices(GenericGraph gGraph, String ... labels) {
 		for (String s: labels) {
 			gGraph.addVertex(new NGramVertex(s));
@@ -65,6 +65,7 @@ public class GenericGraphTest
 			}
 		}
 	}
+
 
 	/* Helper function that adds an edge to a graph, given the labels
 	 * of its source and target vertices and its desired weight. */
@@ -101,6 +102,46 @@ public class GenericGraphTest
 		assertTrue(hasEdge(gGraph, "C$2", "C$4", 1.5));
 		// make sure they are the only ones
 		assertTrue(gGraph.edgeSet().size() == 4);
+	}
+
+	/**
+	 * Test the process of compacting a {@link GenericGraph} to a
+	 * {@link UniqueVertexGraph}.
+	 */
+	public void testCompacting() {
+		GenericGraph gGraph = new GenericGraph();
+		addVertices(gGraph,
+			"a$1", "b$2", "b$3", "a$4", "c$5");
+		putEdge(gGraph, "a$1", "b$2", 3.0);
+		putEdge(gGraph, "a$1", "b$3", 2.0);
+		putEdge(gGraph, "b$2", "b$3", 4.0);
+		putEdge(gGraph, "a$2", "c$5", 2.0);
+		putEdge(gGraph, "c$5", "b$3", 1.0);
+		// apply compacting
+		UniqueVertexGraph uvg = gGraph.compactToUniqueVertexGraph();
+		// make sure vertices are there
+		JVertex vA = new NGramVertex("a");
+		JVertex vB = new NGramVertex("b");
+		JVertex vC = new NGramVertex("c");
+		assertTrue(uvg.containsVertex(vA));
+		assertTrue(uvg.containsVertex(vB));
+		assertTrue(uvg.containsVertex(vC));
+		assertTrue(uvg.vertexSet().size() == 3);
+		// make sure edges are there
+		final Edge e1 = uvg.getEdge(vA, vB);
+		assertNotNull(e1);
+		assertTrue(eqDouble(e1.edgeWeight(), 5.0));
+		final Edge e2 = uvg.getEdge(vB, vB);
+		assertNotNull(e2);
+		assertTrue(eqDouble(e2.edgeWeight(), 4.0));
+		final Edge e3 = uvg.getEdge(vC, vB);
+		assertNotNull(e3);
+		assertTrue(eqDouble(e3.edgeWeight(), 1.0));
+		final Edge e4 = uvg.getEdge(vA, vC);
+		assertNotNull(e4);
+		assertTrue(eqDouble(e4.edgeWeight(), 2.0));
+		// make sure they are the only edges there
+		assertTrue(uvg.edgeSet().size() == 4);
 	}
 
 	/* Helper function to check doubles for equality */

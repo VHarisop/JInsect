@@ -30,13 +30,13 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 
 	/**
 	 * Converts this graph to a {@link UniqueVertexGraph} by
-	 * using the process of collapsing - vertex labels are assumed
+	 * using the process of compacting - vertex labels are assumed
 	 * to follow the convention "<label>$<id>", where <label> is the
 	 * label to be used in the collapsing process.
 	 *
 	 * @return the collapsed {@link UniqueVertexGraph}
 	 */
-	public UniqueVertexGraph toUvg() {
+	public UniqueVertexGraph compactToUniqueVertexGraph() {
 		UniqueVertexGraph res = new UniqueVertexGraph();
 		/* add all vertices to the UniqueVertexGraph */
 		this.vertexSet().forEach(v -> res.addVertex(
@@ -89,10 +89,8 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		// add vertices
 		addVertex(source);
 		addVertex(target);
-		// add edge
-		addEdge(source, target);
-		// get it as an E object and set its weight
-		Edge eAdded = getEdge(source, target);
+		// add edge and set its weight
+		Edge eAdded = super.addEdge(source, target);
 		setEdgeWeight(eAdded, weight);
 	}
     
