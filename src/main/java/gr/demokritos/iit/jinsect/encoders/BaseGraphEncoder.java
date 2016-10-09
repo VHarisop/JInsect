@@ -70,13 +70,7 @@ public abstract class BaseGraphEncoder {
 	 * @return a list of edge objects
 	 */
 	public List<Edge> outgoingEdgeList(JVertex vSource) {
-		List<Edge> eList = new ArrayList<Edge>();
-
-		for (Edge e: nGraph.outgoingEdgesOf(vSource)) {
-			eList.add(e);
-		}
-
-		return eList;
+		return new ArrayList<Edge>(nGraph.outgoingEdgesOf(vSource));
 	}
 
 	/**
@@ -93,14 +87,13 @@ public abstract class BaseGraphEncoder {
 		
 		/* add to backward edges if target vertex is 
 		 * already visited, else add to forward edges. */
-		for (Edge e: nGraph.outgoingEdgesOf(vSource)) {
-			if (visited.contains(nGraph.getEdgeTarget(e))) {
-				eBwd.add(e);
-			}
-			else {
-				eFwd.add(e);
-			}
-		}
+		nGraph.outgoingEdgesOf(vSource)
+			.forEach(e -> {
+				if (visited.contains(nGraph.getEdgeTarget(e)))
+					eBwd.add(e);
+				else
+					eFwd.add(e);
+			});
 
 		/* return a tuple containing both lists */
 		return new Pair<List<Edge>, List<Edge>>(eFwd, eBwd);

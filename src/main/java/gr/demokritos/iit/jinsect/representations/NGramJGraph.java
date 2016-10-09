@@ -159,11 +159,9 @@ implements Serializable, NGramGraph
 	 * the document n-gram graph.
 	 */
 	public int length() {
-		int iCnt = 0;
-		for (UniqueVertexGraph uvg: NGramGraphArray) {
-			iCnt += uvg.getEdgeCount();
-		}
-		return iCnt;
+		return Arrays.stream(NGramGraphArray)
+			.mapToInt(g -> g.getEdgeCount())
+			.sum();
 	}
 
 	/**
@@ -219,9 +217,8 @@ implements Serializable, NGramGraph
 			new HashSet<Edge>(length() / (MaxSize - MinSize)); // Init set
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++)
 		{
-			for (Edge e: NGramGraphArray[iCurLvl - MinSize].edgeSet()) {
-				hRes.add(e);
-			}
+			NGramGraphArray[iCurLvl - MinSize].edgeSet()
+				.forEach(e -> hRes.add(e));
 		}
 
 		return hRes;
@@ -289,10 +286,8 @@ implements Serializable, NGramGraph
 				// Not added. Ignore.
 			}
 		}
-
 		// create a new cached locator
 		EdgeCachedLocator ecl = new EdgeCachedLocator(100);
-
 
 		// For every edge
 		while (iIter.hasNext())
@@ -992,7 +987,7 @@ implements Serializable, NGramGraph
 	}
 
 	public String toCooccurenceText(Map<String, String> mCooccurenceMap) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		// For every graph level
 		for (int iCnt=MinSize; iCnt <= MaxSize; iCnt++) {
 			UniqueVertexGraph g = getGraphLevelByNGramSize(iCnt);
