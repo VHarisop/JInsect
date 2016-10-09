@@ -22,7 +22,7 @@ import java.util.TreeMap;
  * Originally by:
  * @author ggianna
  */
-public class EdgeCachedLocator {
+public final class EdgeCachedLocator {
 	protected int CacheMaxSize;
 
 	/**
@@ -65,7 +65,7 @@ public class EdgeCachedLocator {
 	 * @param vTail A vertex with the desired label for the tail of the edge.
 	 * @return The edge, if found, otherwise null.
 	 */
-	public final Edge locateDirectedEdgeInGraph(
+	public Edge locateDirectedEdgeInGraph(
 			UniqueVertexGraph gGraph,
 			JVertex vHead,
 			JVertex vTail) 
@@ -160,7 +160,9 @@ public class EdgeCachedLocator {
 	 * @param vToFind The vertex to locate.
 	 * @return The vertex, if found, otherwise null.
 	 */
-	public final JVertex locateVertexInGraph(UniqueVertexGraph gGraph, JVertex vToFind) {
+	public JVertex locateVertexInGraph(
+		UniqueVertexGraph gGraph, JVertex vToFind)
+	{
 		return gGraph.locateVertex(vToFind);
 	}
 
@@ -169,34 +171,40 @@ public class EdgeCachedLocator {
 	 * The edge is described based on the label of its
 	 * vertices.
 	 * @param gGraph The graph to use.
-	 * @param vHead A vertex with the desired label for the head or tail of the edge.
-	 * @param vTail A vertex with the desired label for the tail or tail of the edge.
+	 * @param vHead A vertex with the desired head or tail label
+	 * @param vTail A vertex with the desired tail or head label
 	 * @return The edge, if found, otherwise null.
 	 */
-	public final Edge locateEdgeInGraph(UniqueVertexGraph gGraph, JVertex vHead, JVertex vTail) {
-		Edge eRes = locateDirectedEdgeInGraph(gGraph, vHead, vTail);
-		return eRes == null ? locateDirectedEdgeInGraph(gGraph, vTail, vHead) : eRes;
+	public Edge locateEdgeInGraph(
+		UniqueVertexGraph gGraph, JVertex vHead, JVertex vTail)
+	{
+		final Edge eRes = locateDirectedEdgeInGraph(gGraph, vHead, vTail);
+		if (null == eRes) {
+			return locateDirectedEdgeInGraph(gGraph, vTail, vHead);
+		}
+		else {
+			return eRes;
+		}
 	}
 
 	/** 
 	 * Gets the outgoing edges of a given vertex in a directed graph.
 	 * @param gGraph The graph to use.
 	 * @param vHead A vertex with the desired label for the head of the edge.
-	 * @return A list of outgoing edges from <code>vHead</code>. If no such edges exist returns an
-	 * empty list.
+	 * @return A list of outgoing edges from <code>vHead</code>.
+	 * If no such edges exist returns an empty list.
 	 */
-	public final List<Edge> getOutgoingEdges(UniqueVertexGraph gGraph, JVertex vHead) {
+	public List<Edge> getOutgoingEdges(
+		UniqueVertexGraph gGraph, JVertex vHead)
+	{
 		JVertex vNode = gGraph.locateVertex(vHead.getLabel());
 		ArrayList<Edge> lRes = new ArrayList<Edge>();
 		if (vNode != null) {
-
-			List<JVertex> neighbours = gGraph.getAdjacentVertices(vNode);
-			for (JVertex v: neighbours) {
-				// Add only child neighbours
-				Edge eCur = locateDirectedEdgeInGraph(gGraph, vNode, v);
+			gGraph.getAdjacentVertices(vNode).forEach(v -> {
+				final Edge eCur = locateDirectedEdgeInGraph(gGraph, vNode, v);
 				if (eCur != null)
 					lRes.add(eCur);
-			}
+			});
 		}
 		return lRes;
 	}    

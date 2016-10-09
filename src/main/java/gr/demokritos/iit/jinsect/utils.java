@@ -141,7 +141,6 @@ public final class utils {
 			e.printStackTrace();
 			return new String(baBytes);
 		}
-
 	}
 
 	/** 
@@ -154,58 +153,6 @@ public final class utils {
 		return dNum == 0.0 ? dNum : dNum / Math.abs(dNum);
 	}
 
-	/**
-	 * Calculates the product of two lists.
-	 * @param oA The first list.
-	 * @param oB The second list.
-	 * @return The product of the elements of the two lists as a new list of lists.
-	 */
-	private static final List getListProduct(Object oA, Object oB) {
-		// Join list of lists
-		ArrayList<Object> aRes = new ArrayList<Object>();
-		List<Object> lAList, lBList;
-
-		// If unary, create unary list, else use existing list
-		if (!(oA instanceof List)) {
-			lAList = new ArrayList<Object>();
-			lAList.add(oA);
-		}
-		else
-			lAList = (List<Object>)oA;
-		if (!(oB instanceof List)) {
-			lBList = new ArrayList<Object>();
-			lBList.add(oB);
-		}
-		else
-			lBList = (List<Object>) oB;
-
-		// For every item in A
-		Iterator<Object> iA = lAList.iterator();        
-		while (iA.hasNext()) {
-			Object oANext = iA.next();
-
-			// For every item in B
-			Iterator<Object> iB = lBList.iterator();
-			while (iB.hasNext()) {
-				Object oBNext = iB.next();
-
-				ArrayList<Object> lTemp = new ArrayList<Object>();
-				if (oANext instanceof List)
-					lTemp.addAll((List)oANext);
-				else
-					lTemp.add(oANext);
-				if (oBNext instanceof List)
-					lTemp.addAll((List)oBNext);
-				else
-					lTemp.add(oBNext);
-
-				aRes.add(lTemp);
-			}
-
-		}
-
-		return (List)aRes;
-	}
 
 	/**
 	 * Returns the sum of a sequence of numbers in a specified range

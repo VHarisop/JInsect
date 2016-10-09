@@ -18,7 +18,7 @@ public final class NGramVertex implements JVertex {
 	/**
 	 * Creates a <tt>NGramVertex</tt> object, to represent
 	 * an n-gram provided in text format.
-	 * @param ngram the ngram to be represented
+	 * @param ngram the n-gram to be represented
 	 * @return a new <tt>NGramVertex</tt> object.
 	 */
 	public NGramVertex(String ngram) {

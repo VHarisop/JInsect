@@ -1,15 +1,13 @@
 package gr.demokritos.iit.jinsect.structs;
 
-import java.util.*;
 
 /* use JGraphT for basic graph operations */
 import org.jgrapht.graph.*;
 
-import gr.demokritos.iit.jinsect.structs.calculators.*;
 
 /**
  * GenericGraph is a directed weighted graph with vertices that
- * may or may not be uniquelly labelled.
+ * may or may not be uniquely labeled.
  * The vertex labels are supposed to follow the convention
  * <label>$<id>, where <label> is the actual label and <id> is the
  * identifier of the vertex in case multiple labels exist.
@@ -93,24 +91,33 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		Edge eAdded = super.addEdge(source, target);
 		setEdgeWeight(eAdded, weight);
 	}
-    
+
+	/**
+	 * Queries the graph for an edge connecting two vertices
+	 * designated by their labels. Returns <tt>null</tt> if no
+	 * such edge is found.
+	 * @param lblFrom the label of the source vertex
+	 * @param lblTo the label of the target vertex
+	 * @return the {@link Edge} found, if any, otherwise null
+	 */
+	public Edge getEdge(String lblFrom, String lblTo) {
+		return super.getEdge(
+			new NGramVertex(lblFrom),
+			new NGramVertex(lblTo));
+	}
+
 	@Override
     public Object clone() {
-        GenericGraph res = new GenericGraph();
+		GenericGraph res = new GenericGraph();
 		/* add all edges to the clone graph - all vertices will
 		 * eventually be added both to the supergraph's vertex set
 		 * and the hashmap, because of calls to the add() method */
-        for (Edge eCur: this.edgeSet()) {
-            try {
-				final JVertex v1 = super.getEdgeSource(eCur);
-				final JVertex v2 = super.getEdgeTarget(eCur);
-				res.addEdge(v1, v2, super.getEdgeWeight(eCur));
-            } catch (Exception ex) {
-				ex.printStackTrace();
-                return null;
-            }
-		}
-        return res;
+		this.edgeSet().forEach(e ->
+			res.addEdge(
+				getEdgeSource(e),
+				getEdgeTarget(e),
+				getEdgeWeight(e))
+		);
+		return res;
     }
-    
 }

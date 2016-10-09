@@ -2,7 +2,6 @@ package gr.demokritos.iit.jinsect.comparators;
 
 import gr.demokritos.iit.jinsect.representations.*;
 import gr.demokritos.iit.jinsect.structs.*;
-import gr.demokritos.iit.jinsect.jutils;
 import gr.demokritos.iit.jinsect.utils;
 
 public class NGramGraphComparator {

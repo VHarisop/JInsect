@@ -3,7 +3,6 @@ package gr.demokritos.iit.jinsect.comparators;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import java.util.*;
 
 import gr.demokritos.iit.jinsect.representations.*;
 import gr.demokritos.iit.jinsect.structs.*;

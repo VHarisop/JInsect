@@ -7,7 +7,6 @@ import junit.framework.TestSuite;
 import java.lang.Math;
 
 import gr.demokritos.iit.jinsect.representations.NGramJGraph;
-import gr.demokritos.iit.jinsect.jutils;
 
 
 /**
@@ -68,8 +67,7 @@ public class AppTest
 
 	public void testNGramJGraph()
 	{
-		NGramJGraph dng = new NGramJGraph();
-		dng.setDataString("ACTACTA");
+		NGramJGraph dng = new NGramJGraph("ACTACTA");
 
 		/* get the underlying graph */
 		UniqueVertexGraph uvg = dng.getGraphLevel(0);

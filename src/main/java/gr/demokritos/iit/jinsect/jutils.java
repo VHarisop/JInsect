@@ -4,7 +4,6 @@ import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 import gr.demokritos.iit.jinsect.structs.JVertex;
 import gr.demokritos.iit.jinsect.structs.Edge;
 import gr.demokritos.iit.jinsect.encoders.CanonicalCoder;
-import gr.demokritos.iit.jinsect.encoders.VertexCoder;
 
 import java.util.Iterator;
 

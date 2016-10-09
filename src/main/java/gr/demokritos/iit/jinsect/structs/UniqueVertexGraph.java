@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /* use JGraphT for basic graph operations */
 import org.jgrapht.graph.*;
@@ -125,7 +126,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 */
 	public synchronized Edge addEdge(JVertex v1, JVertex v2, double weight)
 	{
-		/* implicitly add missing vertices from the supergraph */
+		/* implicitly add missing vertices from the super-graph */
 		if (!(this.contains(v1))) 
 			add(v1);
 
@@ -145,17 +146,29 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	}
 
 	/**
+	 * Queries the graph for an edge connecting two vertices
+	 * designated by their labels. Returns <tt>null</tt> if no
+	 * such edge is found.
+	 * @param lblFrom the label of the source vertex
+	 * @param lblTo the label of the target vertex
+	 * @return the {@link Edge} found, if any, otherwise null
+	 */
+	public Edge getEdge(String lblFrom, String lblTo) {
+		return super.getEdge(
+			new NGramVertex(lblFrom),
+			new NGramVertex(lblTo));
+	}
+
+	/**
 	 * Gets all vertices adjacent to a given vertex in 
 	 * an unmodifiable list.
 	 * @param vFrom the vertex whose adjacent vertices are needed
 	 * @return an unmodifiable list of adjacent vertices
 	 */
 	public List<JVertex> getAdjacentVertices(JVertex vFrom) {
-		List<JVertex> adjacentVertices = new ArrayList<JVertex>();
-		super.outgoingEdgesOf(vFrom).stream()
-			.forEach(e -> {
-				adjacentVertices.add(super.getEdgeTarget(e));
-			});
+		List<JVertex> adjacentVertices = new ArrayList<>();
+		super.outgoingEdgesOf(vFrom)
+			.forEach(e -> adjacentVertices.add(getEdgeTarget(e)));
 
 		return Collections.unmodifiableList(adjacentVertices);
 	}
@@ -224,27 +237,16 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		}
 		return ordWeightCalc.getOrderedPairs();
 	}
-	  
+
 	@Override
     public Object clone() {
-		JVertex v1, v2;
         UniqueVertexGraph res = new UniqueVertexGraph();
-		
 		/* add all edges to the clone graph - all vertices will
 		 * eventually be added both to the supergraph's vertex set
-		 * and the hashmap, because of calls to the add() method */
-        for (Edge eCur: this.edgeSet()) {
-            try {
-				v1 = super.getEdgeSource(eCur);
-				v2 = super.getEdgeTarget(eCur);
-
-                res.addEdge(v1, v2, super.getEdgeWeight(eCur));
-            } catch (Exception ex) {
-				ex.printStackTrace();
-                return null;
-            }
-		}
-        return res;
+		 * and the hash map, because of calls to the add() method */
+        this.edgeSet().forEach(e ->
+			res.addEdge(getEdgeSource(e), getEdgeTarget(e), getEdgeWeight(e))
+		);
+		return res;
     }
-    
 }

@@ -4,15 +4,9 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.jgrapht.traverse.*;
-import org.jgrapht.*;
-import org.jgrapht.graph.*;
-
 import gr.demokritos.iit.jinsect.representations.NGramJGraph;
-import gr.demokritos.iit.jinsect.representations.NGramSymJGraph;
 import gr.demokritos.iit.jinsect.structs.*;
 import gr.demokritos.iit.jinsect.jutils;
-import gr.demokritos.iit.jinsect.utils;
 
 
 /**
