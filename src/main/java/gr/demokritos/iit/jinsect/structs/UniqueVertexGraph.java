@@ -58,6 +58,10 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	protected double edgeSum;
 
 	/**
+	 * Cached count of the graph's edge count
+	 */
+
+	/**
 	 * Returns a <tt>UniqueJVertexJGraph</tt> object. 
 	 */
 	public UniqueVertexGraph() {

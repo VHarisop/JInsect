@@ -65,7 +65,7 @@ public final class jutils {
 	 * @return The DOT formatted string representation of the graph.
 	 */
 	public static String graphToDot(UniqueVertexGraph gTree, boolean bDirected) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		String sConnector;
 
 		// Render graph

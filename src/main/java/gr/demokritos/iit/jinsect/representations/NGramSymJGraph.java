@@ -118,7 +118,7 @@ public class NGramSymJGraph extends NGramJGraph {
 	}
 
 	private void createGraphs() {       
-		final String sUsableString = new StringBuilder().append(DataString).toString();
+		final String sUsableString = DataString;
 		final int iLen = DataString.length();
 		// Create token histogram.
 		HashMap<String, Double> hTokenAppearence = 

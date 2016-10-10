@@ -435,8 +435,7 @@ implements Serializable, NGramGraph
 	 * specified in the MinSize, MaxSize range.
 	 */
 	private void createGraphs() {       
-		final String sUsableString =
-			new StringBuilder().append(DataString).toString();
+		final String sUsableString = DataString;
 
 		final int iLen = DataString.length();
 		// Create token histogram.
@@ -881,7 +880,7 @@ implements Serializable, NGramGraph
 	 * @param sDataString the new data string to be represented
 	 */
 	public void setDataString(String sDataString) {
-		DataString = new StringBuilder().append(sDataString).toString();
+		DataString = sDataString;
 		InitGraphs();   // Clear graphs
 		createGraphs(); // Update graphs        
 	}
@@ -992,7 +991,7 @@ implements Serializable, NGramGraph
 	}
 
 	public String toCooccurenceText(Map<String, String> mCooccurenceMap) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		// For every graph level
 		for (int iCnt=MinSize; iCnt <= MaxSize; iCnt++) {
 			UniqueVertexGraph g = getGraphLevelByNGramSize(iCnt);

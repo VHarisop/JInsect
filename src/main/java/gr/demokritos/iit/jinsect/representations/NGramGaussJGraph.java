@@ -82,14 +82,15 @@ public class NGramGaussJGraph extends NGramJGraph {
 		setDataString(dataString);
 	}
 
-	/***
-	 * Creates the graph of n-grams, for all the levels specified in the MinSize, MaxSize range.
-	 * The whole document is taken into account for neighbouring, even though the distance affects neighbouring
-	 * importance, by scaling the neighbouring weight by a Gaussian function of distance.
-	 ***/
-
+	/**
+	 * Creates the graph of n-grams, for all the levels specified in the
+	 * MinSize, MaxSize range.
+	 * The whole document is taken into account for neighbouring, even
+	 * though the distance affects neighbouring importance, by scaling
+	 * the neighbouring weight by a Gaussian function of distance.
+	 */
 	private void createGraphs() {       
-		final String sUsableString = new StringBuilder().append(DataString).toString();
+		final String sUsableString = DataString;
 
 		final int iLen = DataString.length();
 		// Create token histogram.

@@ -79,7 +79,7 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
 	}
     
     public void createGraphs() {       
-        String sUsableString = new StringBuilder().append(DataString).toString();
+        final String sUsableString = DataString;
         
         final int iLen = DataString.length();
         // Create token histogram.
