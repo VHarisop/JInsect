@@ -207,7 +207,7 @@ public final class EdgeCachedLocator {
 			});
 		}
 		return lRes;
-	}    
+	}
 
 	/** 
 	 * Clears the cache of the locator.

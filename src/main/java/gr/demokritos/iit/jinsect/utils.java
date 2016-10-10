@@ -75,22 +75,13 @@ public final class utils {
 	 */
 	public static final String
 	printSortIterable(Iterable<?> iIterable, String sSeparator) {
-		// Init buffer
-		StringBuffer sOut = new StringBuffer();
-		Iterator<?> iIter = iIterable.iterator();
 		// Use treeset to sort
 		TreeSet<String> tsItems = new TreeSet<String>();
-		while (iIter.hasNext()) {
-			tsItems.add(iIter.next().toString());
+		for (Object obj: iIterable) {
+			tsItems.add(obj.toString());
 		}
-
-		// Add all string representations to buffer, using separator.
-		for (Iterator<String> isCur = tsItems.iterator(); isCur.hasNext();) {
-			sOut.append(isCur.next());
-			if (isCur.hasNext())
-				sOut.append(sSeparator);
-		}
-		return sOut.toString();
+		/* collect all items to a delimited string */
+		return tsItems.stream().collect(Collectors.joining(sSeparator));
 	}
 
 	/**
@@ -284,13 +275,11 @@ public final class utils {
 	 * Repeats a given string a specified number of times.
 	 * @param sStr The string to repeat.
 	 * @param iTimes The times to repeat the string.
-	 * @return A string containing the given string concatenated the specified number of times.
+	 * @return A string containing the given string
+	 * concatenated the specified number of times.
 	 */
 	public static final String repeatString(String sStr, int iTimes) {
-		StringBuffer sb = new StringBuffer();
-		for (int iCnt=0; iCnt < iTimes; iCnt++)
-			sb.append(sStr);
-		return sb.toString();
+		return String.join("", Collections.nCopies(iTimes, sStr));
 	}
 
 	/**
