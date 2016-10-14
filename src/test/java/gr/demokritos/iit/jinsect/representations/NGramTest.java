@@ -12,7 +12,7 @@ import gr.demokritos.iit.jinsect.structs.*;
 /**
  * Unit test for simple App.
  */
-public class NGramTest 
+public class NGramTest
     extends TestCase
 {
     /**
@@ -51,7 +51,7 @@ public class NGramTest
 			assertTrue(false); // fail
 		}
 	}
-	
+
 	/**
 	 * Make sure the array version of {@link GraphUtils}'s methods does not
 	 * return nulls.
@@ -88,14 +88,13 @@ public class NGramTest
 		 * Ensure that the two graphs contain the proper sets
 		 * of edges and vertices.
 		 */
-		String[] bigrams = {
-			"he", "el", "ll", "lo", "o ", " h"
-		};
+		List<String> bigrams = Arrays.asList(
+			"he", "el", "ll", "lo", "o ", " h");
+
 		Set<JVertex> bigramVertices = uvgBigram.vertexSet();
-		for (String s: bigrams) {
-			assertTrue(bigramVertices.contains(new NGramVertex(s)));
-		}
-		EdgePair[] edges = {
+		bigrams.forEach(b -> assertTrue(
+			bigramVertices.contains(new NGramVertex(b))));
+		List<EdgePair> edges = Arrays.asList(
 			new EdgePair("el", "he", 2.0),
 			new EdgePair("ll", "he", 2.0),
 			new EdgePair("lo", "he", 2.0),
@@ -113,13 +112,11 @@ public class NGramTest
 			new EdgePair("el", "o ", 1.0),
 			new EdgePair("he", " h", 1.0),
 			new EdgePair("el", " h", 1.0),
-			new EdgePair("ll", " h", 1.0)
-		};
-
+			new EdgePair("ll", " h", 1.0));
 		/*
 		 * Make sure all edges are contained in the graph
 		 */
-		for (EdgePair ep: edges) {
+		edges.forEach(ep -> {
 			assertTrue(containedIn(
 				new String[] {ep.source, ep.target},
 				uvgBigram));
@@ -128,19 +125,18 @@ public class NGramTest
 				uvgBigram,
 				ep.weight));
 			assertEquals(18, uvgBigram.edgeSet().size());
-		}
+		});
 
 		/*
 		 * Check trigram graph
 		 */
-		String[] trigrams = {
-			"hel", "ell", "llo", "lo ", "o h", " he"
-		};
+		List<String> trigrams = Arrays.asList(
+			"hel", "ell", "llo", "lo ", "o h", " he");
 		Set<JVertex> trigramVertices = uvgTrigram.vertexSet();
-		for (String s: trigrams) {
-			assertTrue(trigramVertices.contains(new NGramVertex(s)));
-		}
-		EdgePair[] triEdges = {
+		trigrams.forEach(t -> {
+			assertTrue(trigramVertices.contains(new NGramVertex(t)));
+		});
+		List<EdgePair> triEdges = Arrays.asList(
 			new EdgePair("ell", "hel", 2.0),
 			new EdgePair("llo", "hel", 2.0),
 			new EdgePair("lo ", "hel", 1.0),
@@ -158,12 +154,11 @@ public class NGramTest
 			new EdgePair("ell", "o h", 1.0),
 			new EdgePair("hel", " he", 1.0),
 			new EdgePair("ell", " he", 1.0),
-			new EdgePair("llo", " he", 1.0)
-		};
+			new EdgePair("llo", " he", 1.0));
 		/*
 		 * Make sure all edges are contained in the graph
 		 */
-		for (EdgePair ep: triEdges) {
+		triEdges.forEach(ep -> {
 			assertTrue(containedIn(
 				new String[] {ep.source, ep.target},
 				uvgTrigram));
@@ -172,7 +167,7 @@ public class NGramTest
 				uvgTrigram,
 				ep.weight));
 			assertEquals(18, uvgTrigram.edgeSet().size());
-		}
+		});
 	}
 
 	/*

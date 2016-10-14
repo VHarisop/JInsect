@@ -7,14 +7,14 @@ import gr.demokritos.iit.jinsect.structs.*;
 import gr.demokritos.iit.jinsect.io.LineReader;
 import gr.demokritos.iit.jinsect.utils;
 
-/** 
+/**
  * Represents the graph of a document, with the n-grams of the document as
  * vertices and the number of the n-grams' co-occurences within a given window
  * as edges.
  *
  * @author PCKid
  */
-public class NGramJGraph 
+public class NGramJGraph
 implements Serializable, NGramGraph
 {
 	static final long serialVersionUID = 1L;
@@ -35,8 +35,8 @@ implements Serializable, NGramGraph
 	 */
 	protected String label = null;
 
-	/** 
-	 * Creates a new instance of NGramJGraph with default 
+	/**
+	 * Creates a new instance of NGramJGraph with default
 	 * parameters (MinSize = MaxSize = 3, CorrelationWindow = 3)
 	 */
 	public NGramJGraph() {
@@ -44,7 +44,7 @@ implements Serializable, NGramGraph
 	}
 
 	/**
-	 * Creates a new instance of NGramJGraph with default 
+	 * Creates a new instance of NGramJGraph with default
 	 * parameters (MinSize = MaxSize = CorrelationWindow = 3)
 	 * with an initial data string.
 	 *
@@ -52,21 +52,21 @@ implements Serializable, NGramGraph
 	 * @return a new NGramJGraph object with default parameters
 	 */
 	public NGramJGraph(String dataString) {
-		setDataString(dataString);		
+		setDataString(dataString);
 	}
 
 	/**
-	 * Creates a new instance of NGramJGraph with an initial 
+	 * Creates a new instance of NGramJGraph with an initial
 	 * data string to be represented and custom parameters.
 	 *
-	 * @param dataString the data string to represent 
+	 * @param dataString the data string to represent
 	 * @param iMinSize the minimum n-gram size
 	 * @param iMaxSize the maximum n-gram size
 	 * @param iCorrelationWindow the correlation window length
 	 * @return a new NGramJGraph with the given parameters
 	 */
 	public NGramJGraph
-	(String dataString, int iMinSize, int iMaxSize, int iCorrelationWindow) 
+	(String dataString, int iMinSize, int iMaxSize, int iCorrelationWindow)
 	{
 		MinSize = iMinSize;
 		MaxSize = iMaxSize;
@@ -95,8 +95,8 @@ implements Serializable, NGramGraph
 	 * @param path the string containing the file path
 	 * @return an array of {@link NGramJGraph} objects
 	 */
-	public static NGramJGraph[] fromFileLines(String path) 
-		throws IOException, FileNotFoundException 
+	public static NGramJGraph[] fromFileLines(String path)
+		throws IOException, FileNotFoundException
 	{
 		return fromFileLines(new File(path));
 	}
@@ -108,17 +108,17 @@ implements Serializable, NGramGraph
 	 * @param path the {@link java.io.File} from which to read the lines
 	 * @return an array of {@link NGramJGraph} objects
 	 */
-	public static NGramJGraph[] fromFileLines(File path) 
+	public static NGramJGraph[] fromFileLines(File path)
 		throws IOException, FileNotFoundException
 	{
 		/* read lines and allocate array */
 		String[] lines = new LineReader().getLines(path);
-		NGramJGraph[] nGraphs = new NGramJGraph[lines.length]; 
+		NGramJGraph[] nGraphs = new NGramJGraph[lines.length];
 
 		/* build the array of n-gram graphs */
 		for (int i = 0; i < lines.length; i++) {
 			nGraphs[i] = new NGramJGraph(lines[i]);
-		} 
+		}
 
 		return nGraphs;
 	}
@@ -130,7 +130,7 @@ implements Serializable, NGramGraph
 		for (int iCnt = MinSize; iCnt <= MaxSize; iCnt++)
 			NGramGraphArray[iCnt - MinSize] = new UniqueVertexGraph();
 		// Create degraded edge list
-		DegradedEdges = new HashMap<Edge, Double>();        
+		DegradedEdges = new HashMap<Edge, Double>();
 	}
 
 	/**
@@ -151,10 +151,10 @@ implements Serializable, NGramGraph
 		this.label = label;
 	}
 
-	/** 
-	 * Measures an indication of the size of a document n-gram graph based on 
+	/**
+	 * Measures an indication of the size of a document n-gram graph based on
 	 * the edge count of its contained graphs.
-	 * 
+	 *
 	 * @return The sum of the count of the edges of the various level graphs in
 	 * the document n-gram graph.
 	 */
@@ -186,7 +186,7 @@ implements Serializable, NGramGraph
 
 	/**
 	 * Returns graph with M-based index
-	 * @param iIndex The index of the graph. Zero (0) equals to the graph for 
+	 * @param iIndex The index of the graph. Zero (0) equals to the graph for
 	 * level MinSize n-grams.
 	 * @return The {@link UniqueVertexGraph} of the corresponding level.
 	 */
@@ -196,7 +196,7 @@ implements Serializable, NGramGraph
 
 	/**
 	 * Returns graph with n-gram-size-based index
-	 * @param iNGramSize The n-gram size of the graph. 
+	 * @param iNGramSize The n-gram size of the graph.
 	 * @return The {@link UniqueVertexGraph} of the corresponding level.
 	 */
 	public final UniqueVertexGraph getGraphLevelByNGramSize(int iNGramSize) {
@@ -209,11 +209,11 @@ implements Serializable, NGramGraph
 
 	/**
 	 * Returns a HashSet with all the edges of the graph.
-	 * 
+	 *
 	 * @return a hashset containing the edges of the graph
 	 */
 	public final HashSet<Edge> getAllNodes() {
-		HashSet<Edge> hRes = 
+		HashSet<Edge> hRes =
 			new HashSet<Edge>(length() / (MaxSize - MinSize)); // Init set
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++)
 		{
@@ -244,7 +244,7 @@ implements Serializable, NGramGraph
 	private void createEdgesConnecting(UniqueVertexGraph gGraph,
 			String sStartNode,
 			List<String> lOtherNodes,
-			HashMap<String, Double> hAppearenceHistogram) 
+			HashMap<String, Double> hAppearenceHistogram)
 	{
 		double dStartWeight = 0;
 		double dIncreaseWeight = 0;
@@ -258,7 +258,7 @@ implements Serializable, NGramGraph
 				// Attempt to add solitary node [sStartNode]
 				JVertex v = new NGramVertex(sStartNode);
 				try {
-					gGraph.add(v);    
+					gGraph.add(v);
 				}
 				catch (Exception e) {
 					// Probably exists already
@@ -354,7 +354,7 @@ implements Serializable, NGramGraph
 				// Attempt to add solitary node [sStartNode]
 				NGramVertex v = new NGramVertex(sStartNode);
 				try {
-					gGraph.add(v);    
+					gGraph.add(v);
 				}
 				catch (Exception e) {
 					// Probably exists already
@@ -429,7 +429,7 @@ implements Serializable, NGramGraph
 	 * Creates the graph of n-grams, for all the levels
 	 * specified in the MinSize, MaxSize range.
 	 */
-	private void createGraphs() {       
+	protected void createGraphs() {
 		final String sUsableString = DataString;
 
 		final int iLen = DataString.length();
@@ -493,8 +493,11 @@ implements Serializable, NGramGraph
 				PrecedingNeighbours.toArray(aFinalNeighbours);
 
 				/* create edges to connect preceding neighbours to current ngram */
-				createEdgesConnecting(gGraph, sCurNGram, Arrays.asList(aFinalNeighbours), 
-						hTokenAppearance);
+				createEdgesConnecting(
+					gGraph,
+					sCurNGram,
+					Arrays.asList(aFinalNeighbours),
+					hTokenAppearance);
 
 				/* add the currently examined N-Gram to the preceding neighbours */
 				PrecedingNeighbours.add(sCurNGram);
@@ -504,20 +507,20 @@ implements Serializable, NGramGraph
 					PrecedingNeighbours.removeElementAt(0);
 				// Remove first element
 			}
-		}        
+		}
 	}
 
 	/**
 	 * Merges the data of [dgOtherGraph] document graph to the data of this
 	 * graph by adding all existing edges and moving the values of those
 	 * existing in both graphs towards the new graph values based on a tendency
-	 * modifier. 
+	 * modifier.
 	 * The convergence tendency towards the starting value or the new value
-	 * is determined by [fWeightPercent]. 
+	 * is determined by [fWeightPercent].
 	 * @param dgOtherGraph The second graph used for the merging
-	 * @param fWeightPercent The convergence tendency parameter. A value of 0.0 
-	 * means no change to existing value, 1.0 means new value is the same as 
-	 * that of the new graph. A value of 0.5 means new value is exactly between 
+	 * @param fWeightPercent The convergence tendency parameter. A value of 0.0
+	 * means no change to existing value, 1.0 means new value is the same as
+	 * that of the new graph. A value of 0.5 means new value is exactly between
 	 * the old and new value (average).
 	 */
 	public void mergeGraph(NGramGraph dgOtherGraph, double fWeightPercent) {
@@ -590,23 +593,23 @@ implements Serializable, NGramGraph
 						List<String> l = new ArrayList<String>();
 						l.add(vTail.getLabel());
 
-						final double dTargetWeight = 
+						final double dTargetWeight =
 							0.5 * (curWeight + eEdge.edgeWeight());
 
-						createWeightedEdgesConnecting(gNewGraph, 
-								vHead.getLabel(), l, 
+						createWeightedEdgesConnecting(gNewGraph,
+								vHead.getLabel(), l,
 								dTargetWeight, dTargetWeight, 1.0);
 					}
 					catch (Exception ex) {
 						ex.printStackTrace();
-					} 
+					}
 				}
 			}
-		}                
+		}
 		return gRes;
 	}
 
-	/** 
+	/**
 	 * Returns the difference (inverse of the intersection) graph between
 	 * the current graph and a given graph.
 	 * @param dgOtherGraph The graph to compare to.
@@ -625,9 +628,9 @@ implements Serializable, NGramGraph
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
 			/* get union and intersection graphs for the
 			 * current n-gram level */
-			UniqueVertexGraph gUnion = 
+			UniqueVertexGraph gUnion =
 				dgUnion.getGraphLevelByNGramSize(iCurLvl);
-			UniqueVertexGraph gIntersection = 
+			UniqueVertexGraph gIntersection =
 				dgIntersection.getGraphLevelByNGramSize(iCurLvl);
 
 			// TODO: Order by edge count for optimization
@@ -636,7 +639,7 @@ implements Serializable, NGramGraph
 			// Check if other graph has corresponding level
 			if (gIntersection == null)
 				// If not, ignore level
-				continue;            
+				continue;
 
 			// For every edge of intersection
 			for (Edge weCurItem: gIntersection.edgeSet())
@@ -650,7 +653,7 @@ implements Serializable, NGramGraph
 				if (eEdge != null) {
 					try {
 						gUnion.removeEdge(eEdge);
-					} 
+					}
 					catch (Exception ex) {
 						// Non-lethal exception. Continue.
 						ex.printStackTrace();
@@ -663,7 +666,7 @@ implements Serializable, NGramGraph
 
 	}
 
-	/** 
+	/**
 	 * Returns both the intersection and the difference (inverse of the
 	 * intersection) graph between the current graph and a given graph.
 	 * @param dgOtherGraph The graph to use for intersection and difference.
@@ -692,7 +695,7 @@ implements Serializable, NGramGraph
 		// For every level
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
 			/* get union and intersection graph for each n-gram level */
-			UniqueVertexGraph gUnion = 
+			UniqueVertexGraph gUnion =
 				dgUnion.getGraphLevelByNGramSize(iCurLvl);
 			UniqueVertexGraph gIntersection =
 				dgIntersection.getGraphLevelByNGramSize(iCurLvl);
@@ -714,7 +717,7 @@ implements Serializable, NGramGraph
 				if (eEdge != null) {
 					try {
 						gUnion.removeEdge(eEdge);
-					} 
+					}
 					catch (Exception ex) {
 						// Non-lethal exception. Continue.
 						ex.printStackTrace();
@@ -775,7 +778,7 @@ implements Serializable, NGramGraph
 		// Search all levels
 		for (int iNGramSize=MinSize; iNGramSize <= MaxSize; iNGramSize++) {
 			UniqueVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
-			if (gCurLevel.containsVertex(vNode))                
+			if (gCurLevel.containsVertex(vNode))
 			{
 				// Keep max neighbours number
 				Set<Edge> lEdges = gCurLevel.edgesOf(vNode);
@@ -796,7 +799,7 @@ implements Serializable, NGramGraph
 				dRes = Math.log10(Math.pow(2 * dMaxEdgeWeight, 2.5) /
 					Math.max(1.0, Math.pow(iNoOfNeighbours / 2, 2)));
 			else
-				dRes = Math.log10(Math.pow(2 * dMaxEdgeWeight, 2.5));                
+				dRes = Math.log10(Math.pow(2 * dMaxEdgeWeight, 2.5));
 		}
 		return dRes;
 	}
@@ -819,7 +822,7 @@ implements Serializable, NGramGraph
 				}
 			}
 			// Actually remove
-			for (JVertex vCur: vToRemove) { 
+			for (JVertex vCur: vToRemove) {
 				try {
 					gCurLevel.removeVertex(vCur);
 				}
@@ -828,7 +831,7 @@ implements Serializable, NGramGraph
 					e.printStackTrace();
 				}
 			}
-		}        
+		}
 	}
 
 	/**
@@ -852,7 +855,7 @@ implements Serializable, NGramGraph
 				// Most probable cause: Node did not exist
 				e.printStackTrace();
 			}
-		}        
+		}
 	}
 
 	/**
@@ -866,7 +869,7 @@ implements Serializable, NGramGraph
 			for (Edge e: gCurLevel.edgeSet()) {
 				gCurLevel.setEdgeWeight(e, 0.0);
 			}
-		}                
+		}
 	}
 
 	/**
@@ -877,7 +880,7 @@ implements Serializable, NGramGraph
 	public void setDataString(String sDataString) {
 		DataString = sDataString;
 		InitGraphs();   // Clear graphs
-		createGraphs(); // Update graphs        
+		createGraphs(); // Update graphs
 	}
 
 	/**
@@ -927,7 +930,7 @@ implements Serializable, NGramGraph
 			NGramGraphArray = new UniqueVertexGraph[MaxSize - MinSize + 1];
 			// For each graph
 			for (int iCnt=MinSize; iCnt <= MaxSize; iCnt++) {
-				this.NGramGraphArray[iCnt - MinSize] = 
+				this.NGramGraphArray[iCnt - MinSize] =
 					(UniqueVertexGraph)in.readObject();
 			}
 			// Load degradation
@@ -965,10 +968,10 @@ implements Serializable, NGramGraph
 				catch (Exception e)
 				{
 					// Non fatal error occured. Continue.
-					e.printStackTrace();                        
+					e.printStackTrace();
 				}
 			}
-		}        
+		}
 	}
 
 	/**
@@ -1018,9 +1021,9 @@ implements Serializable, NGramGraph
 	public NGramGraph clone() {
 		NGramJGraph gRes = new NGramJGraph(MinSize, MaxSize, CorrelationWindow);
 		gRes.DataString = DataString;
-		gRes.DegradedEdges = 
+		gRes.DegradedEdges =
 			new HashMap<Edge, Double>(this.DegradedEdges);
-		gRes.NGramGraphArray = 
+		gRes.NGramGraphArray =
 			new UniqueVertexGraph[this.NGramGraphArray.length];
 		int iCnt=0;
 		for (UniqueVertexGraph uCur : this.NGramGraphArray)
@@ -1029,16 +1032,16 @@ implements Serializable, NGramGraph
 		return gRes;
 	}
 
-	/** 
-	 * See the <i>mergeGraph</i> member for details. 
+	/**
+	 * See the <i>mergeGraph</i> member for details.
 	 * Implements the merge interface.
 	 */
 	public void merge(NGramGraph dgOtherObject, double fWeightPercent) {
 		mergeGraph(dgOtherObject, fWeightPercent);
 	}
 
-	/** 
-	 * Returns all edges not existent in another graph. 
+	/**
+	 * Returns all edges not existent in another graph.
 	 * @param dgOtherGraph The graph to use for intersection and difference.
 	 * @return A NGramJGraph containing all edges from this graph
 	 * not existing in the other given graph (edge distros are not used).
@@ -1051,9 +1054,9 @@ implements Serializable, NGramGraph
 		// Clone this graph
 		NGramGraph dgClone = (NGramGraph)clone();
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
-			UniqueVertexGraph gCloneLevel = 
+			UniqueVertexGraph gCloneLevel =
 				dgClone.getGraphLevelByNGramSize(iCurLvl);
-			UniqueVertexGraph gOtherGraphLevel = 
+			UniqueVertexGraph gOtherGraphLevel =
 				dgOtherGraph.getGraphLevelByNGramSize(iCurLvl);
 
 			// If this level does not exist in other graph, then keep
@@ -1061,7 +1064,7 @@ implements Serializable, NGramGraph
 			if (gOtherGraphLevel == null)
 				continue;
 
-			/* 
+			/*
 			 * create a copy of the edge set to avoid
 			/* ConcurrentModificationException
 			 */
@@ -1071,7 +1074,7 @@ implements Serializable, NGramGraph
 			for (Edge weCurItem: eSet) {
 				// Edge weCurItem = eIter.next();
 				// If the edge is contained in the merged graph
-				Edge eEdge = 
+				Edge eEdge =
 					eclLocator.locateDirectedEdgeInGraph(gOtherGraphLevel,
 							gCloneLevel.getEdgeSource(weCurItem),
 							gCloneLevel.getEdgeTarget(weCurItem));

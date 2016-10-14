@@ -14,7 +14,7 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.Objects;
 
-/** 
+/**
  * Represents a pair of elements of any type (as a templated class).
  *
  * @author ggianna
@@ -24,9 +24,9 @@ public class Pair<ObjTypeFirst, ObjTypeSecond> implements Serializable {
 
     protected ObjTypeFirst first;
     protected ObjTypeSecond second;
-    
-    /** 
-	 * Creates a new instance of Pair, given two objects. 
+
+    /**
+	 * Creates a new instance of Pair, given two objects.
      * @param oFirst The first object.
      * @param oSecond The second object.
      */
@@ -53,23 +53,23 @@ public class Pair<ObjTypeFirst, ObjTypeSecond> implements Serializable {
 			return false;
 
 		Pair<?, ?> otherP = (Pair<?, ?>) obj;
-		return (first.equals(otherP.getFirst()) && 
+		return (first.equals(otherP.getFirst()) &&
 				second.equals(otherP.getSecond()));
     }
 
 
 
-    /** 
-	 * Returns the first object of the pair. 
-     * @return The first object. 
+    /**
+	 * Returns the first object of the pair.
+     * @return The first object.
      */
     public ObjTypeFirst getFirst() {
         return first;
     }
 
-    /** 
-	 * Returns the second object of the pair. 
-     * @return The second object. 
+    /**
+	 * Returns the second object of the pair.
+     * @return The second object.
      */
     public ObjTypeSecond getSecond() {
         return second;
@@ -88,7 +88,8 @@ public class Pair<ObjTypeFirst, ObjTypeSecond> implements Serializable {
          second = (ObjTypeSecond) in.readObject();
     }
 
-    private void readObjectNoData() throws ObjectStreamException {
+    @SuppressWarnings("unused")
+	private void readObjectNoData() throws ObjectStreamException {
         first = null;
         second = null;
     }

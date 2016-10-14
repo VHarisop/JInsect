@@ -23,12 +23,12 @@ public class NGramSymJGraph extends NGramJGraph {
 	final static long serialVersionUID = 1L;
 
 	/**
-	 * Speeds up edge location in a given graph, by caching last searches. 
+	 * Speeds up edge location in a given graph, by caching last searches.
 	 */
 	public EdgeCachedLocator eclLocator = null;
 
 	/**
-	 * Creates a NGramSymJGraph object with default parameters 
+	 * Creates a NGramSymJGraph object with default parameters
 	 * (MinSize = MaxSize = CorrelationWindow = 3) and empty
 	 * initial data string.
 	 *
@@ -74,7 +74,7 @@ public class NGramSymJGraph extends NGramJGraph {
 	 * @param iMinSize the minimum n-gram size
 	 * @param iMaxSize the maximum n-gram size
 	 * @param iCorrelationWindow the correlation window length
-	 * @return a NGramSymJGraph object with an initial data string 
+	 * @return a NGramSymJGraph object with an initial data string
 	 * and custom parameters
 	 */
 	public NGramSymJGraph
@@ -91,7 +91,7 @@ public class NGramSymJGraph extends NGramJGraph {
 	 * @param path the string containing the file path
 	 * @return an array of {@link NGramSymJGraph} objects
 	 */
-	public static NGramSymJGraph[] fromFileLines(String path) 
+	public static NGramSymJGraph[] fromFileLines(String path)
 		throws IOException, FileNotFoundException {
 		return fromFileLines(new File(path));
 	}
@@ -103,25 +103,26 @@ public class NGramSymJGraph extends NGramJGraph {
 	 * @param path the {@link java.io.File} from which to read the lines
 	 * @return an array of {@link NGramJGraph} objects
 	 */
-	public static NGramSymJGraph[] fromFileLines(File path) 
+	public static NGramSymJGraph[] fromFileLines(File path)
 		throws IOException, FileNotFoundException {
 		/* read lines and allocate array */
 		String[] lines = new LineReader().getLines(path);
-		NGramSymJGraph[] nGraphs = new NGramSymJGraph[lines.length]; 
+		NGramSymJGraph[] nGraphs = new NGramSymJGraph[lines.length];
 
 		/* build the array of n-gram graphs */
 		for (int i = 0; i < lines.length; i++) {
 			nGraphs[i] = new NGramSymJGraph(lines[i]);
-		} 
+		}
 
 		return nGraphs;
 	}
 
-	private void createGraphs() {       
+	@Override
+	protected void createGraphs() {
 		final String sUsableString = DataString;
 		final int iLen = DataString.length();
 		// Create token histogram.
-		HashMap<String, Double> hTokenAppearence = 
+		HashMap<String, Double> hTokenAppearence =
 			new HashMap<String, Double>();
 		// 1st pass. Populate histogram.
 		///////////////////////////////
@@ -142,8 +143,8 @@ public class NGramSymJGraph extends NGramJGraph {
 					// then break
 					break;
 
-				// Get n-gram                
-				final String sCurNGram = 
+				// Get n-gram
+				final String sCurNGram =
 					sUsableString.substring(iCurStart, iCurStart + iNGramSize);
 
 				// Update Histogram
@@ -158,13 +159,13 @@ public class NGramSymJGraph extends NGramJGraph {
 				// Update graph
 				final int iListSize = lNGramSequence.size();
 				final int iTo = (iListSize - 1) >= 0 ? iListSize - 1 : 0;
-				final int iFrom = (iListSize - CorrelationWindow - 1) >= 0 ? 
+				final int iFrom = (iListSize - CorrelationWindow - 1) >= 0 ?
 					iListSize - CorrelationWindow - 1 : 0;
 
 				/**
-				 * Create a reversed copy of the sublist 
+				 * Create a reversed copy of the sublist
 				 */
-				List<String> revList = 
+				List<String> revList =
 					new LinkedList<String>(lNGramSequence.subList(iFrom, iTo));
 				Collections.reverse(revList);
 
@@ -177,20 +178,20 @@ public class NGramSymJGraph extends NGramJGraph {
 
 	/**
 	 * Creates an edge in [gGraph] connecting [sStartNode] to each node in the
-	 * [lOtherNodes] list of nodes, as well as other nodes to [sBaseNode]. 
+	 * [lOtherNodes] list of nodes, as well as other nodes to [sBaseNode].
 	 * If an edge exists, its weight is increased by [iIncreaseWeight],
 	 * else its weight is set to [iStartWeight]
 	 * @param gGraph The graph to use
 	 * @param sStartNode The node from which all edges begin
-	 * @param lOtherNodes The list of nodes to which sBaseNode is connected. The list MUST BE ORDERED ASCENDINGLY 
+	 * @param lOtherNodes The list of nodes to which sBaseNode is connected. The list MUST BE ORDERED ASCENDINGLY
 	 * based on distance from the <code>sStartNode</code>.
 	 * @param hAppearenceHistogram The histogram of appearences of the terms
 	 */
 	private void createSymEdgesConnecting(
 			UniqueVertexGraph gGraph,
-			String sStartNode, 
+			String sStartNode,
 			List<String> lOtherNodes,
-			HashMap<String, Double> hAppearenceHistogram) 
+			HashMap<String, Double> hAppearenceHistogram)
 	{
 		double dStartWeight = 0;
 		double dIncreaseWeight = 0;
@@ -202,7 +203,7 @@ public class NGramSymJGraph extends NGramJGraph {
 				// Attempt to add solitary node [sStartNode]
 				NGramVertex v = new NGramVertex(sStartNode);
 				try {
-					gGraph.add(v);    
+					gGraph.add(v);
 				}
 				catch (Exception e) {
 					// Probably exists already
@@ -252,7 +253,7 @@ public class NGramSymJGraph extends NGramJGraph {
 			if (eclLocator == null)
 				eclLocator = new EdgeCachedLocator(10);
 			// Add one-way edge
-			Edge weCorrectEdge = 
+			Edge weCorrectEdge =
 				eclLocator.locateDirectedEdgeInGraph(gGraph, vA, vB);
 
 			if (weCorrectEdge == null)

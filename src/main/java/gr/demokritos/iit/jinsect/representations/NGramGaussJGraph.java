@@ -11,8 +11,8 @@ import gr.demokritos.iit.jinsect.structs.JVertex;
 import gr.demokritos.iit.jinsect.structs.NGramVertex;
 import gr.demokritos.iit.jinsect.structs.Edge;
 
-/** 
- * A Document N-gram UniqueJVertexGraph that uses a Gaussian bell scaling 
+/**
+ * A Document N-gram UniqueJVertexGraph that uses a Gaussian bell scaling
  * function to determine weights applied to various distances of neighbouring
  * n-grams. Default parameters for n-gram size are MinSize = MaxSize = 3 and
  * the default correlation window has length equal to 3.
@@ -22,11 +22,11 @@ public class NGramGaussJGraph extends NGramJGraph {
 	static final long serialVersionUID = 1L;
 	public EdgeCachedLocator eclLocator = null;
 
-	/** 
-	 * Creates a new instance of DocumentNGramGaussNormJGraph 
-	 * using the default parameters and an empty initial 
+	/**
+	 * Creates a new instance of DocumentNGramGaussNormJGraph
+	 * using the default parameters and an empty initial
 	 * data string.
-	 * 
+	 *
 	 * @return a new NGramGaussJGraph object
 	 */
 	public NGramGaussJGraph() {
@@ -35,7 +35,7 @@ public class NGramGaussJGraph extends NGramJGraph {
 
 	/**
 	 * Creates a new instance of NGramGaussJGraph using the default
-	 * parameters representing a given data string. 
+	 * parameters representing a given data string.
 	 *
 	 * @param dataString the data string to be represented
 	 * @return a new NGramGaussJGraph object
@@ -50,7 +50,7 @@ public class NGramGaussJGraph extends NGramJGraph {
 	 * and an empty initial data string.
 	 * @param iMinSize The minimum n-gram size
 	 * @param iMaxSize The maximum n-gram size
-	 * @param iCorrelationWindow The standard deviation of the Gaussian 
+	 * @param iCorrelationWindow The standard deviation of the Gaussian
 	 * scaling function to use when determining neighbouring weights.
 	 */
 	public NGramGaussJGraph(int iMinSize, int iMaxSize, int iCorrelationWindow) {
@@ -62,9 +62,9 @@ public class NGramGaussJGraph extends NGramJGraph {
 	}
 
 	/**
-	 * Creates a new NGramGaussJGraph object with custom parameters to 
+	 * Creates a new NGramGaussJGraph object with custom parameters to
 	 * represent a given data string.
-	 * 
+	 *
 	 * @param dataString the data string to be represented
 	 * @param iMinSize the minimum n-gram size
 	 * @param iMaxSize the maximum n-gram size
@@ -73,7 +73,7 @@ public class NGramGaussJGraph extends NGramJGraph {
 	 * @return a new NGramGaussJGraph object
 	 */
 	public NGramGaussJGraph
-	(String dataString, int iMinSize, int iMaxSize, int iCorrelationWindow) 
+	(String dataString, int iMinSize, int iMaxSize, int iCorrelationWindow)
 	{
 		MinSize = iMinSize;
 		MaxSize = iMaxSize;
@@ -89,12 +89,13 @@ public class NGramGaussJGraph extends NGramJGraph {
 	 * though the distance affects neighbouring importance, by scaling
 	 * the neighbouring weight by a Gaussian function of distance.
 	 */
-	private void createGraphs() {       
+	@Override
+	protected void createGraphs() {
 		final String sUsableString = DataString;
 
 		final int iLen = DataString.length();
 		// Create token histogram.
-		HashMap<String, Double> hTokenAppearence = 
+		HashMap<String, Double> hTokenAppearence =
 			new HashMap<String, Double>();
 		// 1st pass. Populate histogram.
 		///////////////////////////////
@@ -113,7 +114,7 @@ public class NGramGaussJGraph extends NGramJGraph {
 					// then break
 					break;
 
-				// Get n-gram                
+				// Get n-gram
 				final String sCurNGram =
 					sUsableString.substring(iCurStart, iCurStart + iNGramSize);
 
@@ -149,15 +150,15 @@ public class NGramGaussJGraph extends NGramJGraph {
 					// then break
 					break;
 
-				// Get n-gram                
-				sCurNGram = sUsableString.substring(iCurStart, iCurStart + iNGramSize);
-				
+				// Get n-gram
+				sCurNGram = sUsableString.substring(
+					iCurStart, iCurStart + iNGramSize);
 				String[] aFinalNeighbours;
 				aFinalNeighbours = new String[PrecedingNeighbours.size()];
 				PrecedingNeighbours.toArray(aFinalNeighbours);
 				createEdgesConnecting(gGraph,
 						sCurNGram,
-						Arrays.asList(aFinalNeighbours), 
+						Arrays.asList(aFinalNeighbours),
 						hTokenAppearence);
 
 				PrecedingNeighbours.add(sCurNGram);
@@ -172,7 +173,7 @@ public class NGramGaussJGraph extends NGramJGraph {
 						PrecedingNeighbours,
 						hTokenAppearence);
 			}
-		}        
+		}
 	}
 
 	/**
@@ -185,11 +186,11 @@ public class NGramGaussJGraph extends NGramJGraph {
 	 * @param hAppearenceHistogram The histogram of appearences of the terms
 	 *
 	 */
-	private void createEdgesConnecting(
+	protected void createEdgesConnecting(
 		UniqueVertexGraph gGraph,
 		String sStartNode,
 		List<String> lOtherNodes,
-		HashMap<String, Double> hAppearenceHistogram) 
+		HashMap<String, Double> hAppearenceHistogram)
 	{
 		double dStartWeight = 0;
 		double dIncreaseWeight = 0;
@@ -201,7 +202,7 @@ public class NGramGaussJGraph extends NGramJGraph {
 				// Attempt to add solitary node [sStartNode]
 				JVertex v = new NGramVertex(sStartNode);
 				try {
-					gGraph.add(v);    
+					gGraph.add(v);
 				}
 				catch (Exception e) {
 					// Probably exists already
@@ -248,7 +249,7 @@ public class NGramGaussJGraph extends NGramJGraph {
 
 			if (eclLocator == null)
 				eclLocator = new EdgeCachedLocator(10);
-			Edge weCorrectEdge = 
+			Edge weCorrectEdge =
 				eclLocator.locateDirectedEdgeInGraph(gGraph, vA, vB);
 
 			if (weCorrectEdge == null)
@@ -279,15 +280,15 @@ public class NGramGaussJGraph extends NGramJGraph {
 	}
 
 
-	/** 
-	 * A function providing a scaling factor according to 
+	/**
+	 * A function providing a scaling factor according to
 	 * the distance between any two n-grams.
-	 * 
+	 *
 	 * @param iDistance The distance between the two n-grams.
 	 * @return A double scaling factor.
 	 */
 	protected double ScalingFunction(int iDistance) {
-		return Math.exp(-Math.pow((iDistance), 2.0) / 
+		return Math.exp(-Math.pow((iDistance), 2.0) /
 				(2.0*Math.pow(CorrelationWindow,2.0)));
 	}
 

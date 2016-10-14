@@ -1,9 +1,9 @@
 # project is in java
 language: java
 
-# only build the maven-core branch
+# only build the v8 branch
 branches:
     only:
-        - maven-core
+        - v8
 
 script: mvn clean verify
