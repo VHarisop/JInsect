@@ -1,5 +1,7 @@
 # project is in java
 language: java
+jdk:
+    - oraclejdk8
 
 # only build the v8 branch
 branches:
