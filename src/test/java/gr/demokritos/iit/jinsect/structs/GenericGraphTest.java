@@ -1,16 +1,20 @@
 package gr.demokritos.iit.jinsect.structs;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import java.lang.Math;
 
 /**
  * Unit test for {@link GenericGraph} and its conversion via collapsing
  * to {@link UniqueVertexGraph}.
  */
-public class GenericGraphTest 
+public class GenericGraphTest
     extends TestCase
 {
     /**
@@ -142,6 +146,30 @@ public class GenericGraphTest
 		assertTrue(eqDouble(e4.edgeWeight(), 2.0));
 		// make sure they are the only edges there
 		assertTrue(uvg.edgeSet().size() == 4);
+	}
+
+	/**
+	 * Test that the list of generic graphs in the file small.json
+	 * is read properly.
+	 */
+	public void testGsonInput() {
+		final String fileName = "/small.json";
+		try {
+			assertNotNull("Missing file!", getClass().getResource(fileName));
+			URI resource = getClass().getResource(fileName).toURI();
+			File fJson = new File(resource);
+			List<GenericGraph> graphs = GenericGraph.fromJsonFile(fJson);
+			assertNotNull(graphs);
+			assertEquals(3, graphs.size());
+		}
+		catch (URISyntaxException ex) {
+			/* Print exception and fail instantly */
+			ex.printStackTrace();
+			assertTrue(false);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			assertTrue(false);
+		}
 	}
 
 	/* Helper function to check doubles for equality */
