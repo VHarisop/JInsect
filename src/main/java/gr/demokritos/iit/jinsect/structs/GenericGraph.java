@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /* use JGraphT for basic graph operations */
@@ -156,9 +155,6 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		Map<String, Map<String, Double>> edges;
 		String id;
 
-		private static final Logger logger =
-				Logger.getLogger("GraphTemplate");
-
 		private static final Type G_TYPE =
 				new TypeToken<List<GraphTemplate>>(){}.getType();
 
@@ -206,7 +202,6 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		 * @return a new generic graph object
 		 */
 		public GenericGraph toGenericGraph() {
-			logger.info("Converting to GenericGraph with id " + id);
 			GenericGraph gGen = new GenericGraph(id);
 			addNodes(gGen); addEdges(gGen);
 			return gGen;
@@ -278,8 +273,6 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		parsed.forEach(g -> {
 			final GenericGraph gGen = g.toGenericGraph();
 			UniqueVertexGraph uvg = gGen.compactToUniqueVertexGraph();
-			Logger.getAnonymousLogger().info(gGen.toString());
-			Logger.getAnonymousLogger().info(uvg.toString());
 		});
 	}
 }

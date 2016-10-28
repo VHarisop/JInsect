@@ -32,18 +32,13 @@
 		<scope>test</scope>
 	</dependency>
 
-	<!-- fiddling with JGraphT -->
+	<!-- JGraphT for graph backend -->
 	<dependency>
 		<groupId>org.jgrapht</groupId>
 		<artifactId>jgrapht-core</artifactId>
 		<version>1.0.0</version>
 	</dependency>
 
-	<dependency>
-		<groupId>commons-lang</groupId>
-		<artifactId>commons-lang</artifactId>
-		<version>2.6</version>
-    </dependency>
     <!-- Add Gson to parse graphs in .json format -->
     <dependency>
       <groupId>com.google.code.gson</groupId>
