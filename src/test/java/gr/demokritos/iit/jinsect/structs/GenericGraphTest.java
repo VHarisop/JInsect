@@ -4,8 +4,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import gr.demokritos.iit.jinsect.jutils;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -169,6 +173,34 @@ public class GenericGraphTest
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			assertTrue(false);
+		}
+	}
+	
+	public void testMutations() {
+		List<GenericGraph> graphs = getGraphList();
+		Set<String> availLabels = new HashSet<>();
+		graphs.forEach(g -> {
+			availLabels.addAll(g.getEffectiveLabelSet());
+		});
+		/* Create a mutation for every graph */
+		graphs.forEach(g -> {
+			GenericGraph gNew = jutils.getEditedGraph(
+				g, 3, availLabels.stream().collect(Collectors.toList()));
+			assertNotNull(gNew);
+		});
+	}
+	
+	/* Get the list of generic graphs from <small.json> */
+	private List<GenericGraph> getGraphList() {
+		final String fileName = "/small.json";
+		try {
+			URI resource = getClass().getResource(fileName).toURI();
+			File jsonFile = new File(resource);
+			List<GenericGraph> graphs = GenericGraph.fromJsonFile(jsonFile);
+			return graphs;
+		}
+		catch (Exception ex) {
+			return null;
 		}
 	}
 

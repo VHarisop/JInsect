@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /* use JGraphT for basic graph operations */
@@ -102,6 +103,26 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	private String extractLabel(JVertex v) {
 		return v.getLabel().split("\\$")[0];
 	}
+	
+	/**
+	 * Given a {@link JVertex} whose name follows the convention
+	 * <label>$<id>, splits it into a two-part String array.
+	 * @param v the vertex whose label will be split
+	 * @return a {@link String[]} containing the parts
+	 */
+	public static String[] getLabelParts(JVertex v) {
+		return v.getLabel().split("\\$");
+	}
+	
+	/**
+	 * Get the set of all effective labels in this graph.
+	 * @return a {@link Set} containing all the labels
+	 */
+	public Set<String> getEffectiveLabelSet() {
+		return vertexSet().stream()
+			.map(v -> extractLabel(v))
+			.collect(Collectors.toSet());
+	}
 
 	/**
 	 * Adds a weighted edge from a source to a target vertex in the graph.
@@ -134,7 +155,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	}
 
 	@Override
-	public Object clone() {
+	public GenericGraph clone() {
 		GenericGraph res = new GenericGraph();
 		/* add all edges to the clone graph - all vertices will
 		 * eventually be added both to the supergraph's vertex set
@@ -273,6 +294,14 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		parsed.forEach(g -> {
 			final GenericGraph gGen = g.toGenericGraph();
 			UniqueVertexGraph uvg = gGen.compactToUniqueVertexGraph();
+			System.out.println("Vertices: ");
+			uvg.vertexSet().forEach(v -> {
+				System.out.println("\t" + v.getLabel());
+			});
+			System.out.println("Edges: ");
+			uvg.edgeSet().forEach(e -> {
+				System.out.println("\t" + e.getLabels());
+			});
 		});
 	}
 }
