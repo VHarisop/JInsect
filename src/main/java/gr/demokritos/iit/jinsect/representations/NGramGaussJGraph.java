@@ -1,15 +1,18 @@
 package gr.demokritos.iit.jinsect.representations;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
+
+import gr.demokritos.iit.jinsect.Logging;
+import gr.demokritos.iit.jinsect.structs.Edge;
 import gr.demokritos.iit.jinsect.structs.EdgeCachedLocator;
-import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 import gr.demokritos.iit.jinsect.structs.JVertex;
 import gr.demokritos.iit.jinsect.structs.NGramVertex;
-import gr.demokritos.iit.jinsect.structs.Edge;
+import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 
 /**
  * A Document N-gram UniqueJVertexGraph that uses a Gaussian bell scaling
@@ -21,6 +24,9 @@ import gr.demokritos.iit.jinsect.structs.Edge;
 public class NGramGaussJGraph extends NGramJGraph {
 	static final long serialVersionUID = 1L;
 	public EdgeCachedLocator eclLocator = null;
+
+	private static final Logger logger =
+			Logging.getLogger(NGramGaussJGraph.class.getName());
 
 	/**
 	 * Creates a new instance of DocumentNGramGaussNormJGraph
@@ -95,36 +101,39 @@ public class NGramGaussJGraph extends NGramJGraph {
 
 		final int iLen = DataString.length();
 		// Create token histogram.
-		HashMap<String, Double> hTokenAppearence =
-			new HashMap<String, Double>();
+		final HashMap<String, Double> hTokenAppearence =
+			new HashMap<>();
 		// 1st pass. Populate histogram.
 		///////////////////////////////
 		// For all sizes create corresponding levels
 		for (int iNGramSize = MinSize; iNGramSize <= MaxSize; iNGramSize++)
 		{
 			// If n-gram bigger than text
-			if (iLen < iNGramSize)
+			if (iLen < iNGramSize) {
 				// then Ignore
 				continue;
+			}
 
 			for (int iCurStart = 0; iCurStart < iLen; iCurStart++)
 			{
 				// If reached end
-				if (iLen < iCurStart + iNGramSize)
+				if (iLen < iCurStart + iNGramSize) {
 					// then break
 					break;
+				}
 
 				// Get n-gram
 				final String sCurNGram =
 					sUsableString.substring(iCurStart, iCurStart + iNGramSize);
 
 				// Update Histogram
-				if (hTokenAppearence.containsKey(sCurNGram))
+				if (hTokenAppearence.containsKey(sCurNGram)) {
 					hTokenAppearence.put(
 							sCurNGram,
 							hTokenAppearence.get(sCurNGram).doubleValue() + 1.0);
-				else
+				} else {
 					hTokenAppearence.put(sCurNGram, 1.0);
+				}
 
 			}
 		}
@@ -135,20 +144,22 @@ public class NGramGaussJGraph extends NGramJGraph {
 		for (int iNGramSize = MinSize; iNGramSize <= MaxSize; iNGramSize++)
 		{
 			// If n-gram bigger than text
-			if (iLen < iNGramSize)
+			if (iLen < iNGramSize) {
 				// then Ignore
 				continue;
+			}
 
-			List<String> PrecedingNeighbours = new ArrayList<String>();
-			UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iNGramSize);
+			final List<String> PrecedingNeighbours = new ArrayList<>();
+			final UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iNGramSize);
 
 			String sCurNGram = "";
 			for (int iCurStart = 0; iCurStart < iLen; iCurStart++)
 			{
 				// If reached end
-				if (iLen < iCurStart + iNGramSize)
+				if (iLen < iCurStart + iNGramSize) {
 					// then break
 					break;
+				}
 
 				// Get n-gram
 				sCurNGram = sUsableString.substring(
@@ -164,7 +175,9 @@ public class NGramGaussJGraph extends NGramJGraph {
 				PrecedingNeighbours.add(sCurNGram);
 				// Take neighbours into account up to 3 times the stdev
 				if (PrecedingNeighbours.size() > CorrelationWindow * 3)
+				 {
 					PrecedingNeighbours.remove(0); // remove first element
+				}
 			}
 			final int iNeighboursLen = PrecedingNeighbours.size();
 			if (iNeighboursLen > 0) {
@@ -196,37 +209,37 @@ public class NGramGaussJGraph extends NGramJGraph {
 		double dIncreaseWeight = 0;
 
 		// If no neightbours
-		if (lOtherNodes != null)
+		if (lOtherNodes != null) {
 			if (lOtherNodes.size() == 0)
 			{
 				// Attempt to add solitary node [sStartNode]
-				JVertex v = new NGramVertex(sStartNode);
+				final JVertex v = new NGramVertex(sStartNode);
 				try {
 					gGraph.add(v);
 				}
-				catch (Exception e) {
-					// Probably exists already
-					e.printStackTrace();
+				catch (final Exception e) {
+					logger.warning(e.getMessage());
 				}
 				return;
 			}
+		}
 
 		// Otherwise for every neighbour add edge
-		Iterator<String> iIter = lOtherNodes.iterator();
+		final Iterator<String> iIter = lOtherNodes.iterator();
 
 		// Locate source node
-		JVertex vOldA = gGraph.locateVertex(sStartNode);
+		final JVertex vOldA = gGraph.locateVertex(sStartNode);
 		JVertex vA;
-		if (vOldA != null)
+		if (vOldA != null) {
 			vA = vOldA;
-		else {
+		} else {
 			// else create it
 			vA = new NGramVertex(sStartNode);
 			// Add to graph
 			try {
 				gGraph.add(vA);
 			}
-			catch (Exception e) {
+			catch (final Exception e) {
 				// Not added. Ignore.
 			}
 
@@ -240,22 +253,23 @@ public class NGramGaussJGraph extends NGramJGraph {
 		// For every edge
 		while (iIter.hasNext())
 		{
-			JVertex vB = new NGramVertex(iIter.next());
+			final JVertex vB = new NGramVertex(iIter.next());
 
 			double dOldWeight = 0;
 			double dNewWeight = 0;
 			dStartWeight = ScalingFunction(++iCnt);
 			dIncreaseWeight = dStartWeight;
 
-			if (eclLocator == null)
+			if (eclLocator == null) {
 				eclLocator = new EdgeCachedLocator(10);
-			Edge weCorrectEdge =
+			}
+			final Edge weCorrectEdge =
 				eclLocator.locateDirectedEdgeInGraph(gGraph, vA, vB);
 
-			if (weCorrectEdge == null)
+			if (weCorrectEdge == null) {
 				// Not found. Using Start weight
 				dNewWeight = dStartWeight;
-			else {
+			} else {
 				dOldWeight = weCorrectEdge.edgeWeight();
 				dNewWeight = dOldWeight + dIncreaseWeight; // Increase as required
 			}
@@ -263,17 +277,17 @@ public class NGramGaussJGraph extends NGramJGraph {
 			try
 			{
 				if (weCorrectEdge == null) {
-					Edge e = gGraph.addEdge(vA, vB, dNewWeight);
+					final Edge e = gGraph.addEdge(vA, vB, dNewWeight);
 					eclLocator.addedEdge(e);
 				}
 				else {
 					gGraph.setEdgeWeight(weCorrectEdge, dNewWeight);
 				}
 			}
-			catch (Exception e)
+			catch (final Exception e)
 			{
-				// Unknown error
-				e.printStackTrace();
+				/* Unknown error, output as severe */
+				logger.severe(e.getMessage());
 			}
 		}
 
@@ -292,9 +306,11 @@ public class NGramGaussJGraph extends NGramJGraph {
 				(2.0*Math.pow(CorrelationWindow,2.0)));
 	}
 
+	@Override
 	protected void InitGraphs() {
 		super.InitGraphs();
-		if (eclLocator != null)
+		if (eclLocator != null) {
 			eclLocator.resetCache();
+		}
 	}
 }

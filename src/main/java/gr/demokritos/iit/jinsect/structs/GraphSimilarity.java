@@ -7,7 +7,7 @@ package gr.demokritos.iit.jinsect.structs;
  *     - ContainmentSimilarity
  *     - SizeSimilarity
  *
- * @author ggianna 
+ * @author ggianna
  * @author VHarisop
  */
 public class GraphSimilarity {
@@ -26,7 +26,7 @@ public class GraphSimilarity {
 	public double ContainmentSimilarity;
 
 	/**
-	 * Specifies the similarity by means of size. Range of possible values 
+	 * Specifies the similarity by means of size. Range of possible values
 	 * is in [0, 1] - 1 means that A has the same number of edges as B.
 	 */
 	public double SizeSimilarity;
@@ -43,11 +43,11 @@ public class GraphSimilarity {
 
 	/**
 	 * Calculates the overall similarity this object describes. The default method
-	 * is to return the product size, value and containment similarities. 
-	 * It is recommended to override this method, should another type of 
+	 * is to return the product size, value and containment similarities.
+	 * It is recommended to override this method, should another type of
 	 * calculation be required.
 	 *
-	 * @return the overall similarity 
+	 * @return the overall similarity
 	 */
 	public double getOverallSimilarity() {
 		return ValueSimilarity * ContainmentSimilarity * SizeSimilarity;
@@ -55,16 +55,17 @@ public class GraphSimilarity {
 
 	/**
 	 * Calculates an overall distance as a function of the overall similarity.
-	 * The distance is the inverse of the overall similarity. In case overall 
+	 * The distance is the inverse of the overall similarity. In case overall
 	 * similarity is equal to 0, POSITIVE_INFINITY is returned.
 	 *
 	 * @return the overall distance, ranging from 0 to positive infinity
 	 */
 	public double asDistance() {
-		double overall = getOverallSimilarity();
-		if (overall == 0) 
+		final double overall = getOverallSimilarity();
+		if (overall == 0) {
 			return Double.POSITIVE_INFINITY;
-		else
+		} else {
 			return 1.0 / overall;
+		}
 	}
 }

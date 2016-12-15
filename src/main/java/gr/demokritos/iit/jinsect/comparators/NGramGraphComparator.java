@@ -2,7 +2,7 @@ package gr.demokritos.iit.jinsect.comparators;
 
 import gr.demokritos.iit.jinsect.representations.*;
 import gr.demokritos.iit.jinsect.structs.*;
-import gr.demokritos.iit.jinsect.utils;
+import gr.demokritos.iit.jinsect.Utils;
 
 public class NGramGraphComparator {
 	
@@ -25,12 +25,12 @@ public class NGramGraphComparator {
 		/* calculate overall importance first */
 		int overallImportance = 0;
 		for (int iCnt = ngA.getMinSize(); iCnt <= ngA.getMaxSize(); ++iCnt) {
-			overallImportance += utils.sumFromTo(ngA.getMinSize(), iCnt);
+			overallImportance += Utils.sumFromTo(ngA.getMinSize(), iCnt);
 		}
 
 		for (int iCnt = ngA.getMinSize(); iCnt <= ngA.getMaxSize(); ++iCnt) {
 			// calculate level weight
-			final int levelImportance = utils.sumFromTo(ngA.getMinSize(), iCnt);
+			final int levelImportance = Utils.sumFromTo(ngA.getMinSize(), iCnt);
 
 			GraphSimilarity gSimLevel = new GraphSimilarity();
 			UniqueVertexGraph uvgA = ngA.getGraphLevelByNGramSize(iCnt);

@@ -6,7 +6,7 @@ import junit.framework.TestSuite;
 
 import gr.demokritos.iit.jinsect.representations.NGramJGraph;
 import gr.demokritos.iit.jinsect.structs.*;
-import gr.demokritos.iit.jinsect.jutils;
+import gr.demokritos.iit.jinsect.JUtils;
 
 
 /**
@@ -64,7 +64,7 @@ public class EncodersTest
 		assertFalse(cCoder_A.getEncoding().equals(cCoder_B.getEncoding()));
 
 		// assert that AAT is lexicographically smaller than ACA
-		assertTrue(jutils.compareCanonicalCodes(nggA.getGraphLevel(0), 
+		assertTrue(JUtils.compareCanonicalCodes(nggA.getGraphLevel(0), 
 												nggB.getGraphLevel(0)) > 0);
 
 		// assert that two identical graphs give indentical canonical codes

@@ -1,14 +1,15 @@
 package gr.demokritos.iit.jinsect.structs;
 
-import java.util.Collections;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
-/* use JGraphT for basic graph operations */
-import org.jgrapht.graph.*;
 
-import gr.demokritos.iit.jinsect.structs.calculators.*;
+/* use JGraphT for basic graph operations */
+import org.jgrapht.graph.DefaultDirectedWeightedGraph;
+
+import gr.demokritos.iit.jinsect.structs.calculators.OrderedWeightCalculator;
 
 /**
  * UniqueJVertexGraph is an extension to a weighted graph from
@@ -64,7 +65,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 */
 	public UniqueVertexGraph() {
 		super(Edge.class);
-		UniqueVertices = new HashMap<String, JVertex>();
+		UniqueVertices = new HashMap<>();
 	}
 
 	/**
@@ -108,8 +109,9 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 */
 	public synchronized void add(JVertex v) {
 		/* if already existing, return immediately */
-		if (this.contains(v))
+		if (this.contains(v)) {
 			return;
+		}
 
 		/* otherwise, add to vertices and update label map */
 		super.addVertex(v);
@@ -129,16 +131,18 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	public synchronized Edge addEdge(JVertex v1, JVertex v2, double weight)
 	{
 		/* implicitly add missing vertices from the super-graph */
-		if (!(this.contains(v1)))
+		if (!(this.contains(v1))) {
 			add(v1);
+		}
 
-		if (!(this.contains(v2)))
+		if (!(this.contains(v2))) {
 			add(v2);
+		}
 
 		/* add edge to the graph, and update the weight
 		 * if the addition was successful. Also make the
 		 * cached variable false */
-		Edge e = super.addEdge(v1, v2);
+		final Edge e = super.addEdge(v1, v2);
 		if (e != null) {
 			super.setEdgeWeight(e, weight);
 			cached = false;
@@ -168,7 +172,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 * @return an unmodifiable list of adjacent vertices
 	 */
 	public List<JVertex> getAdjacentVertices(JVertex vFrom) {
-		List<JVertex> adjacentVertices = new ArrayList<>();
+		final List<JVertex> adjacentVertices = new ArrayList<>();
 		super.outgoingEdgesOf(vFrom)
 			.forEach(e -> adjacentVertices.add(getEdgeTarget(e)));
 
@@ -242,13 +246,15 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 
 	@Override
     public Object clone() {
-        UniqueVertexGraph res = new UniqueVertexGraph();
+        final UniqueVertexGraph res = new UniqueVertexGraph();
 		/* add all edges to the clone graph - all vertices will
 		 * eventually be added both to the supergraph's vertex set
 		 * and the hash map, because of calls to the add() method */
         this.edgeSet().forEach(e ->
-			res.addEdge(getEdgeSource(e), getEdgeTarget(e), getEdgeWeight(e))
-		);
+			res.addEdge(
+				getEdgeSource(e),
+				getEdgeTarget(e),
+				getEdgeWeight(e)));
 		return res;
     }
 }

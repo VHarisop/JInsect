@@ -11,17 +11,23 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.logging.Logger;
+
+import gr.demokritos.iit.jinsect.Logging;
 
 /**
  * A file database which stores object in their raw format.
  * @author ggianna
  */
-public class INSECTFileRawDB<TObjectType extends Serializable> 
-	extends INSECTFileDB<TObjectType> 
+public class INSECTFileRawDB<TObjectType extends Serializable>
+	extends INSECTFileDB<TObjectType>
 {
 	static final long serialVersionUID = 1L;
 
-	/** 
+	private static final Logger logger =
+			Logging.getLogger(INSECTFileRawDB.class.getName());
+
+	/**
 	 * Creates a new instance of INSECTFileRawDB using a given
 	 * prefix and base directory.
 	 *
@@ -38,15 +44,15 @@ public class INSECTFileRawDB<TObjectType extends Serializable>
 	@Override
 	public void saveObject(Serializable oObj, String sObjectName, String sObjectCategory) {
 		try {
-			FileOutputStream fsOut = new FileOutputStream(getFileName(sObjectName, sObjectCategory));
-
-			ObjectOutputStream oOut = new ObjectOutputStream(fsOut);
+			final FileOutputStream fsOut = new FileOutputStream(
+					getFileName(sObjectName, sObjectCategory));
+			final ObjectOutputStream oOut = new ObjectOutputStream(fsOut);
 			oOut.writeObject(oObj);
 			// Complete the GZIP file
 			fsOut.close();
 		}
-		catch (Exception e) {
-			e.printStackTrace();
+		catch (final Exception e) {
+			logger.severe(e.getMessage());
 		}
 	}
 
@@ -62,8 +68,8 @@ public class INSECTFileRawDB<TObjectType extends Serializable>
 			fsIn = new FileInputStream(getFileName(sObjectName, sObjectCategory));
 			iIn = new ObjectInputStream(fsIn);
 		}
-		catch (Exception e) {
-			e.printStackTrace();
+		catch (final Exception e) {
+			logger.severe(e.getMessage());
 			return null;
 		}
 
@@ -72,19 +78,19 @@ public class INSECTFileRawDB<TObjectType extends Serializable>
 			oRes = iIn.readObject();
 			iIn.close();
 		}
-		catch (Exception e) {
-			e.printStackTrace();
+		catch (final Exception e) {
+			logger.severe(e.getMessage());
 
-			/* closed iIn in try {} block to fix resource leak 
-			 * in which iIn was still open when returning null 
+			/* closed iIn in try {} block to fix resource leak
+			 * in which iIn was still open when returning null
 			 */
 			return null;
 		}
 
 		try {
 			fsIn.close();
-		} catch (IOException ex) {
-			ex.printStackTrace();
+		} catch (final IOException ex) {
+			logger.warning(ex.getMessage());
 		}
 		return (TObjectType)oRes;
 	}

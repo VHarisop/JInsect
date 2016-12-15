@@ -5,7 +5,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import gr.demokritos.iit.jinsect.structs.*;
+import java.util.logging.Logger;
+
+import gr.demokritos.iit.jinsect.Logging;
+import gr.demokritos.iit.jinsect.structs.Edge;
+import gr.demokritos.iit.jinsect.structs.EdgeCachedLocator;
+import gr.demokritos.iit.jinsect.structs.JVertex;
+import gr.demokritos.iit.jinsect.structs.NGramVertex;
+import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 
 
 /**
@@ -21,6 +28,9 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
 	 * The width of the actual window, as a factor over the given window
 	 */
     static final double Visibility = 3.0;
+
+    private static final Logger logger =
+    		Logging.getLogger(NGramGaussSymJGraph.class.getName());
 
     /**
 	 * Creates a new instance of NGramGaussSymJGraph
@@ -84,38 +94,41 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
 
         final int iLen = DataString.length();
         // Create token histogram.
-        HashMap<String, Double> hTokenAppearence =
-			new HashMap<String, Double>();
+        final HashMap<String, Double> hTokenAppearence =
+			new HashMap<>();
         // 1st pass. Populate histogram.
         ///////////////////////////////
         // For all sizes create corresponding levels
         for (int iNGramSize = MinSize; iNGramSize <= MaxSize; iNGramSize++)
         {
             // If n-gram bigger than text
-            if (iLen < iNGramSize)
-                // then Ignore
+            if (iLen < iNGramSize) {
+				// then Ignore
                 continue;
+			}
 
-            LinkedList<String> lNGramSequence = new LinkedList<String>();
-            UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iNGramSize);
+            final LinkedList<String> lNGramSequence = new LinkedList<>();
+            final UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iNGramSize);
             for (int iCurStart = 0; iCurStart < iLen; iCurStart++)
             {
                 // If reached end
-                if (iLen < iCurStart + iNGramSize)
-                    // then break
+                if (iLen < iCurStart + iNGramSize) {
+					// then break
                     break;
+				}
 
                 // Get n-gram
                 final String sCurNGram =
 					sUsableString.substring(iCurStart, iCurStart + iNGramSize);
 
                 // Update Histogram
-                if (hTokenAppearence.containsKey(sCurNGram))
-                    hTokenAppearence.put(
+                if (hTokenAppearence.containsKey(sCurNGram)) {
+					hTokenAppearence.put(
 						sCurNGram,
 						(hTokenAppearence.get(sCurNGram)).doubleValue() + 1.0);
-                else
-                    hTokenAppearence.put(sCurNGram, 1.0);
+				} else {
+					hTokenAppearence.put(sCurNGram, 1.0);
+				}
 
                 // Update list of n-grams
                 lNGramSequence.add(sCurNGram);
@@ -125,8 +138,8 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
 				final int iTemp = iListSize - (int)(CorrelationWindow * Visibility);
                 final int iFrom = iTemp - 1 >= 0 ? iTemp - 1 : 0;
 
-				List<String> revList =
-					new LinkedList<String>(lNGramSequence.subList(iFrom, iTo));
+				final List<String> revList =
+					new LinkedList<>(lNGramSequence.subList(iFrom, iTo));
 				Collections.reverse(revList);
 
                 createSymEdgesConnecting(
@@ -159,37 +172,38 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
         double dIncreaseWeight = 0;
 
         // If no neightbours
-        if (lOtherNodes != null)
-            if (lOtherNodes.size() == 0)
+        if (lOtherNodes != null) {
+			if (lOtherNodes.size() == 0)
             {
                 // Attempt to add solitary node [sStartNode]
-                JVertex v = new NGramVertex(sStartNode);
+                final JVertex v = new NGramVertex(sStartNode);
                 try {
                     gGraph.add(v);
                 }
-                catch (Exception e) {
+                catch (final Exception e) {
                     // Probably exists already
-                    e.printStackTrace(System.err);
+                	logger.warning(e.getMessage());
                 }
                 return;
             }
+		}
 
         // Otherwise for every neighbour add edge
-        Iterator<String> iIter = lOtherNodes.iterator();
+        final Iterator<String> iIter = lOtherNodes.iterator();
 
         // Locate source node
-		JVertex vOldA = gGraph.locateVertex(sStartNode);
+		final JVertex vOldA = gGraph.locateVertex(sStartNode);
         JVertex vA;
-        if (vOldA != null)
-            vA = vOldA;
-        else {
+        if (vOldA != null) {
+			vA = vOldA;
+		} else {
             // else create it
 			vA = new NGramVertex(sStartNode);
             // Add to graph
             try {
                 gGraph.add(vA);
             }
-            catch (Exception e) {
+            catch (final Exception e) {
                 // Not added. Ignore.
             }
         }
@@ -202,7 +216,7 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
         // For every edge
         while (iIter.hasNext())
         {
-            JVertex vB = new NGramVertex((String)iIter.next());
+            final JVertex vB = new NGramVertex(iIter.next());
 
             double dOldWeight = 0;
             double dNewWeight = 0;
@@ -210,17 +224,17 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
                     //((Double)hAppearenceHistogram.get(vB.getLabel())).doubleValue());
             dStartWeight = ScalingFunction(++iCnt);
             dIncreaseWeight = dStartWeight;
-            //WeightedEdge weCorrectEdge = (WeightedEdge)jinsect.utils.locateDirectedEdgeInGraph(gGraph, vA, vB);
+            //WeightedEdge weCorrectEdge = (WeightedEdge)jinsect.Utils.locateDirectedEdgeInGraph(gGraph, vA, vB);
 
-            if (eclLocator == null)
-                eclLocator = new EdgeCachedLocator(10);
+            if (eclLocator == null) {
+				eclLocator = new EdgeCachedLocator(10);
+			}
             // Add one-way edge
             Edge weCorrectEdge = eclLocator.locateDirectedEdgeInGraph(gGraph, vA, vB);
 
-            if (weCorrectEdge == null)
-                // Not found. Using Start weight
-                dNewWeight = dStartWeight;
-            else {
+            if (weCorrectEdge == null) {
+				dNewWeight = dStartWeight;
+			} else {
                 dOldWeight = weCorrectEdge.edgeWeight();
                 dNewWeight = dOldWeight + dIncreaseWeight; // Increase as required
             }
@@ -228,26 +242,25 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
             try
             {
                 if (weCorrectEdge == null) {
-                    Edge e = gGraph.addEdge(vA, vB, dNewWeight);
+                    final Edge e = gGraph.addEdge(vA, vB, dNewWeight);
                     eclLocator.addedEdge(e);
                 }
                 else {
 					gGraph.setEdgeWeight(weCorrectEdge, dNewWeight);
 				}
             }
-            catch (Exception e)
+            catch (final Exception e)
             {
                 // Unknown error
-                e.printStackTrace();
+            	logger.severe(e.getMessage());
             }
 
             // Add reverse edge
             weCorrectEdge = eclLocator.locateDirectedEdgeInGraph(gGraph, vB, vA);
 
-            if (weCorrectEdge == null)
-                // Not found. Using Start weight
-                dNewWeight = dStartWeight;
-            else {
+            if (weCorrectEdge == null) {
+				dNewWeight = dStartWeight;
+			} else {
                 dOldWeight = weCorrectEdge.edgeWeight();
                 dNewWeight = dOldWeight + dIncreaseWeight; // Increase as required
             }
@@ -255,17 +268,17 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
             try
             {
                 if (weCorrectEdge == null) {
-                    Edge e = gGraph.addEdge(vB, vA, dNewWeight);
+                    final Edge e = gGraph.addEdge(vB, vA, dNewWeight);
                     eclLocator.addedEdge(e);
                 }
                 else {
 					gGraph.setEdgeWeight(weCorrectEdge, dNewWeight);
 				}
             }
-            catch (Exception e)
+            catch (final Exception e)
             {
                 // Unknown error
-                e.printStackTrace();
+            	logger.severe(e.getMessage());
             }
 
         }
@@ -293,37 +306,38 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
         double dIncreaseWeight = 0;
 
         // If no neightbours
-        if (lOtherNodes != null)
-            if (lOtherNodes.size() == 0)
+        if (lOtherNodes != null) {
+			if (lOtherNodes.size() == 0)
             {
                 // Attempt to add solitary node [sStartNode]
-                JVertex v = new NGramVertex(sStartNode);
+                final JVertex v = new NGramVertex(sStartNode);
                 try {
                     gGraph.add(v);
                 }
-                catch (Exception e) {
+                catch (final Exception e) {
                     // Probably exists already
-                    e.printStackTrace();
+                	logger.warning(e.getMessage());
                 }
                 return;
             }
+		}
 
         // Otherwise for every neighbour add edge
-        Iterator<String> iIter = lOtherNodes.iterator();
+        final Iterator<String> iIter = lOtherNodes.iterator();
 
         // Locate source node
-        JVertex vOldA = gGraph.locateVertex(sStartNode);
+        final JVertex vOldA = gGraph.locateVertex(sStartNode);
         JVertex vA;
-        if (vOldA != null)
-            vA = vOldA;
-        else {
+        if (vOldA != null) {
+			vA = vOldA;
+		} else {
             // else create it
             vA = new NGramVertex(sStartNode);
             // Add to graph
             try {
                 gGraph.add(vA);
             }
-            catch (Exception e) {
+            catch (final Exception e) {
                 // Not added. Ignore.
             }
 
@@ -335,21 +349,22 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
         // For every edge
         while (iIter.hasNext())
         {
-			JVertex vB = new NGramVertex(iIter.next());
+			final JVertex vB = new NGramVertex(iIter.next());
             double dOldWeight = 0;
             double dNewWeight = 0;
 
             dStartWeight = ScalingFunction(Math.abs(++iCnt - (lOtherNodes.size() / 2)));
             dIncreaseWeight = dStartWeight;
-			if (eclLocator == null)
-                eclLocator = new EdgeCachedLocator(10);
-            Edge weCorrectEdge =
+			if (eclLocator == null) {
+				eclLocator = new EdgeCachedLocator(10);
+			}
+            final Edge weCorrectEdge =
 				eclLocator.locateDirectedEdgeInGraph(gGraph, vA, vB);
 
-            if (weCorrectEdge == null)
-                // Not found. Using Start weight
+            if (weCorrectEdge == null) {
+				// Not found. Using Start weight
                 dNewWeight = dStartWeight;
-            else {
+			} else {
                 dOldWeight = weCorrectEdge.edgeWeight();
                 dNewWeight = dOldWeight + dIncreaseWeight; // Increase as required
             }
@@ -357,17 +372,17 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
             try
             {
                 if (weCorrectEdge == null) {
-                    Edge e = gGraph.addEdge(vA, vB, dNewWeight);
+                    final Edge e = gGraph.addEdge(vA, vB, dNewWeight);
                     eclLocator.addedEdge(e);
                 }
                 else {
 					gGraph.setEdgeWeight(weCorrectEdge, dNewWeight);
 				}
             }
-            catch (Exception e)
+            catch (final Exception e)
             {
                 // Unknown error
-                e.printStackTrace();
+            	logger.severe(e.getMessage());
             }
         }
 

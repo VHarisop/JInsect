@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import gr.demokritos.iit.jinsect.jutils;
+import gr.demokritos.iit.jinsect.JUtils;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -184,7 +184,7 @@ public class GenericGraphTest
 		});
 		/* Create a mutation for every graph */
 		graphs.forEach(g -> {
-			GenericGraph gNew = jutils.getEditedGraph(
+			GenericGraph gNew = JUtils.getEditedGraph(
 				g, 3, availLabels.stream().collect(Collectors.toList()));
 			assertNotNull(gNew);
 		});

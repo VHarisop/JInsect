@@ -1,14 +1,21 @@
 package gr.demokritos.iit.jinsect.encoders;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Deque;
+import java.util.List;
 
-import gr.demokritos.iit.jinsect.structs.*;
+import gr.demokritos.iit.jinsect.structs.Edge;
+import gr.demokritos.iit.jinsect.structs.JVertex;
+import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 
-public class DepthFirstEncoder 
+public class DepthFirstEncoder
 extends BaseGraphEncoder implements GraphEncoding {
 
 	private String encodedString = "";
-	private Deque<JVertex> stack;
+	private Deque<JVertex> stack = new ArrayDeque<>();
 
 	// default separator for DFS coding
 	private String SEPARATOR = "";
@@ -22,7 +29,6 @@ extends BaseGraphEncoder implements GraphEncoding {
 	 */
 	public DepthFirstEncoder(UniqueVertexGraph uvg) {
 		super(uvg);
-		stack = new ArrayDeque<JVertex>();
 	}
 
 	/**
@@ -35,9 +41,8 @@ extends BaseGraphEncoder implements GraphEncoding {
 	 */
 	public DepthFirstEncoder(UniqueVertexGraph uvg, JVertex vFrom) {
 		super(uvg, vFrom);
-		stack = new ArrayDeque<JVertex>();
 	}
-	
+
 	/**
 	 * @see GraphEncoding.getEncoding()
 	 */
@@ -50,13 +55,13 @@ extends BaseGraphEncoder implements GraphEncoding {
 		}
 	}
 
-	/* DFS encoding for NGramJGraph should start from the 
+	/* DFS encoding for NGramJGraph should start from the
 	 * lexicographically minimum vertex */
 	@Override
 	protected JVertex chooseStart() {
 		JVertex vMin = null;
 
-		for (JVertex vCur: nGraph.vertexSet()) {
+		for (final JVertex vCur: nGraph.vertexSet()) {
 			if (vMin == null) {
 				vMin = vCur;
 			}
@@ -72,7 +77,7 @@ extends BaseGraphEncoder implements GraphEncoding {
 	}
 
 	/**
-	 * @see GraphEncoding.getEncoding(JVertex) 
+	 * @see GraphEncoding.getEncoding(JVertex)
 	 */
 	public String getEncoding(JVertex vFrom) {
 		encodedString = encodeFrom(vFrom);
@@ -94,27 +99,18 @@ extends BaseGraphEncoder implements GraphEncoding {
 			return sEncoded;
 		}
 
+		final StringBuilder fwdLabels = new StringBuilder();
+		final StringBuilder bwdLabels = new StringBuilder();
 
-		StringBuilder fwdLabels = new StringBuilder();
-		StringBuilder bwdLabels = new StringBuilder();
-
-		/* custom comparator for two edges 
+		/* custom comparator for two edges
 		 * that sorts them according to lexicographic order */
-		Comparator<Edge> eComp = new Comparator<Edge>(){
-			@Override
-			public int compare(final Edge e1, final Edge e2) {
-				return e1.getLabels().compareTo(e2.getLabels());
-			}
-		};
+		final Comparator<Edge> eComp = (e1, e2) ->
+			e1.getLabels().compareTo(e2.getLabels());
 
 		/* custom comparator for vertices that compares them
 		 * based on the lexicographic ordering of their labels */
-		Comparator<JVertex> vComp = new Comparator<JVertex>(){
-			@Override
-			public int compare(final JVertex v1, final JVertex v2) {
-				return v1.getLabel().compareTo(v2.getLabel());
-			}
-		};
+		final Comparator<JVertex> vComp = (v1, v2) ->
+			v1.getLabel().compareTo(v2.getLabel());
 
 		/* push starting point on the stack */
 		stack.push(vFrom);
@@ -124,53 +120,55 @@ extends BaseGraphEncoder implements GraphEncoding {
 			vNext = stack.pop();
 
 			/* if node is already visited, return string so far
-			 * This return is required so that exploration for 
+			 * This return is required so that exploration for
 			 * unvisited nodes (after end of while loop) does not
-			 * produce duplicates. 
+			 * produce duplicates.
 			 */
 			if (!(visitNode(vNext))) {
 				return sEncoded;
 			}
 
 			/* acquire a sorted list of edges */
-			List<Edge> eList = outgoingEdgeList(vNext);
+			final List<Edge> eList = outgoingEdgeList(vNext);
 			Collections.sort(eList, eComp);
 
-			for (Edge e: eList) {
+			for (final Edge e: eList) {
 				vAdj = nGraph.getEdgeTarget(e);
 
-				/* if node has not been visited, add it to the 
+				/* if node has not been visited, add it to the
 				 * stack and create a forward edge label.
 				 * Otherwise, create a backward edge label */
 				if (!(visited.contains(vAdj))) {
 					stack.push(vAdj);
 					fwdLabels.append(e.getLabels() + "|");
-				} 
+				}
 				else {
 					bwdLabels.append(e.getLabels() + "|");
 				}
 			}
 
-			// add separator if strings aren't empty 
-			if (fwdLabels.length() > 0)
+			// add separator if strings aren't empty
+			if (fwdLabels.length() > 0) {
 				fwdLabels.append(this.SEPARATOR);
-			if (bwdLabels.length() > 0)
+			}
+			if (bwdLabels.length() > 0) {
 				bwdLabels.append(this.SEPARATOR);
+			}
 
 			sEncoded += bwdLabels.toString() + fwdLabels.toString();
 			fwdLabels.setLength(0); bwdLabels.setLength(0);
-	
+
 		} while (!stack.isEmpty());
 
 		// if unvisited nodes remain, explore them
 		if (unvisited.size() != 0) {
-			List<JVertex> unvList = new ArrayList<JVertex>(unvisited);
+			final List<JVertex> unvList = new ArrayList<>(unvisited);
 			Collections.sort(unvList, vComp);
-			for (JVertex v: unvList) {
+			for (final JVertex v: unvList) {
 				sEncoded += encodeFrom(v);
 			}
 		}
-		
+
 		return sEncoded;
 	}
 }

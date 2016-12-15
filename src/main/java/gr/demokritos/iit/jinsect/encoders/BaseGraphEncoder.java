@@ -2,30 +2,33 @@ package gr.demokritos.iit.jinsect.encoders;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.List;
+import java.util.Set;
 
-import gr.demokritos.iit.jinsect.structs.*;
+import gr.demokritos.iit.jinsect.structs.Edge;
+import gr.demokritos.iit.jinsect.structs.JVertex;
+import gr.demokritos.iit.jinsect.structs.Pair;
+import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 
 public abstract class BaseGraphEncoder {
 	protected UniqueVertexGraph nGraph;
 	protected JVertex vStart = null;
 
 	// sets of visited / unvisited vertices
-	protected Set<JVertex> visited = new HashSet<JVertex>();
-	protected Set<JVertex> unvisited = new HashSet<JVertex>();
+	protected Set<JVertex> visited = new HashSet<>();
+	protected Set<JVertex> unvisited = new HashSet<>();
 
 	/**
 	 * Initializes the visited / unvisited sets. Creates 2 empty
-	 * {@link java.util.HashSet} instances, one for visited and 
+	 * {@link java.util.HashSet} instances, one for visited and
 	 * one for unvisited nodes.
 	 *
 	 * This method can be overriden in subclasses that require
 	 * different set types.
 	 */
 	protected void initSets() {
-		unvisited = new HashSet<JVertex>();
-		visited = new HashSet<JVertex>();
+		unvisited = new HashSet<>();
+		visited = new HashSet<>();
 	}
 
 	/**
@@ -70,42 +73,43 @@ public abstract class BaseGraphEncoder {
 	 * @return a list of edge objects
 	 */
 	public List<Edge> outgoingEdgeList(JVertex vSource) {
-		return new ArrayList<Edge>(nGraph.outgoingEdgesOf(vSource));
+		return new ArrayList<>(nGraph.outgoingEdgesOf(vSource));
 	}
 
 	/**
 	 * Explores the outgoing edges of a vertex and returns a Pair
 	 * containing two lists, one for backward edges (that point to
-	 * an already visited vertex) and one for forward edges. 
+	 * an already visited vertex) and one for forward edges.
 	 *
 	 * @param vSource the vertex to explore edges from
 	 * @return a Pair of edge lists (forward and backward respectively)
 	 */
 	public Pair<List<Edge>, List<Edge>> exploreEdges(JVertex vSource) {
-		List<Edge> eFwd = new ArrayList<Edge>();
-		List<Edge> eBwd = new ArrayList<Edge>(); 
-		
-		/* add to backward edges if target vertex is 
+		final List<Edge> eFwd = new ArrayList<>();
+		final List<Edge> eBwd = new ArrayList<>();
+
+		/* add to backward edges if target vertex is
 		 * already visited, else add to forward edges. */
 		nGraph.outgoingEdgesOf(vSource)
 			.forEach(e -> {
-				if (visited.contains(nGraph.getEdgeTarget(e)))
+				if (visited.contains(nGraph.getEdgeTarget(e))) {
 					eBwd.add(e);
-				else
+				} else {
 					eFwd.add(e);
+				}
 			});
 
 		/* return a tuple containing both lists */
-		return new Pair<List<Edge>, List<Edge>>(eFwd, eBwd);
+		return new Pair<>(eFwd, eBwd);
 	}
 
 	/**
-	 * Visits a node by adding it to the set of visited vertices 
+	 * Visits a node by adding it to the set of visited vertices
 	 * if it isn't already contained and removing it from the set
 	 * of unvisited vertices.
 	 *
 	 * @param vVisit the vertex to visit
-	 * @return a boolean - true if the vertex was not already visited, 
+	 * @return a boolean - true if the vertex was not already visited,
 	 * else false
 	 */
 	public boolean visitNode(JVertex vVisit) {

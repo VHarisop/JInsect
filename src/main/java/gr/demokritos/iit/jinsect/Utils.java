@@ -1,24 +1,40 @@
 package gr.demokritos.iit.jinsect;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 import gr.demokritos.iit.jinsect.storage.IFileLoader;
 
-import java.io.*;
-import java.util.*;
-import java.util.stream.*;
-
-/** 
+/**
  * A class including a set of useful, general purpose functions.
  *
  * @author ggianna
  */
-public final class utils {
+public final class Utils {
+	private static final Logger logger =
+			Logging.getLogger(Utils.class.getName());
+
 	/**
 	 * Converts milliseconds to a string representation of x hours, y min, z sec.
 	 * @param lMillis The long number of milliseconds.
 	 * @return The formated string.
 	 */
 	public static final String millisToMinSecString(long lMillis) {
-		return String.format("%d hours %d min %d sec", lMillis / (1000 * 60 * 60), (lMillis / (1000 * 60)) % 60, 
+		return String.format("%d hours %d min %d sec", lMillis / (1000 * 60 * 60), (lMillis / (1000 * 60)) % 60,
 				(lMillis / 1000) % 60);
 	}
 
@@ -30,8 +46,9 @@ public final class utils {
 	 * more shuffling.
 	 */
 	public static final void shuffleList(List<?> l, int repeat) {
-		for (int iCnt = 0 ; iCnt < repeat; iCnt++)
+		for (int iCnt = 0 ; iCnt < repeat; iCnt++) {
 			shuffleList(l);
+		}
 	}
 
 	/**
@@ -39,7 +56,7 @@ public final class utils {
 	 * @param l The input list that will be modified.
 	 */
 	public static final void shuffleList(List<?> l) {
-		Random d = new Random();
+		final Random d = new Random();
 		Collections.shuffle(l, d);
 	}
 
@@ -52,7 +69,7 @@ public final class utils {
 	 * @return An array of String containing the words of the given string.
 	 */
 	public static final String[] splitToWords(String sStr) {
-		String[] sRes = sStr.split("(\\s|\\p{Punct})+");
+		final String[] sRes = sStr.split("(\\s|\\p{Punct})+");
 		return sRes;
 	}
 
@@ -76,8 +93,8 @@ public final class utils {
 	public static final String
 	printSortIterable(Iterable<?> iIterable, String sSeparator) {
 		// Use treeset to sort
-		TreeSet<String> tsItems = new TreeSet<String>();
-		for (Object obj: iIterable) {
+		final TreeSet<String> tsItems = new TreeSet<>();
+		for (final Object obj: iIterable) {
 			tsItems.add(obj.toString());
 		}
 		/* collect all items to a delimited string */
@@ -94,13 +111,14 @@ public final class utils {
 	 */
 	public static final String
 	printIterable(Iterable<?> iIterable, String sSeparator) {
-		StringBuffer sbRes = new StringBuffer();
-		Iterator<?> iIter = iIterable.iterator();
+		final StringBuffer sbRes = new StringBuffer();
+		final Iterator<?> iIter = iIterable.iterator();
 		while (iIter.hasNext()) {
-			Object oNext = iIter.next();
+			final Object oNext = iIter.next();
 			sbRes.append(oNext.toString());
-			if (iIter.hasNext())
+			if (iIter.hasNext()) {
 				sbRes.append(sSeparator);
+			}
 		}
 
 		return sbRes.toString();
@@ -111,7 +129,7 @@ public final class utils {
 	 * @return A String indicating the System default encoding.
 	 */
 	public static String getSystemEncoding() {
-		String defaultEncoding = new InputStreamReader(
+		final String defaultEncoding = new InputStreamReader(
 				new ByteArrayInputStream(new byte[0])).getEncoding();
 
 		return defaultEncoding;
@@ -124,17 +142,17 @@ public final class utils {
 	 * @return A UTF-8 encoded version of the input string.
 	 */
 	public static String toUTF8(String sStr) {
-		byte[] baBytes = sStr.getBytes();
+		final byte[] baBytes = sStr.getBytes();
 		try {
 			return new String(baBytes, "UTF-8");
 		}
-		catch (Exception e) {
-			e.printStackTrace();
+		catch (final Exception e) {
+			logger.warning(e.getMessage());
 			return new String(baBytes);
 		}
 	}
 
-	/** 
+	/**
 	 * The sign function.
 	 * @param dNum The input number.
 	 * @return 1 if the input number is positive, -1 if negative
@@ -165,71 +183,71 @@ public final class utils {
 			.stream()
 			.mapToDouble(v -> v.doubleValue())
 			.sum();
-	}    
+	}
 
 	/**
-	 * Loads the contents of a file into a string, <i>without preserving newlines</i>. 
+	 * Loads the contents of a file into a string, <i>without preserving newlines</i>.
 	 * @param sFilename The filename of the file to load.
 	 * @return A String containing the contents of the given file.
 	 */
 	public static String loadFileToString(String sFilename) {
-		StringBuffer sb = new StringBuffer();
+		final StringBuffer sb = new StringBuffer();
 		try {
-			BufferedReader in = new BufferedReader(new FileReader(sFilename));
+			final BufferedReader in = new BufferedReader(new FileReader(sFilename));
 			String line;
 			while ((line = in.readLine()) != null) {
 				sb.append(line);
 			}
 			in.close();
-		} catch (Exception e) {
-			System.err.println("Coult not load file:" + sFilename);
-			e.printStackTrace(System.err);
+		} catch (final Exception e) {
+			logger.warning("Could not load file:" + sFilename);
+			logger.warning(e.getMessage());
 		}
 
 		return sb.toString();
 	}
 
 	/**
-	 * Loads the contents of a file into a string, <i>without preserving newlines</i>. 
+	 * Loads the contents of a file into a string, <i>without preserving newlines</i>.
 	 * @param sFilename The filename of the file to load.
 	 * @return A String containing the contents of the given file.
 	 */
 	public static String loadFileToString(String sFilename, int iMaxLen) {
-		StringBuffer sb = new StringBuffer();
+		final StringBuffer sb = new StringBuffer();
 		try {
-			BufferedReader in = new BufferedReader(new FileReader(sFilename));
+			final BufferedReader in = new BufferedReader(new FileReader(sFilename));
 			String line;
-			while (((line = in.readLine()) != null) && 
+			while (((line = in.readLine()) != null) &&
 					(sb.length() + line.length() < iMaxLen)) {
 				sb.append(line);
 			}
 			in.close();
-		} catch (Exception e) {
-			System.err.println("Coult not load file:" + sFilename);
-			e.printStackTrace(System.err);
+		} catch (final Exception e) {
+			logger.warning("Could not load file:" + sFilename);
+			logger.warning(e.getMessage());
 		}
 
 		return sb.toString();
 	}
 
 	/**
-	 * Loads the contents of a file into a string, preserving newlines. 
+	 * Loads the contents of a file into a string, preserving newlines.
 	 * @param sFilename The filename of the file to load.
 	 * @return A String containing the contents of the given file.
 	 */
 	public static String loadFileToStringWithNewlines(String sFilename) {
-		StringBuffer sb = new StringBuffer();
+		final StringBuffer sb = new StringBuffer();
 		try {
-			BufferedReader in = new BufferedReader(new FileReader(sFilename));
+			final BufferedReader in = new BufferedReader(new FileReader(sFilename));
 			String line;
 			while ((line = in.readLine()) != null) {
 				sb.append(line);
 				sb.append("\n");
 			}
 			in.close();
-		} catch (Exception e) {
-			System.err.println("Coult not load file:" + sFilename);
-			e.printStackTrace(System.err);
+		} catch (final Exception e) {
+			logger.warning("Could not load file:" + sFilename);
+			logger.warning(e.getMessage());
 		}
 
 		return sb.toString();
@@ -237,15 +255,15 @@ public final class utils {
 
 	/**
 	 * Loads the contents of a set of files into a string, by calling repeatedly
-	 * <code>loadFileToString</code>. Each file is separated from another by a 
+	 * <code>loadFileToString</code>. Each file is separated from another by a
 	 * zero character (char(0)).
 	 * @param ssFiles The set of string filenames to load.
-	 * @return A String containing the concatenation of the contents of the 
+	 * @return A String containing the concatenation of the contents of the
 	 * given files.
 	 */
 	public static String loadFileSetToString(Set<String> ssFiles) {
-		StringBuffer sbRes = new StringBuffer();
-		for (String sCurFile : ssFiles) {
+		final StringBuffer sbRes = new StringBuffer();
+		for (final String sCurFile : ssFiles) {
 			sbRes.append(loadFileToString(sCurFile)).append((char)0);
 		}
 
@@ -254,17 +272,17 @@ public final class utils {
 
 	/**
 	 * Loads the contents of a set of files into a string, by calling repeatedly
-	 * the <code>loadFile</code> function of a {@link IFileLoader}. 
+	 * the <code>loadFile</code> function of a {@link IFileLoader}.
 	 * Each file is separated from another by a zero character (char(0)).
 	 * @param ssFiles The set of string filenames to load.
 	 * @param lLoader The loader to use for loading the files
-	 * @return A String containing the concatenation of the contents of the 
+	 * @return A String containing the concatenation of the contents of the
 	 * given files.
 	 */
-	public static String loadFileSetToString(Set<String> ssFiles, 
+	public static String loadFileSetToString(Set<String> ssFiles,
 			IFileLoader<String> lLoader) {
-		StringBuffer sbRes = new StringBuffer();
-		for (String sCurFile : ssFiles) {
+		final StringBuffer sbRes = new StringBuffer();
+		for (final String sCurFile : ssFiles) {
 			sbRes.append(lLoader.loadFile(sCurFile)).append((char)0);
 		}
 
@@ -290,20 +308,21 @@ public final class utils {
 	 */
 	public static String reverseString(String source) {
 		final int len = source.length();
-		StringBuffer dest = new StringBuffer(len);
-		for (int i = (len - 1); i >= 0; i--)
+		final StringBuffer dest = new StringBuffer(len);
+		for (int i = (len - 1); i >= 0; i--) {
 			dest.append(source.charAt(i));
+		}
 		return dest.toString();
 	}
 
-	/** 
+	/**
 	 * Returns a reversed (by means of item index) version of a given list.
 	 *
 	 * @param l The list to reverse.
 	 * @return The reversed list.
 	 */
 	public static List<?> reverseList(List<?> l) {
-		LinkedList<?> lRes = new LinkedList<Object>(l);
+		final LinkedList<?> lRes = new LinkedList<Object>(l);
 		Collections.reverse(lRes);
 		return lRes;
 	}
@@ -327,9 +346,9 @@ public final class utils {
 	public static String getNormalString() {
 		// Both the set of vowels and consonants also include
 		// black characters to allow for space in the string.
-		String sVowels = "aeiuoy ";
-		String sConsonants = "qwrtpsdf jklhzxcvbnm ";
-		StringBuffer sbRes = new StringBuffer();
+		final String sVowels = "aeiuoy ";
+		final String sConsonants = "qwrtpsdf jklhzxcvbnm ";
+		final StringBuffer sbRes = new StringBuffer();
 		final int iLen = (int)(7.0 +
 				(3.0 * new Random().nextGaussian()));
 
@@ -357,8 +376,8 @@ public final class utils {
 	 * @return The random string.
 	 */
 	public static String getAbnormalString() {
-		String sAlphabet = "aeiuoy qwrtpsdfjklhzxcvbnm1234567890!@#";
-		StringBuffer sbRes = new StringBuffer();
+		final String sAlphabet = "aeiuoy qwrtpsdfjklhzxcvbnm1234567890!@#";
+		final StringBuffer sbRes = new StringBuffer();
 		final int iLen = (int)(12.0 +
 				(11.0 * new Random().nextGaussian()));
 

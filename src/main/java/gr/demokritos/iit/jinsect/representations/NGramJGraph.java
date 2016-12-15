@@ -1,11 +1,30 @@
 package gr.demokritos.iit.jinsect.representations;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+import java.util.logging.Logger;
 
-import gr.demokritos.iit.jinsect.structs.*;
+import gr.demokritos.iit.jinsect.Logging;
+import gr.demokritos.iit.jinsect.Utils;
 import gr.demokritos.iit.jinsect.io.LineReader;
-import gr.demokritos.iit.jinsect.utils;
+import gr.demokritos.iit.jinsect.structs.Edge;
+import gr.demokritos.iit.jinsect.structs.EdgeCachedLocator;
+import gr.demokritos.iit.jinsect.structs.JVertex;
+import gr.demokritos.iit.jinsect.structs.NGramVertex;
+import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 
 /**
  * Represents the graph of a document, with the n-grams of the document as
@@ -18,6 +37,9 @@ public class NGramJGraph
 implements Serializable, NGramGraph
 {
 	static final long serialVersionUID = 1L;
+
+	private static final Logger logger =
+		Logging.getLogger(NGramJGraph.class.getName());
 
 	/** The minimum and maximum n-gram size, and the cooccurence window.
 	 * Default values are 3, 3, 3 correspondingly.
@@ -112,8 +134,8 @@ implements Serializable, NGramGraph
 		throws IOException, FileNotFoundException
 	{
 		/* read lines and allocate array */
-		String[] lines = new LineReader().getLines(path);
-		NGramJGraph[] nGraphs = new NGramJGraph[lines.length];
+		final String[] lines = new LineReader().getLines(path);
+		final NGramJGraph[] nGraphs = new NGramJGraph[lines.length];
 
 		/* build the array of n-gram graphs */
 		for (int i = 0; i < lines.length; i++) {
@@ -127,10 +149,11 @@ implements Serializable, NGramGraph
 		// Create array of graphs
 		NGramGraphArray = new UniqueVertexGraph[MaxSize - MinSize + 1];
 		// Init array
-		for (int iCnt = MinSize; iCnt <= MaxSize; iCnt++)
+		for (int iCnt = MinSize; iCnt <= MaxSize; iCnt++) {
 			NGramGraphArray[iCnt - MinSize] = new UniqueVertexGraph();
+		}
 		// Create degraded edge list
-		DegradedEdges = new HashMap<Edge, Double>();
+		DegradedEdges = new HashMap<>();
 	}
 
 	/**
@@ -180,7 +203,7 @@ implements Serializable, NGramGraph
 	public void loadDataStringFromFile(String sFilename)
 	throws IOException, FileNotFoundException
 	{
-		String sDataString = utils.loadFileToStringWithNewlines(sFilename);
+		final String sDataString = Utils.loadFileToStringWithNewlines(sFilename);
 		setDataString(sDataString); // Actually update
 	}
 
@@ -201,8 +224,9 @@ implements Serializable, NGramGraph
 	 */
 	public final UniqueVertexGraph getGraphLevelByNGramSize(int iNGramSize) {
 		// Check bounds
-		if ((iNGramSize < MinSize) || (iNGramSize > MaxSize))
+		if ((iNGramSize < MinSize) || (iNGramSize > MaxSize)) {
 			return null;
+		}
 
 		return NGramGraphArray[iNGramSize - MinSize];
 	}
@@ -213,8 +237,8 @@ implements Serializable, NGramGraph
 	 * @return a hashset containing the edges of the graph
 	 */
 	public final HashSet<Edge> getAllNodes() {
-		HashSet<Edge> hRes =
-			new HashSet<Edge>(length() / (MaxSize - MinSize)); // Init set
+		final HashSet<Edge> hRes =
+			new HashSet<>(length() / (MaxSize - MinSize)); // Init set
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++)
 		{
 			NGramGraphArray[iCurLvl - MinSize].edgeSet()
@@ -249,62 +273,64 @@ implements Serializable, NGramGraph
 		double dStartWeight = 0;
 		double dIncreaseWeight = 0;
 
-		JVertex vProbe = new NGramVertex(sStartNode);
+		final JVertex vProbe = new NGramVertex(sStartNode);
 
 		// If no neightbours
-		if (lOtherNodes != null)
+		if (lOtherNodes != null) {
 			if (lOtherNodes.size() == 0)
 			{
 				// Attempt to add solitary node [sStartNode]
-				JVertex v = new NGramVertex(sStartNode);
+				final JVertex v = new NGramVertex(sStartNode);
 				try {
 					gGraph.add(v);
 				}
-				catch (Exception e) {
+				catch (final Exception e) {
 					// Probably exists already
-					e.printStackTrace();
+					logger.warning(e.getMessage());
 				}
 				return;
 			}
+		}
 
 		// Otherwise for every neighbour add edge
-		Iterator<String> iIter = lOtherNodes.iterator();
+		final Iterator<String> iIter = lOtherNodes.iterator();
 
 		// Locate source node
-		JVertex vOldA = gGraph.locateVertex(vProbe);
+		final JVertex vOldA = gGraph.locateVertex(vProbe);
 		JVertex vA;
-		if (vOldA != null)
+		if (vOldA != null) {
 			vA = vOldA;
-		else {
+		} else {
 			// else create it
 			vA = vProbe;
 			// Add to graph
 			try {
 				gGraph.add(vA);
 			}
-			catch (Exception e) {
+			catch (final Exception e) {
 				// Not added. Ignore.
 			}
 		}
 		// create a new cached locator
-		EdgeCachedLocator ecl = new EdgeCachedLocator(100);
+		final EdgeCachedLocator ecl = new EdgeCachedLocator(100);
 
 		// For every edge
 		while (iIter.hasNext())
 		{
-			JVertex vB = new NGramVertex(iIter.next());
+			final JVertex vB = new NGramVertex(iIter.next());
 			double dOldWeight = 0;
 			double dNewWeight = 0;
 
 			dStartWeight = 1.0;
 			dIncreaseWeight = dStartWeight;
 
-			Edge weCorrectEdge = ecl.locateDirectedEdgeInGraph(gGraph, vA, vB);
+			final Edge weCorrectEdge =
+				ecl.locateDirectedEdgeInGraph(gGraph, vA, vB);
 
-			if (weCorrectEdge == null)
+			if (weCorrectEdge == null) {
 				// Not found. Using Start weight
 				dNewWeight = dStartWeight;
-			else {
+			} else {
 				dOldWeight = weCorrectEdge.edgeWeight();
 				dNewWeight = dOldWeight + dIncreaseWeight; // Increase as required
 			}
@@ -319,10 +345,10 @@ implements Serializable, NGramGraph
 					gGraph.setEdgeWeight(weCorrectEdge, dNewWeight);
 				}
 			}
-			catch (Exception e)
+			catch (final Exception e)
 			{
 				// Unknown error
-				e.printStackTrace();
+				logger.severe(e.getMessage());
 			}
 		}
 
@@ -348,20 +374,21 @@ implements Serializable, NGramGraph
 			double dDataImportance) {
 
 		// If no neightbours
-		if (lOtherNodes != null)
+		if (lOtherNodes != null) {
 			if (lOtherNodes.size() == 0)
 			{
 				// Attempt to add solitary node [sStartNode]
-				NGramVertex v = new NGramVertex(sStartNode);
+				final NGramVertex v = new NGramVertex(sStartNode);
 				try {
 					gGraph.add(v);
 				}
-				catch (Exception e) {
+				catch (final Exception e) {
 					// Probably exists already
-					e.printStackTrace();
+					logger.warning(e.getMessage());
 				}
 
 			}
+		}
 
 		// Locate or create source node
 		JVertex vA = gGraph.locateVertex(sStartNode);
@@ -370,23 +397,24 @@ implements Serializable, NGramGraph
 			try {
 				gGraph.add(vA);
 			}
-			catch (Exception e) {
+			catch (final Exception e) {
 				// Add failed. Ignore
 			}
 		}
 
 		EdgeCachedLocator ecl;
-		if (eclLocator == null)
+		if (eclLocator == null) {
 			ecl = new EdgeCachedLocator(100);
-		else
+		} else {
 			ecl = eclLocator;
+		}
 
 		// Otherwise for every neighbour add edge
-		Iterator<String> iIter = lOtherNodes.iterator();
+		final Iterator<String> iIter = lOtherNodes.iterator();
 		// For every edge
 		while (iIter.hasNext())
 		{
-			JVertex vB = new NGramVertex(iIter.next());
+			final JVertex vB = new NGramVertex(iIter.next());
 
 			double dOldWeight = 0;
 			double dFinalWeight = 0;
@@ -395,7 +423,7 @@ implements Serializable, NGramGraph
 			// Get old weight
 			Edge weEdge = null;
 			// Look for SAME ORIENTATION OF EDGE
-			boolean bFound = (weEdge =
+			final boolean bFound = (weEdge =
 					gGraph.getEdge(vA, vB))
 				!= null;
 			if (bFound)
@@ -416,10 +444,10 @@ implements Serializable, NGramGraph
 					gGraph.addEdge(vA, vB, dFinalWeight);
 					ecl.resetCache();
 				}
-				catch (Exception e) {
+				catch (final Exception e) {
 					// Insert failed. Ignoring...
 					// TODO: Check if it needs to be removed
-					e.printStackTrace();
+					logger.warning(e.getMessage());
 				}
 			}
 		}
@@ -434,8 +462,8 @@ implements Serializable, NGramGraph
 
 		final int iLen = DataString.length();
 		// Create token histogram.
-		HashMap<String, Double> hTokenAppearance =
-			new HashMap<String, Double>();
+		final HashMap<String, Double> hTokenAppearance =
+			new HashMap<>();
 
 		/* 1st pass. Populate histogram.
 		 * For all sizes create corresponding levels
@@ -443,27 +471,30 @@ implements Serializable, NGramGraph
 		for (int iNGramSize = MinSize; iNGramSize <= MaxSize; iNGramSize++)
 		{
 			// If n-gram bigger than text
-			if (iLen < iNGramSize)
+			if (iLen < iNGramSize) {
 				// then Ignore
 				continue;
+			}
 
 			for (int iCurStart = 0; iCurStart < iLen; iCurStart++)
 			{
 				// If reached end
-				if (iLen < iCurStart + iNGramSize)
+				if (iLen < iCurStart + iNGramSize) {
 					// then break
 					break;
+				}
 
 				// Get n-gram
 				final String sCurNGram =
 					sUsableString.substring(iCurStart, iCurStart + iNGramSize);
 				// Update Histogram
-				if (hTokenAppearance.containsKey(sCurNGram))
+				if (hTokenAppearance.containsKey(sCurNGram)) {
 					hTokenAppearance.put(
 						sCurNGram,
 						(hTokenAppearance.get(sCurNGram)).doubleValue() + 1.0);
-				else
+				} else {
 					hTokenAppearance.put(sCurNGram, 1.0);
+				}
 			}
 		}
 
@@ -473,23 +504,25 @@ implements Serializable, NGramGraph
 		for (int iNGramSize = MinSize; iNGramSize <= MaxSize; iNGramSize++)
 		{
 			// If n-gram bigger than text, ignore
-			if (iLen < iNGramSize)
+			if (iLen < iNGramSize) {
 				continue;
+			}
 
-			Vector<String> PrecedingNeighbours = new Vector<String>();
-			UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iNGramSize);
+			final Vector<String> PrecedingNeighbours = new Vector<>();
+			final UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iNGramSize);
 
 			for (int iCurStart = 0; iCurStart < iLen; iCurStart++)
 			{
 				// If reached end, break
-				if (iLen < iCurStart + iNGramSize)
+				if (iLen < iCurStart + iNGramSize) {
 					break;
+				}
 
 				// Get n-gram
 				final String sCurNGram =
 					sUsableString.substring(iCurStart, iCurStart + iNGramSize);
 				/* put all preceding neighbours to an array */
-				String[] aFinalNeighbours = new String[PrecedingNeighbours.size()];
+				final String[] aFinalNeighbours = new String[PrecedingNeighbours.size()];
 				PrecedingNeighbours.toArray(aFinalNeighbours);
 
 				/* create edges to connect preceding neighbours to current ngram */
@@ -504,8 +537,10 @@ implements Serializable, NGramGraph
 
 				/* has preceding neighbours exceeded window length? */
 				if (PrecedingNeighbours.size() > CorrelationWindow)
+				 {
 					PrecedingNeighbours.removeElementAt(0);
 				// Remove first element
+				}
 			}
 		}
 	}
@@ -525,23 +560,25 @@ implements Serializable, NGramGraph
 	 */
 	public void mergeGraph(NGramGraph dgOtherGraph, double fWeightPercent) {
 		// If both graphs are the same, ignore merging.
-		if (dgOtherGraph == this)
+		if (dgOtherGraph == this) {
 			return;
+		}
 
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
-			UniqueVertexGraph gGraph =
+			final UniqueVertexGraph gGraph =
 				getGraphLevelByNGramSize(iCurLvl);
-			UniqueVertexGraph gOtherGraph =
+			final UniqueVertexGraph gOtherGraph =
 				dgOtherGraph.getGraphLevelByNGramSize(iCurLvl);
 
 			// Check if other graph has corresponding level
-			if (gOtherGraph == null)
+			if (gOtherGraph == null) {
 				// If not, ignore level
 				continue;
+			}
 
 			// For every edge on other graph
-			ArrayList<String> lOtherNodes = new ArrayList<String>();
-			for (Edge weCurItem: gOtherGraph.edgeSet())
+			final ArrayList<String> lOtherNodes = new ArrayList<>();
+			for (final Edge weCurItem: gOtherGraph.edgeSet())
 			{
 				final String sHead = weCurItem.getSourceLabel();
 				final String sTail = weCurItem.getTargetLabel();
@@ -566,31 +603,32 @@ implements Serializable, NGramGraph
 	 */
 	public NGramGraph intersectGraph(NGramGraph dgOtherGraph) {
 		// Init res graph
-		NGramJGraph gRes = new NGramJGraph(MinSize, MaxSize, CorrelationWindow);
+		final NGramJGraph gRes = new NGramJGraph(MinSize, MaxSize, CorrelationWindow);
 
 		// Use cached edge locator
-		EdgeCachedLocator ecl = new EdgeCachedLocator(1000);
+		final EdgeCachedLocator ecl = new EdgeCachedLocator(1000);
 
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
-			UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iCurLvl);
-			UniqueVertexGraph gOtherGraph = dgOtherGraph.getGraphLevelByNGramSize(iCurLvl);
-			UniqueVertexGraph gNewGraph = gRes.getGraphLevelByNGramSize(iCurLvl);
+			final UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iCurLvl);
+			final UniqueVertexGraph gOtherGraph = dgOtherGraph.getGraphLevelByNGramSize(iCurLvl);
+			final UniqueVertexGraph gNewGraph = gRes.getGraphLevelByNGramSize(iCurLvl);
 
 			// Check if other graph has corresponding level
-			if (gOtherGraph == null)
+			if (gOtherGraph == null) {
 				// If not, ignore level
 				continue;
+			}
 
 			// For every edge on other graph
-			for (Edge e: gOtherGraph.edgeSet()) {
-				JVertex vHead = gOtherGraph.getEdgeSource(e);
-				JVertex vTail = gOtherGraph.getEdgeTarget(e);
+			for (final Edge e: gOtherGraph.edgeSet()) {
+				final JVertex vHead = gOtherGraph.getEdgeSource(e);
+				final JVertex vTail = gOtherGraph.getEdgeTarget(e);
 				final double curWeight = e.edgeWeight();
 
-				Edge eEdge = ecl.locateEdgeInGraph(gGraph, vHead, vTail);
+				final Edge eEdge = ecl.locateEdgeInGraph(gGraph, vHead, vTail);
 				if (eEdge != null) {
 					try {
-						List<String> l = new ArrayList<String>();
+						final List<String> l = new ArrayList<>();
 						l.add(vTail.getLabel());
 
 						final double dTargetWeight =
@@ -600,8 +638,8 @@ implements Serializable, NGramGraph
 								vHead.getLabel(), l,
 								dTargetWeight, dTargetWeight, 1.0);
 					}
-					catch (Exception ex) {
-						ex.printStackTrace();
+					catch (final Exception ex) {
+						logger.severe(ex.getMessage());
 					}
 				}
 			}
@@ -618,34 +656,35 @@ implements Serializable, NGramGraph
 	public NGramGraph inverseIntersectGraph(NGramGraph dgOtherGraph) {
 
 		// Get the union (merged) graph
-		NGramJGraph dgUnion = (NGramJGraph)clone();
+		final NGramJGraph dgUnion = (NGramJGraph)clone();
 		dgUnion.mergeGraph(dgOtherGraph, 0);
 
 		// Get the intersection graph
-		NGramGraph dgIntersection = intersectGraph(dgOtherGraph);
+		final NGramGraph dgIntersection = intersectGraph(dgOtherGraph);
 
 		// For every level
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
 			/* get union and intersection graphs for the
 			 * current n-gram level */
-			UniqueVertexGraph gUnion =
+			final UniqueVertexGraph gUnion =
 				dgUnion.getGraphLevelByNGramSize(iCurLvl);
-			UniqueVertexGraph gIntersection =
+			final UniqueVertexGraph gIntersection =
 				dgIntersection.getGraphLevelByNGramSize(iCurLvl);
 
 			// TODO: Order by edge count for optimization
-			EdgeCachedLocator eclLocator = new EdgeCachedLocator(10);
+			final EdgeCachedLocator eclLocator = new EdgeCachedLocator(10);
 
 			// Check if other graph has corresponding level
-			if (gIntersection == null)
+			if (gIntersection == null) {
 				// If not, ignore level
 				continue;
+			}
 
 			// For every edge of intersection
-			for (Edge weCurItem: gIntersection.edgeSet())
+			for (final Edge weCurItem: gIntersection.edgeSet())
 			{
 				// If the edge is contained in the merged graph
-				Edge eEdge = eclLocator.locateDirectedEdgeInGraph(gUnion,
+				final Edge eEdge = eclLocator.locateDirectedEdgeInGraph(gUnion,
 						gIntersection.getEdgeSource(weCurItem),
 						gIntersection.getEdgeTarget(weCurItem));
 
@@ -654,9 +693,9 @@ implements Serializable, NGramGraph
 					try {
 						gUnion.removeEdge(eEdge);
 					}
-					catch (Exception ex) {
+					catch (final Exception ex) {
 						// Non-lethal exception. Continue.
-						ex.printStackTrace();
+						logger.info(ex.getMessage());
 					}
 				}
 			}
@@ -678,49 +717,50 @@ implements Serializable, NGramGraph
 		NGramGraph dgUnion = null;
 		// Initialize union using the biggest graph and get the merged one
 		if (dgOtherGraph.length() > length()) {
-			dgUnion = (NGramGraph) dgOtherGraph.clone();
+			dgUnion = dgOtherGraph.clone();
 			dgUnion.merge(this, 0);
 		}
 		else {
-			dgUnion = (NGramGraph) clone();
+			dgUnion = clone();
 			dgUnion.merge(dgOtherGraph, 0);
 		}
 
-		NGramGraph[] res = new NGramGraph[2];
+		final NGramGraph[] res = new NGramGraph[2];
 
 		// Get the intersection graph
-		NGramGraph dgIntersection = intersectGraph(dgOtherGraph);
+		final NGramGraph dgIntersection = intersectGraph(dgOtherGraph);
 		res[0] = dgIntersection;
 
 		// For every level
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
 			/* get union and intersection graph for each n-gram level */
-			UniqueVertexGraph gUnion =
+			final UniqueVertexGraph gUnion =
 				dgUnion.getGraphLevelByNGramSize(iCurLvl);
-			UniqueVertexGraph gIntersection =
+			final UniqueVertexGraph gIntersection =
 				dgIntersection.getGraphLevelByNGramSize(iCurLvl);
 
 			// TODO: Order by edge count for optimization
-			EdgeCachedLocator eclLocator = new EdgeCachedLocator(100);
+			final EdgeCachedLocator eclLocator = new EdgeCachedLocator(100);
 
 			// Check if other graph has corresponding level
-			if (gIntersection == null)
+			if (gIntersection == null) {
 				// If not, ignore level
 				continue;
+			}
 
-			for (Edge weCurItem: gIntersection.edgeSet()) {
+			for (final Edge weCurItem: gIntersection.edgeSet()) {
 
 				// If the edge is contained in the merged graph
-				Edge eEdge = eclLocator.locateDirectedEdgeInGraph(gUnion,
+				final Edge eEdge = eclLocator.locateDirectedEdgeInGraph(gUnion,
 						gIntersection.getEdgeSource(weCurItem),
 						gIntersection.getEdgeTarget(weCurItem));
 				if (eEdge != null) {
 					try {
 						gUnion.removeEdge(eEdge);
 					}
-					catch (Exception ex) {
+					catch (final Exception ex) {
 						// Non-lethal exception. Continue.
-						ex.printStackTrace();
+						logger.info(ex.getMessage());
 					}
 				}
 			}
@@ -759,7 +799,7 @@ implements Serializable, NGramGraph
 	 * @param sNode The node object the Coexistence Importance of which we calculate
 	 */
 	public double calcCoexistenceImportance(String sNode) {
-		NGramVertex v = new NGramVertex(sNode);
+		final NGramVertex v = new NGramVertex(sNode);
 
 		return calcCoexistenceImportance(v);
 	}
@@ -777,15 +817,15 @@ implements Serializable, NGramGraph
 		double dMaxEdgeWeight = 0;
 		// Search all levels
 		for (int iNGramSize=MinSize; iNGramSize <= MaxSize; iNGramSize++) {
-			UniqueVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
+			final UniqueVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
 			if (gCurLevel.containsVertex(vNode))
 			{
 				// Keep max neighbours number
-				Set<Edge> lEdges = gCurLevel.edgesOf(vNode);
+				final Set<Edge> lEdges = gCurLevel.edgesOf(vNode);
 				final int iTempNeighbours = lEdges.size();
 				iNoOfNeighbours = Math.max(iTempNeighbours, iNoOfNeighbours);
 
-				for (Edge weEdge: lEdges) {
+				for (final Edge weEdge: lEdges) {
 					final double dWeight = weEdge.edgeWeight();
 					dMaxEdgeWeight = Math.max(dWeight, dMaxEdgeWeight);
 				}
@@ -795,11 +835,12 @@ implements Serializable, NGramGraph
 		// Final calculation
 		dRes = -200000.0; // Very low value
 		if (dMaxEdgeWeight > 0) {
-			if (iNoOfNeighbours > 0)
+			if (iNoOfNeighbours > 0) {
 				dRes = Math.log10(Math.pow(2 * dMaxEdgeWeight, 2.5) /
 					Math.max(1.0, Math.pow(iNoOfNeighbours / 2, 2)));
-			else
+			} else {
 				dRes = Math.log10(Math.pow(2 * dMaxEdgeWeight, 2.5));
+			}
 		}
 		return dRes;
 	}
@@ -813,22 +854,22 @@ implements Serializable, NGramGraph
 	 */
 	public void prune(double dMinCoexistenceImportance) {
 		for (int iNGramSize=MinSize; iNGramSize <= MaxSize; iNGramSize++) {
-			UniqueVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
-			Vector<JVertex> vToRemove = new Vector<JVertex>();
+			final UniqueVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
+			final Vector<JVertex> vToRemove = new Vector<>();
 
-			for (JVertex vCur: gCurLevel.vertexSet()) {
+			for (final JVertex vCur: gCurLevel.vertexSet()) {
 				if (calcCoexistenceImportance(vCur) < dMinCoexistenceImportance) {
 					vToRemove.add(vCur);
 				}
 			}
 			// Actually remove
-			for (JVertex vCur: vToRemove) {
+			for (final JVertex vCur: vToRemove) {
 				try {
 					gCurLevel.removeVertex(vCur);
 				}
-				catch (Exception e) {
+				catch (final Exception e) {
 					// nonfatal, continue
-					e.printStackTrace();
+					logger.info(e.getMessage());
 				}
 			}
 		}
@@ -842,18 +883,19 @@ implements Serializable, NGramGraph
 	public void deleteItem(String sItem) {
 		// From all levels
 		for (int iNGramSize = MinSize; iNGramSize <= MaxSize; iNGramSize++) {
-			UniqueVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
-			// Vertex v = utils.locateVertexInGraph(gCurLevel, sItem);
+			final UniqueVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
+			// Vertex v = Utils.locateVertexInGraph(gCurLevel, sItem);
 			JVertex v = null;
 			v = gCurLevel.locateVertex(v);
-			if (v == null)
+			if (v == null) {
 				return;
+			}
 			try {
 				gCurLevel.removeVertex(v);
 			}
-			catch (Exception e) {
+			catch (final Exception e) {
 				// Most probable cause: Node did not exist
-				e.printStackTrace();
+				logger.warning(e.getMessage());
 			}
 		}
 	}
@@ -864,9 +906,9 @@ implements Serializable, NGramGraph
 	public void nullify() {
 		// From all levels
 		for (int iNGramSize=MinSize; iNGramSize <= MaxSize; iNGramSize++) {
-			UniqueVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
+			final UniqueVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
 			// For all edges, set weight to zero
-			for (Edge e: gCurLevel.edgeSet()) {
+			for (final Edge e: gCurLevel.edgeSet()) {
 				gCurLevel.setEdgeWeight(e, 0.0);
 			}
 		}
@@ -936,39 +978,40 @@ implements Serializable, NGramGraph
 			// Load degradation
 			DegradedEdges = (HashMap<Edge, Double>)in.readObject();
 
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			throw new IOException(e.getMessage());
 		}
 	}
 
 	public void degrade(NGramJGraph dgOtherGraph) {
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
-			UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iCurLvl);
-			UniqueVertexGraph gOtherGraph = dgOtherGraph.getGraphLevelByNGramSize(iCurLvl);
+			final UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iCurLvl);
+			final UniqueVertexGraph gOtherGraph = dgOtherGraph.getGraphLevelByNGramSize(iCurLvl);
 			// Check if other graph has corresponding level
-			if (gOtherGraph == null)
+			if (gOtherGraph == null) {
 				// If not, ignore level
 				continue;
+			}
 
 			// For every edge on other graph
-			for (Edge weCurItem: gOtherGraph.edgeSet()) {
-				JVertex vHead = gOtherGraph.getEdgeSource(weCurItem);
-				JVertex vTail = gOtherGraph.getEdgeTarget(weCurItem);
-				Edge eEdge = gGraph.getEdge(vHead, vTail);
+			for (final Edge weCurItem: gOtherGraph.edgeSet()) {
+				final JVertex vHead = gOtherGraph.getEdgeSource(weCurItem);
+				final JVertex vTail = gOtherGraph.getEdgeTarget(weCurItem);
+				final Edge eEdge = gGraph.getEdge(vHead, vTail);
 
-				if (eEdge != null)
-					try
-					{
-						if (DegradedEdges.containsKey(eEdge))
+				if (eEdge != null) {
+					try {
+						if (DegradedEdges.containsKey(eEdge)) {
 							DegradedEdges.put(eEdge,
-									(DegradedEdges.get(eEdge)).doubleValue() + 1);
-						else
+								(DegradedEdges.get(eEdge)).doubleValue() + 1);
+						} else {
 							DegradedEdges.put(eEdge, 1.0);
+						}
+					} catch (final Exception e)
+					{
+						// Non fatal error occured. Continue.
+						logger.info(e.getMessage());
 					}
-				catch (Exception e)
-				{
-					// Non fatal error occured. Continue.
-					e.printStackTrace();
 				}
 			}
 		}
@@ -982,32 +1025,33 @@ implements Serializable, NGramGraph
 	 * is not degraded
 	 */
 	public double degradationDegree(Edge e) {
-		if (DegradedEdges.containsKey(e))
+		if (DegradedEdges.containsKey(e)) {
 			return (DegradedEdges.get(e)).doubleValue();
-		else
+		} else {
 			return 0;
+		}
 	}
 
 	public String toCooccurenceText(Map<String, String> mCooccurenceMap) {
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 		// For every graph level
 		for (int iCnt=MinSize; iCnt <= MaxSize; iCnt++) {
-			UniqueVertexGraph g = getGraphLevelByNGramSize(iCnt);
+			final UniqueVertexGraph g = getGraphLevelByNGramSize(iCnt);
 			// For all edges
-			for (Edge eCur: g.edgeSet()) {
+			for (final Edge eCur: g.edgeSet()) {
 				String sCooccurenceID;
 				// If the edge is already in the map
-				if (mCooccurenceMap.containsKey(eCur.toString()))
+				if (mCooccurenceMap.containsKey(eCur.toString())) {
 					// Get its ID
 					sCooccurenceID = mCooccurenceMap.get(eCur.toString());
-				else {
+				} else {
 					// else create a new ID based on current time and put it in the map.
 					sCooccurenceID = String.valueOf(mCooccurenceMap.size() + 1);
 					mCooccurenceMap.put(eCur.toString(), sCooccurenceID);
 				}
 
 				// Add the ID as many times as the co-occurences
-				int iStop = (int) g.getEdgeWeight(eCur);
+				final int iStop = (int) g.getEdgeWeight(eCur);
 				for (int iTimes=0; iTimes < iStop; iTimes++) {
 					sb.append(sCooccurenceID + " ");
 				}
@@ -1019,15 +1063,16 @@ implements Serializable, NGramGraph
 
 	@Override
 	public NGramGraph clone() {
-		NGramJGraph gRes = new NGramJGraph(MinSize, MaxSize, CorrelationWindow);
+		final NGramJGraph gRes = new NGramJGraph(MinSize, MaxSize, CorrelationWindow);
 		gRes.DataString = DataString;
 		gRes.DegradedEdges =
-			new HashMap<Edge, Double>(this.DegradedEdges);
+			new HashMap<>(this.DegradedEdges);
 		gRes.NGramGraphArray =
 			new UniqueVertexGraph[this.NGramGraphArray.length];
 		int iCnt=0;
-		for (UniqueVertexGraph uCur : this.NGramGraphArray)
+		for (final UniqueVertexGraph uCur : this.NGramGraphArray) {
 			gRes.NGramGraphArray[iCnt++] = (UniqueVertexGraph)uCur.clone();
+		}
 
 		return gRes;
 	}
@@ -1049,32 +1094,33 @@ implements Serializable, NGramGraph
 	 */
 	public NGramGraph allNotIn(NGramGraph dgOtherGraph) {
 		// TODO: Order by edge count for optimization
-		EdgeCachedLocator eclLocator = new EdgeCachedLocator(Math.max(length(),
+		final EdgeCachedLocator eclLocator = new EdgeCachedLocator(Math.max(length(),
 					dgOtherGraph.length()));
 		// Clone this graph
-		NGramGraph dgClone = (NGramGraph)clone();
+		final NGramGraph dgClone = clone();
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
-			UniqueVertexGraph gCloneLevel =
+			final UniqueVertexGraph gCloneLevel =
 				dgClone.getGraphLevelByNGramSize(iCurLvl);
-			UniqueVertexGraph gOtherGraphLevel =
+			final UniqueVertexGraph gOtherGraphLevel =
 				dgOtherGraph.getGraphLevelByNGramSize(iCurLvl);
 
 			// If this level does not exist in other graph, then keep
 			// it and continue.
-			if (gOtherGraphLevel == null)
+			if (gOtherGraphLevel == null) {
 				continue;
+			}
 
 			/*
 			 * create a copy of the edge set to avoid
 			/* ConcurrentModificationException
 			 */
-			Set<Edge> eSet = new HashSet<Edge>(gCloneLevel.edgeSet());
+			final Set<Edge> eSet = new HashSet<>(gCloneLevel.edgeSet());
 
 			// For every edge of the cloned graph (using a new list of edges)
-			for (Edge weCurItem: eSet) {
+			for (final Edge weCurItem: eSet) {
 				// Edge weCurItem = eIter.next();
 				// If the edge is contained in the merged graph
-				Edge eEdge =
+				final Edge eEdge =
 					eclLocator.locateDirectedEdgeInGraph(gOtherGraphLevel,
 							gCloneLevel.getEdgeSource(weCurItem),
 							gCloneLevel.getEdgeTarget(weCurItem));
@@ -1083,9 +1129,9 @@ implements Serializable, NGramGraph
 					try {
 						gCloneLevel.removeEdge(weCurItem);
 						eclLocator.resetCache();
-					} catch (Exception ex) {
+					} catch (final Exception ex) {
 						// Non-lethal exception. Continue.
-						ex.printStackTrace();
+						logger.info(ex.getMessage());
 					}
 				}
 			}
