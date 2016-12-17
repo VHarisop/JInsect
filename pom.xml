@@ -28,7 +28,7 @@
 	<dependency>
 		<groupId>junit</groupId>
 		<artifactId>junit</artifactId>
-		<version>3.8.1</version>
+		<version>4.8.2</version>
 		<scope>test</scope>
 	</dependency>
 
@@ -46,16 +46,5 @@
       <version>2.7</version>
     </dependency>
   </dependencies>
-
-  <reporting>
-    <plugins>
-      <!-- Use javadoc -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.3</version>
-      </plugin>
-    </plugins>
-  </reporting>
 
 </project>
