@@ -49,7 +49,7 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
 	 * @param dataString the string to be represented
 	 * @return a new NGramGaussSymJGraph object
 	 */
-	public NGramGaussSymJGraph(String dataString) {
+	public NGramGaussSymJGraph(final String dataString) {
 		setDataString(dataString);
 	}
 
@@ -61,7 +61,11 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
      * @param iCorrelationWindow The standard deviation of the Gaussian
 	 * scaling function to use when determining neighbouring weights.
      */
-    public NGramGaussSymJGraph(int iMinSize, int iMaxSize, int iCorrelationWindow) {
+    public NGramGaussSymJGraph(
+    	final int iMinSize,
+    	final int iMaxSize,
+    	final int iCorrelationWindow)
+    {
         MinSize = iMinSize;
         MaxSize = iMaxSize;
         CorrelationWindow = iCorrelationWindow;
@@ -80,8 +84,12 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
 	 * scaling function to use when determining neighbouring weights.
 	 * @return a new NGramGaussSymJGraph object
 	 */
-	public NGramGaussSymJGraph
-	(String dataString, int iMinSize, int iMaxSize, int iCorrelationWindow) {
+	public NGramGaussSymJGraph(
+		final String dataString,
+		final int iMinSize,
+		final int iMaxSize,
+		final int iCorrelationWindow)
+	{
 		MinSize = iMinSize;
 		MaxSize = iMaxSize;
 		CorrelationWindow = iCorrelationWindow;
@@ -97,29 +105,28 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
         final HashMap<String, Double> hTokenAppearence =
 			new HashMap<>();
         // 1st pass. Populate histogram.
-        ///////////////////////////////
         // For all sizes create corresponding levels
-        for (int iNGramSize = MinSize; iNGramSize <= MaxSize; iNGramSize++)
+        for (int size = MinSize; size <= MaxSize; size++)
         {
             // If n-gram bigger than text
-            if (iLen < iNGramSize) {
+            if (iLen < size) {
 				// then Ignore
                 continue;
 			}
 
             final LinkedList<String> lNGramSequence = new LinkedList<>();
-            final UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iNGramSize);
+            final UniqueVertexGraph gGraph = getGraphLevelByNGramSize(size);
             for (int iCurStart = 0; iCurStart < iLen; iCurStart++)
             {
                 // If reached end
-                if (iLen < iCurStart + iNGramSize) {
+                if (iLen < iCurStart + size) {
 					// then break
                     break;
 				}
 
                 // Get n-gram
                 final String sCurNGram =
-					sUsableString.substring(iCurStart, iCurStart + iNGramSize);
+					sUsableString.substring(iCurStart, iCurStart + size);
 
                 // Update Histogram
                 if (hTokenAppearence.containsKey(sCurNGram)) {
@@ -135,7 +142,8 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
                 // Update graph
                 final int iListSize = lNGramSequence.size();
                 final int iTo = (iListSize - 1) >= 0 ? iListSize - 1 : 0;
-				final int iTemp = iListSize - (int)(CorrelationWindow * Visibility);
+				final int iTemp =
+					iListSize - (int)(CorrelationWindow * Visibility);
                 final int iFrom = iTemp - 1 >= 0 ? iTemp - 1 : 0;
 
 				final List<String> revList =
@@ -143,10 +151,7 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
 				Collections.reverse(revList);
 
                 createSymEdgesConnecting(
-						gGraph,
-						sCurNGram,
-                        revList,
-						hTokenAppearence);
+					gGraph, sCurNGram, revList, hTokenAppearence);
             }
         }
     }
@@ -164,10 +169,10 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
      * @param hAppearenceHistogram The histogram of appearences of the terms
      */
     private void createSymEdgesConnecting(
-			UniqueVertexGraph gGraph,
-			String sStartNode,
-			List<String> lOtherNodes,
-            HashMap<String, Double> hAppearenceHistogram) {
+			final UniqueVertexGraph gGraph,
+			final String sStartNode,
+			final List<String> lOtherNodes,
+            final HashMap<String, Double> hAppearenceHistogram) {
         double dStartWeight = 0;
         double dIncreaseWeight = 0;
 
@@ -217,20 +222,17 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
         while (iIter.hasNext())
         {
             final JVertex vB = new NGramVertex(iIter.next());
-
             double dOldWeight = 0;
             double dNewWeight = 0;
-            //dStartWeight = 2.0 / (((Double)hAppearenceHistogram.get(vA.getLabel())).doubleValue() +
-                    //((Double)hAppearenceHistogram.get(vB.getLabel())).doubleValue());
             dStartWeight = ScalingFunction(++iCnt);
             dIncreaseWeight = dStartWeight;
-            //WeightedEdge weCorrectEdge = (WeightedEdge)jinsect.Utils.locateDirectedEdgeInGraph(gGraph, vA, vB);
 
             if (eclLocator == null) {
 				eclLocator = new EdgeCachedLocator(10);
 			}
             // Add one-way edge
-            Edge weCorrectEdge = eclLocator.locateDirectedEdgeInGraph(gGraph, vA, vB);
+            Edge weCorrectEdge =
+            	eclLocator.locateDirectedEdgeInGraph(gGraph, vA, vB);
 
             if (weCorrectEdge == null) {
 				dNewWeight = dStartWeight;
@@ -256,7 +258,8 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
             }
 
             // Add reverse edge
-            weCorrectEdge = eclLocator.locateDirectedEdgeInGraph(gGraph, vB, vA);
+            weCorrectEdge =
+            	eclLocator.locateDirectedEdgeInGraph(gGraph, vB, vA);
 
             if (weCorrectEdge == null) {
 				dNewWeight = dStartWeight;
@@ -298,10 +301,11 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
      */
     @Override
     protected void createEdgesConnecting(
-			UniqueVertexGraph gGraph,
-			String sStartNode,
-			List<String> lOtherNodes,
-            HashMap<String, Double> hAppearenceHistogram) {
+		final UniqueVertexGraph gGraph,
+		final String sStartNode,
+		final List<String> lOtherNodes,
+		final HashMap<String, Double> hAppearenceHistogram)
+    {
         double dStartWeight = 0;
         double dIncreaseWeight = 0;
 
@@ -353,7 +357,8 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
             double dOldWeight = 0;
             double dNewWeight = 0;
 
-            dStartWeight = ScalingFunction(Math.abs(++iCnt - (lOtherNodes.size() / 2)));
+            dStartWeight = ScalingFunction(
+            	Math.abs(++iCnt - (lOtherNodes.size() / 2)));
             dIncreaseWeight = dStartWeight;
 			if (eclLocator == null) {
 				eclLocator = new EdgeCachedLocator(10);
@@ -385,6 +390,5 @@ public class NGramGaussSymJGraph extends NGramGaussJGraph {
             	logger.severe(e.getMessage());
             }
         }
-
     }
 }

@@ -46,7 +46,7 @@ public class NGramGaussJGraph extends NGramJGraph {
 	 * @param dataString the data string to be represented
 	 * @return a new NGramGaussJGraph object
 	 */
-	public NGramGaussJGraph(String dataString) {
+	public NGramGaussJGraph(final String dataString) {
 		InitGraphs();
 		setDataString(dataString);
 	}
@@ -59,7 +59,11 @@ public class NGramGaussJGraph extends NGramJGraph {
 	 * @param iCorrelationWindow The standard deviation of the Gaussian
 	 * scaling function to use when determining neighbouring weights.
 	 */
-	public NGramGaussJGraph(int iMinSize, int iMaxSize, int iCorrelationWindow) {
+	public NGramGaussJGraph(
+		final int iMinSize,
+		final int iMaxSize,
+		final int iCorrelationWindow)
+	{
 		MinSize = iMinSize;
 		MaxSize = iMaxSize;
 		CorrelationWindow = iCorrelationWindow;
@@ -78,8 +82,11 @@ public class NGramGaussJGraph extends NGramJGraph {
 	 * scaling function to use when determining neighbouring weights.
 	 * @return a new NGramGaussJGraph object
 	 */
-	public NGramGaussJGraph
-	(String dataString, int iMinSize, int iMaxSize, int iCorrelationWindow)
+	public NGramGaussJGraph(
+		final String dataString,
+		final int iMinSize,
+		final int iMaxSize,
+		final int iCorrelationWindow)
 	{
 		MinSize = iMinSize;
 		MaxSize = iMaxSize;
@@ -104,12 +111,11 @@ public class NGramGaussJGraph extends NGramJGraph {
 		final HashMap<String, Double> hTokenAppearence =
 			new HashMap<>();
 		// 1st pass. Populate histogram.
-		///////////////////////////////
 		// For all sizes create corresponding levels
-		for (int iNGramSize = MinSize; iNGramSize <= MaxSize; iNGramSize++)
+		for (int size = MinSize; size <= MaxSize; size++)
 		{
 			// If n-gram bigger than text
-			if (iLen < iNGramSize) {
+			if (iLen < size) {
 				// then Ignore
 				continue;
 			}
@@ -117,20 +123,20 @@ public class NGramGaussJGraph extends NGramJGraph {
 			for (int iCurStart = 0; iCurStart < iLen; iCurStart++)
 			{
 				// If reached end
-				if (iLen < iCurStart + iNGramSize) {
+				if (iLen < iCurStart + size) {
 					// then break
 					break;
 				}
 
 				// Get n-gram
 				final String sCurNGram =
-					sUsableString.substring(iCurStart, iCurStart + iNGramSize);
+					sUsableString.substring(iCurStart, iCurStart + size);
 
 				// Update Histogram
 				if (hTokenAppearence.containsKey(sCurNGram)) {
 					hTokenAppearence.put(
-							sCurNGram,
-							hTokenAppearence.get(sCurNGram).doubleValue() + 1.0);
+						sCurNGram,
+						hTokenAppearence.get(sCurNGram).doubleValue() + 1.0);
 				} else {
 					hTokenAppearence.put(sCurNGram, 1.0);
 				}
@@ -139,7 +145,6 @@ public class NGramGaussJGraph extends NGramJGraph {
 		}
 
 		// 2nd pass. Create graph.
-		///////////////////////////////
 		// For all sizes create corresponding levels
 		for (int iNGramSize = MinSize; iNGramSize <= MaxSize; iNGramSize++)
 		{
@@ -191,8 +196,8 @@ public class NGramGaussJGraph extends NGramJGraph {
 
 	/**
 	 * Creates an edge in [gGraph] connecting [sBaseNode] to each node in the
-	 * [lOtherNodes] list of nodes. If an edge exists, its weight is increased by [iIncreaseWeight],
-	 * else its weight is set to [iStartWeight]
+	 * [lOtherNodes] list of nodes. If an edge exists, its weight is increased
+	 * by [iIncreaseWeight], else its weight is set to [iStartWeight].
 	 * @param gGraph The graph to use
 	 * @param sStartNode The node from which all edges begin
 	 * @param lOtherNodes The list of nodes to which sBaseNode is connected
@@ -200,10 +205,10 @@ public class NGramGaussJGraph extends NGramJGraph {
 	 *
 	 */
 	protected void createEdgesConnecting(
-		UniqueVertexGraph gGraph,
-		String sStartNode,
-		List<String> lOtherNodes,
-		HashMap<String, Double> hAppearenceHistogram)
+		final UniqueVertexGraph gGraph,
+		final String sStartNode,
+		final List<String> lOtherNodes,
+		final HashMap<String, Double> hAppearenceHistogram)
 	{
 		double dStartWeight = 0;
 		double dIncreaseWeight = 0;
@@ -301,7 +306,7 @@ public class NGramGaussJGraph extends NGramJGraph {
 	 * @param iDistance The distance between the two n-grams.
 	 * @return A double scaling factor.
 	 */
-	protected double ScalingFunction(int iDistance) {
+	protected double ScalingFunction(final int iDistance) {
 		return Math.exp(-Math.pow((iDistance), 2.0) /
 				(2.0*Math.pow(CorrelationWindow,2.0)));
 	}

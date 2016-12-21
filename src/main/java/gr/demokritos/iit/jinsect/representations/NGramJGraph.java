@@ -73,7 +73,7 @@ implements Serializable, NGramGraph
 	 * @param dataString the data string to represent
 	 * @return a new NGramJGraph object with default parameters
 	 */
-	public NGramJGraph(String dataString) {
+	public NGramJGraph(final String dataString) {
 		setDataString(dataString);
 	}
 
@@ -87,8 +87,11 @@ implements Serializable, NGramGraph
 	 * @param iCorrelationWindow the correlation window length
 	 * @return a new NGramJGraph with the given parameters
 	 */
-	public NGramJGraph
-	(String dataString, int iMinSize, int iMaxSize, int iCorrelationWindow)
+	public NGramJGraph(
+		final String dataString,
+		final int iMinSize,
+		final int iMaxSize,
+		final int iCorrelationWindow)
 	{
 		MinSize = iMinSize;
 		MaxSize = iMaxSize;
@@ -104,7 +107,11 @@ implements Serializable, NGramGraph
 	 * @param iCorrelationWindow The maximum distance of terms to be considered
 	 * as correlated.
 	 */
-	public NGramJGraph(int iMinSize, int iMaxSize, int iCorrelationWindow) {
+	public NGramJGraph(
+		final int iMinSize,
+		final int iMaxSize,
+		final int iCorrelationWindow)
+	{
 		MinSize = iMinSize;
 		MaxSize = iMaxSize;
 		CorrelationWindow = iCorrelationWindow;
@@ -117,7 +124,7 @@ implements Serializable, NGramGraph
 	 * @param path the string containing the file path
 	 * @return an array of {@link NGramJGraph} objects
 	 */
-	public static NGramJGraph[] fromFileLines(String path)
+	public static NGramJGraph[] fromFileLines(final String path)
 		throws IOException, FileNotFoundException
 	{
 		return fromFileLines(new File(path));
@@ -130,7 +137,7 @@ implements Serializable, NGramGraph
 	 * @param path the {@link java.io.File} from which to read the lines
 	 * @return an array of {@link NGramJGraph} objects
 	 */
-	public static NGramJGraph[] fromFileLines(File path)
+	public static NGramJGraph[] fromFileLines(final File path)
 		throws IOException, FileNotFoundException
 	{
 		/* read lines and allocate array */
@@ -170,7 +177,7 @@ implements Serializable, NGramGraph
 	 *
 	 * @param label the new label of the graph
 	 */
-	public void setLabel(String label) {
+	public void setLabel(final String label) {
 		this.label = label;
 	}
 
@@ -200,10 +207,11 @@ implements Serializable, NGramGraph
 	/** Creates the graph based on a data string loaded from a given file.
 	 *@param sFilename The filename of the file containing the data string.
 	 */
-	public void loadDataStringFromFile(String sFilename)
+	public void loadDataStringFromFile(final String sFilename)
 	throws IOException, FileNotFoundException
 	{
-		final String sDataString = Utils.loadFileToStringWithNewlines(sFilename);
+		final String sDataString =
+			Utils.loadFileToStringWithNewlines(sFilename);
 		setDataString(sDataString); // Actually update
 	}
 
@@ -213,7 +221,7 @@ implements Serializable, NGramGraph
 	 * level MinSize n-grams.
 	 * @return The {@link UniqueVertexGraph} of the corresponding level.
 	 */
-	public final UniqueVertexGraph getGraphLevel(int iIndex) {
+	public final UniqueVertexGraph getGraphLevel(final int iIndex) {
 		return NGramGraphArray[iIndex];
 	}
 
@@ -222,12 +230,12 @@ implements Serializable, NGramGraph
 	 * @param iNGramSize The n-gram size of the graph.
 	 * @return The {@link UniqueVertexGraph} of the corresponding level.
 	 */
-	public final UniqueVertexGraph getGraphLevelByNGramSize(int iNGramSize) {
+	public final UniqueVertexGraph
+	getGraphLevelByNGramSize(final int iNGramSize) {
 		// Check bounds
 		if ((iNGramSize < MinSize) || (iNGramSize > MaxSize)) {
 			return null;
 		}
-
 		return NGramGraphArray[iNGramSize - MinSize];
 	}
 
@@ -252,7 +260,7 @@ implements Serializable, NGramGraph
 	 * Set a locator to optimize the edge lookup.
 	 * @param eNewLocator The locator to use.
 	 */
-	public void setLocator(EdgeCachedLocator eNewLocator) {
+	public void setLocator(final EdgeCachedLocator eNewLocator) {
 		eclLocator = eNewLocator;
 	}
 
@@ -265,10 +273,10 @@ implements Serializable, NGramGraph
 	 * @param lOtherNodes The list of nodes to which sBaseNode is connected
 	 * @param hAppearenceHistogram The histogram of appearences of the terms
 	 **/
-	private void createEdgesConnecting(UniqueVertexGraph gGraph,
-			String sStartNode,
-			List<String> lOtherNodes,
-			HashMap<String, Double> hAppearenceHistogram)
+	private void createEdgesConnecting(final UniqueVertexGraph gGraph,
+			final String sStartNode,
+			final List<String> lOtherNodes,
+			final HashMap<String, Double> hAppearenceHistogram)
 	{
 		double dStartWeight = 0;
 		double dIncreaseWeight = 0;
@@ -368,11 +376,12 @@ implements Serializable, NGramGraph
 	 * to the current value. 1.0 means the old value is completely replaced by the
 	 * new. 0.5 means the final value is the average of the old and the new.
 	 **/
-	public void createWeightedEdgesConnecting(UniqueVertexGraph gGraph,
-			String sStartNode, List<String> lOtherNodes,
+	public void createWeightedEdgesConnecting(
+			final UniqueVertexGraph gGraph,
+			final String sStartNode, final List<String> lOtherNodes,
 			final double dStartWeight, final double dNewWeight,
-			double dDataImportance) {
-
+			final double dDataImportance)
+	{
 		// If no neightbours
 		if (lOtherNodes != null) {
 			if (lOtherNodes.size() == 0)
@@ -511,18 +520,19 @@ implements Serializable, NGramGraph
 			final Vector<String> PrecedingNeighbours = new Vector<>();
 			final UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iNGramSize);
 
-			for (int iCurStart = 0; iCurStart < iLen; iCurStart++)
+			for (int iStart = 0; iStart < iLen; iStart++)
 			{
 				// If reached end, break
-				if (iLen < iCurStart + iNGramSize) {
+				if (iLen < iStart + iNGramSize) {
 					break;
 				}
 
 				// Get n-gram
 				final String sCurNGram =
-					sUsableString.substring(iCurStart, iCurStart + iNGramSize);
+					sUsableString.substring(iStart, iStart + iNGramSize);
 				/* put all preceding neighbours to an array */
-				final String[] aFinalNeighbours = new String[PrecedingNeighbours.size()];
+				final String[] aFinalNeighbours =
+						new String[PrecedingNeighbours.size()];
 				PrecedingNeighbours.toArray(aFinalNeighbours);
 
 				/* create edges to connect preceding neighbours to current ngram */
@@ -536,10 +546,9 @@ implements Serializable, NGramGraph
 				PrecedingNeighbours.add(sCurNGram);
 
 				/* has preceding neighbours exceeded window length? */
-				if (PrecedingNeighbours.size() > CorrelationWindow)
-				 {
+				if (PrecedingNeighbours.size() > CorrelationWindow) {
+					// Remove first element
 					PrecedingNeighbours.removeElementAt(0);
-				// Remove first element
 				}
 			}
 		}
@@ -558,7 +567,9 @@ implements Serializable, NGramGraph
 	 * that of the new graph. A value of 0.5 means new value is exactly between
 	 * the old and new value (average).
 	 */
-	public void mergeGraph(NGramGraph dgOtherGraph, double fWeightPercent) {
+	public void mergeGraph(
+		final NGramGraph dgOtherGraph, final double fWeightPercent)
+	{
 		// If both graphs are the same, ignore merging.
 		if (dgOtherGraph == this) {
 			return;
@@ -601,7 +612,7 @@ implements Serializable, NGramGraph
 	 * @return the graph resulting from the intersection of the
 	 * two graphs
 	 */
-	public NGramGraph intersectGraph(NGramGraph dgOtherGraph) {
+	public NGramGraph intersectGraph(final NGramGraph dgOtherGraph) {
 		// Init res graph
 		final NGramJGraph gRes = new NGramJGraph(MinSize, MaxSize, CorrelationWindow);
 
@@ -653,7 +664,7 @@ implements Serializable, NGramGraph
 	 * @param dgOtherGraph The graph to compare to.
 	 * @return A NGramJGraph that is the difference between the current graph and the given graph.
 	 */
-	public NGramGraph inverseIntersectGraph(NGramGraph dgOtherGraph) {
+	public NGramGraph inverseIntersectGraph(final NGramGraph dgOtherGraph) {
 
 		// Get the union (merged) graph
 		final NGramJGraph dgUnion = (NGramJGraph)clone();
@@ -713,7 +724,7 @@ implements Serializable, NGramGraph
 	 * the current graph and the given graph and the second is the difference
 	 * of the graphs. The edge distributions are kept from the original graphs.
 	 */
-	public NGramGraph[] intersectAndDeltaGraph(NGramGraph dgOtherGraph) {
+	public NGramGraph[] intersectAndDeltaGraph(final NGramGraph dgOtherGraph) {
 		NGramGraph dgUnion = null;
 		// Initialize union using the biggest graph and get the merged one
 		if (dgOtherGraph.length() > length()) {
@@ -765,7 +776,6 @@ implements Serializable, NGramGraph
 				}
 			}
 		}
-
 		res[1] = dgUnion;
 		return res;
 	}
@@ -798,10 +808,8 @@ implements Serializable, NGramGraph
 	 *
 	 * @param sNode The node object the Coexistence Importance of which we calculate
 	 */
-	public double calcCoexistenceImportance(String sNode) {
-		final NGramVertex v = new NGramVertex(sNode);
-
-		return calcCoexistenceImportance(v);
+	public double calcCoexistenceImportance(final String sNode) {
+		return calcCoexistenceImportance(new NGramVertex(sNode));
 	}
 
 	/**
@@ -810,14 +818,15 @@ implements Serializable, NGramGraph
 	 * @param vNode the vertex to calculate coexistence importance for
 	 * @return the vertex' coexistence importance
 	 */
-	public double calcCoexistenceImportance(JVertex vNode) {
+	public double calcCoexistenceImportance(final JVertex vNode) {
 		double dRes = 0.0;
 
 		int iNoOfNeighbours = 0;
 		double dMaxEdgeWeight = 0;
 		// Search all levels
 		for (int iNGramSize=MinSize; iNGramSize <= MaxSize; iNGramSize++) {
-			final UniqueVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
+			final UniqueVertexGraph gCurLevel =
+					getGraphLevelByNGramSize(iNGramSize);
 			if (gCurLevel.containsVertex(vNode))
 			{
 				// Keep max neighbours number
@@ -850,15 +859,16 @@ implements Serializable, NGramGraph
 	 * threshold - vertices with coexistence importance below that threshold
 	 * are removed.
 	 *
-	 * @param dMinCoexistenceImportance the minimum coexistence importance
+	 * @param minImportance the minimum coexistence importance
 	 */
-	public void prune(double dMinCoexistenceImportance) {
+	public void prune(final double minImportance) {
 		for (int iNGramSize=MinSize; iNGramSize <= MaxSize; iNGramSize++) {
-			final UniqueVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
+			final UniqueVertexGraph gCurLevel =
+					getGraphLevelByNGramSize(iNGramSize);
 			final Vector<JVertex> vToRemove = new Vector<>();
 
 			for (final JVertex vCur: gCurLevel.vertexSet()) {
-				if (calcCoexistenceImportance(vCur) < dMinCoexistenceImportance) {
+				if (calcCoexistenceImportance(vCur) < minImportance) {
 					vToRemove.add(vCur);
 				}
 			}
@@ -880,13 +890,13 @@ implements Serializable, NGramGraph
 	 *
 	 * @param sItem The label of the node to remove.
 	 */
-	public void deleteItem(String sItem) {
+	public void deleteItem(final String sItem) {
 		// From all levels
 		for (int iNGramSize = MinSize; iNGramSize <= MaxSize; iNGramSize++) {
-			final UniqueVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
+			final UniqueVertexGraph gCurLevel =
+					getGraphLevelByNGramSize(iNGramSize);
 			// Vertex v = Utils.locateVertexInGraph(gCurLevel, sItem);
-			JVertex v = null;
-			v = gCurLevel.locateVertex(v);
+			final JVertex v = gCurLevel.locateVertex(new NGramVertex(sItem));
 			if (v == null) {
 				return;
 			}
@@ -905,11 +915,11 @@ implements Serializable, NGramGraph
 	 */
 	public void nullify() {
 		// From all levels
-		for (int iNGramSize=MinSize; iNGramSize <= MaxSize; iNGramSize++) {
-			final UniqueVertexGraph gCurLevel = getGraphLevelByNGramSize(iNGramSize);
+		for (int size = MinSize; size <= MaxSize; size++) {
+			final UniqueVertexGraph curr = getGraphLevelByNGramSize(size);
 			// For all edges, set weight to zero
-			for (final Edge e: gCurLevel.edgeSet()) {
-				gCurLevel.setEdgeWeight(e, 0.0);
+			for (final Edge e: curr.edgeSet()) {
+				curr.setEdgeWeight(e, 0.0);
 			}
 		}
 	}
@@ -919,7 +929,7 @@ implements Serializable, NGramGraph
 	 * and then creates them anew.
 	 * @param sDataString the new data string to be represented
 	 */
-	public void setDataString(String sDataString) {
+	public void setDataString(final String sDataString) {
 		DataString = sDataString;
 		InitGraphs();   // Clear graphs
 		createGraphs(); // Update graphs
@@ -937,7 +947,7 @@ implements Serializable, NGramGraph
 	/**
 	 * Serializes the object.
 	 */
-	private void writeObject(ObjectOutputStream out)
+	private void writeObject(final ObjectOutputStream out)
 		throws IOException {
 
 		// Write Fields
@@ -959,7 +969,7 @@ implements Serializable, NGramGraph
 	 * Reads a serialized object.
 	 */
 	@SuppressWarnings("unchecked")
-	private void readObject(ObjectInputStream in)
+	private void readObject(final ObjectInputStream in)
 	throws IOException, ClassNotFoundException {
 		try {
 			// Read Fields
@@ -983,10 +993,12 @@ implements Serializable, NGramGraph
 		}
 	}
 
-	public void degrade(NGramJGraph dgOtherGraph) {
+	public void degrade(final NGramJGraph dgOtherGraph) {
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {
-			final UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iCurLvl);
-			final UniqueVertexGraph gOtherGraph = dgOtherGraph.getGraphLevelByNGramSize(iCurLvl);
+			final UniqueVertexGraph gGraph =
+				getGraphLevelByNGramSize(iCurLvl);
+			final UniqueVertexGraph gOtherGraph =
+				dgOtherGraph.getGraphLevelByNGramSize(iCurLvl);
 			// Check if other graph has corresponding level
 			if (gOtherGraph == null) {
 				// If not, ignore level
@@ -1024,7 +1036,7 @@ implements Serializable, NGramGraph
 	 * @return the degradation degree of the edge, or 0 if it
 	 * is not degraded
 	 */
-	public double degradationDegree(Edge e) {
+	public double degradationDegree(final Edge e) {
 		if (DegradedEdges.containsKey(e)) {
 			return (DegradedEdges.get(e)).doubleValue();
 		} else {
@@ -1032,7 +1044,7 @@ implements Serializable, NGramGraph
 		}
 	}
 
-	public String toCooccurenceText(Map<String, String> mCooccurenceMap) {
+	public String toCooccurenceText(final Map<String, String> mCooccurenceMap) {
 		final StringBuilder sb = new StringBuilder();
 		// For every graph level
 		for (int iCnt=MinSize; iCnt <= MaxSize; iCnt++) {
@@ -1063,10 +1075,10 @@ implements Serializable, NGramGraph
 
 	@Override
 	public NGramGraph clone() {
-		final NGramJGraph gRes = new NGramJGraph(MinSize, MaxSize, CorrelationWindow);
+		final NGramJGraph gRes =
+			new NGramJGraph(MinSize, MaxSize, CorrelationWindow);
 		gRes.DataString = DataString;
-		gRes.DegradedEdges =
-			new HashMap<>(this.DegradedEdges);
+		gRes.DegradedEdges = new HashMap<>(this.DegradedEdges);
 		gRes.NGramGraphArray =
 			new UniqueVertexGraph[this.NGramGraphArray.length];
 		int iCnt=0;
@@ -1081,7 +1093,7 @@ implements Serializable, NGramGraph
 	 * See the <i>mergeGraph</i> member for details.
 	 * Implements the merge interface.
 	 */
-	public void merge(NGramGraph dgOtherObject, double fWeightPercent) {
+	public void merge(final NGramGraph dgOtherObject, final double fWeightPercent) {
 		mergeGraph(dgOtherObject, fWeightPercent);
 	}
 
@@ -1092,10 +1104,10 @@ implements Serializable, NGramGraph
 	 * not existing in the other given graph (edge distros are not used).
 	 * The edge distributions are kept from this graph.
 	 */
-	public NGramGraph allNotIn(NGramGraph dgOtherGraph) {
+	public NGramGraph allNotIn(final NGramGraph dgOtherGraph) {
 		// TODO: Order by edge count for optimization
-		final EdgeCachedLocator eclLocator = new EdgeCachedLocator(Math.max(length(),
-					dgOtherGraph.length()));
+		final EdgeCachedLocator eclLocator = new EdgeCachedLocator(
+				Math.max(length(), dgOtherGraph.length()));
 		// Clone this graph
 		final NGramGraph dgClone = clone();
 		for (int iCurLvl = MinSize; iCurLvl <= MaxSize; iCurLvl++) {

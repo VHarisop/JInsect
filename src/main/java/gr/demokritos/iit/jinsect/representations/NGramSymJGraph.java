@@ -56,7 +56,11 @@ public class NGramSymJGraph extends NGramJGraph {
 	 * @param iCorrelationWindow the correlation window length
 	 * @return a NGramSymJGraph object with custom parameters
 	 */
-	public NGramSymJGraph(int iMinSize, int iMaxSize, int iCorrelationWindow) {
+	public NGramSymJGraph(
+		final int iMinSize,
+		final int iMaxSize,
+		final int iCorrelationWindow)
+	{
 		MinSize = iMinSize;
 		MaxSize = iMaxSize;
 		CorrelationWindow = iCorrelationWindow;
@@ -71,7 +75,7 @@ public class NGramSymJGraph extends NGramJGraph {
 	 * @param dataString the data string to be represented
 	 * @return a new NGramSymJGraph with default parameters
 	 */
-	public NGramSymJGraph(String dataString) {
+	public NGramSymJGraph(final String dataString) {
 		setDataString(dataString);
 	}
 
@@ -86,8 +90,11 @@ public class NGramSymJGraph extends NGramJGraph {
 	 * @return a NGramSymJGraph object with an initial data string
 	 * and custom parameters
 	 */
-	public NGramSymJGraph
-	(String dataString, int iMinSize, int iMaxSize, int iCorrelationWindow)
+	public NGramSymJGraph(
+		final String dataString,
+		final int iMinSize,
+		final int iMaxSize,
+		final int iCorrelationWindow)
 	{
 		MinSize = iMinSize;
 		MaxSize = iMaxSize;
@@ -100,7 +107,7 @@ public class NGramSymJGraph extends NGramJGraph {
 	 * @param path the string containing the file path
 	 * @return an array of {@link NGramSymJGraph} objects
 	 */
-	public static NGramSymJGraph[] fromFileLines(String path)
+	public static NGramSymJGraph[] fromFileLines(final String path)
 		throws IOException, FileNotFoundException {
 		return fromFileLines(new File(path));
 	}
@@ -112,7 +119,7 @@ public class NGramSymJGraph extends NGramJGraph {
 	 * @param path the {@link java.io.File} from which to read the lines
 	 * @return an array of {@link NGramJGraph} objects
 	 */
-	public static NGramSymJGraph[] fromFileLines(File path)
+	public static NGramSymJGraph[] fromFileLines(final File path)
 		throws IOException, FileNotFoundException {
 		/* read lines and allocate array */
 		final String[] lines = new LineReader().getLines(path);
@@ -136,32 +143,33 @@ public class NGramSymJGraph extends NGramJGraph {
 		// 1st pass. Populate histogram.
 		///////////////////////////////
 		// For all sizes create corresponding levels
-		for (int iNGramSize = MinSize; iNGramSize <= MaxSize; iNGramSize++)
+		for (int size = MinSize; size <= MaxSize; size++)
 		{
 			// If n-gram bigger than text
-			if (iLen < iNGramSize) {
+			if (iLen < size) {
 				// then Ignore
 				continue;
 			}
 
 			final LinkedList<String> lNGramSequence = new LinkedList<>();
-			final UniqueVertexGraph gGraph = getGraphLevelByNGramSize(iNGramSize);
+			final UniqueVertexGraph gGraph = getGraphLevelByNGramSize(size);
 			for (int iCurStart = 0; iCurStart < iLen; iCurStart++)
 			{
 				// If reached end
-				if (iLen < iCurStart + iNGramSize) {
+				if (iLen < iCurStart + size) {
 					// then break
 					break;
 				}
 
 				// Get n-gram
 				final String sCurNGram =
-					sUsableString.substring(iCurStart, iCurStart + iNGramSize);
+					sUsableString.substring(iCurStart, iCurStart + size);
 
 				// Update Histogram
 				if (hTokenAppearence.containsKey(sCurNGram)) {
-					hTokenAppearence.put(sCurNGram,
-							hTokenAppearence.get(sCurNGram).doubleValue() + 1.0);
+					hTokenAppearence.put(
+						sCurNGram,
+						hTokenAppearence.get(sCurNGram).doubleValue() + 1.0);
 				} else {
 					hTokenAppearence.put(sCurNGram, 1.0);
 				}
@@ -195,15 +203,15 @@ public class NGramSymJGraph extends NGramJGraph {
 	 * else its weight is set to [iStartWeight]
 	 * @param gGraph The graph to use
 	 * @param sStartNode The node from which all edges begin
-	 * @param lOtherNodes The list of nodes to which sBaseNode is connected. The list MUST BE ORDERED ASCENDINGLY
-	 * based on distance from the <code>sStartNode</code>.
+	 * @param lOtherNodes The list of nodes to which sBaseNode is connected.
+	 * The list MUST BE ORDERED ASCENDINGLY based on distance from the <code>sStartNode</code>.
 	 * @param hAppearenceHistogram The histogram of appearences of the terms
 	 */
 	private void createSymEdgesConnecting(
-			UniqueVertexGraph gGraph,
-			String sStartNode,
-			List<String> lOtherNodes,
-			HashMap<String, Double> hAppearenceHistogram)
+			final UniqueVertexGraph gGraph,
+			final String sStartNode,
+			final List<String> lOtherNodes,
+			final HashMap<String, Double> hAppearenceHistogram)
 	{
 		double dStartWeight = 0;
 		double dIncreaseWeight = 0;
@@ -300,8 +308,7 @@ public class NGramSymJGraph extends NGramJGraph {
 				dNewWeight = dOldWeight + dIncreaseWeight; // Increase as required
 			}
 
-			try
-			{
+			try {
 				if (weCorrectEdge == null) {
 					final Edge e = gGraph.addEdge(vB, vA, dNewWeight);
 					eclLocator.addedEdge(e);
@@ -309,8 +316,7 @@ public class NGramSymJGraph extends NGramJGraph {
 					gGraph.setEdgeWeight(weCorrectEdge, dNewWeight);
 				}
 			}
-			catch (final Exception e)
-			{
+			catch (final Exception e) {
 				// Unknown error. Print trace and continue
 				logger.warning(e.getMessage());
 			}

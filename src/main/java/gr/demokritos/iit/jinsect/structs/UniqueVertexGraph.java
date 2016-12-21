@@ -73,7 +73,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
      * @param v The vertex, the label of which will be used for the lookup.
      * @return True if the vertex is contained in this graph. Otherwise false.
      */
-    public boolean contains(JVertex v) {
+    public boolean contains(final JVertex v) {
         return UniqueVertices.containsKey(v.getLabel());
     }
 
@@ -82,7 +82,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
      * @param v The vertex, the label of which will be used for the lookup.
      * @return The vertex if it is contained in this graph. Otherwise null.
      */
-    public synchronized JVertex locateVertex(JVertex v) {
+    public synchronized JVertex locateVertex(final JVertex v) {
         return UniqueVertices.get(v.getLabel());
     }
 
@@ -91,7 +91,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
      * @param sJVertexLabel  The label which will be used for the lookup.
      * @return The vertex if it is contained in this graph. Otherwise null.
      */
-    public synchronized JVertex locateVertex(String sJVertexLabel) {
+    public synchronized JVertex locateVertex(final String sJVertexLabel) {
         return UniqueVertices.get(sJVertexLabel);
     }
 
@@ -107,7 +107,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 * Add a <tt>JVertex</tt> to the graph, if it is not already present.
 	 * @param v the <tt>JVertex</tt> to be added
 	 */
-	public synchronized void add(JVertex v) {
+	public synchronized void add(final JVertex v) {
 		/* if already existing, return immediately */
 		if (this.contains(v)) {
 			return;
@@ -128,7 +128,8 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 * @return the newly created edge if addition was a success, else
 	 * 		   <tt>null</tt>
 	 */
-	public synchronized Edge addEdge(JVertex v1, JVertex v2, double weight)
+	public synchronized Edge
+	addEdge(final JVertex v1, final JVertex v2, final double weight)
 	{
 		/* implicitly add missing vertices from the super-graph */
 		if (!(this.contains(v1))) {
@@ -159,7 +160,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 * @param lblTo the label of the target vertex
 	 * @return the {@link Edge} found, if any, otherwise null
 	 */
-	public Edge getEdge(String lblFrom, String lblTo) {
+	public Edge getEdge(final String lblFrom, final String lblTo) {
 		return super.getEdge(
 			new NGramVertex(lblFrom),
 			new NGramVertex(lblTo));
@@ -171,7 +172,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 * @param vFrom the vertex whose adjacent vertices are needed
 	 * @return an unmodifiable list of adjacent vertices
 	 */
-	public List<JVertex> getAdjacentVertices(JVertex vFrom) {
+	public List<JVertex> getAdjacentVertices(final JVertex vFrom) {
 		final List<JVertex> adjacentVertices = new ArrayList<>();
 		super.outgoingEdgesOf(vFrom)
 			.forEach(e -> adjacentVertices.add(getEdgeTarget(e)));
@@ -198,7 +199,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 * @param v the <tt>JVertex</tt> for which the sum is requested
 	 * @return the sum of incident edge weights, or 0 if no edges are incident.
 	 */
-	public synchronized double weightSumOf(JVertex v) {
+	public synchronized double weightSumOf(final JVertex v) {
 		return sumWeights(super.edgesOf(v));
 	}
 
@@ -207,7 +208,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 * @param v the <tt>JVertex</tt> for which the sum is calculated
 	 * @return the sum of incoming edge weights, or 0 if no such edges exist.
 	 */
-	public synchronized double incomingWeightSumOf(JVertex v) {
+	public synchronized double incomingWeightSumOf(final JVertex v) {
 		return sumWeights(super.incomingEdgesOf(v));
 	}
 
@@ -216,7 +217,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 * @param v the <tt>JVertex</tt> for which the sum is calculated
 	 * @return the sum of outgoing edge weights, or 0 if no such edges exist.
 	 */
-	public synchronized double outgoingWeightSumOf(JVertex v) {
+	public synchronized double outgoingWeightSumOf(final JVertex v) {
 		return sumWeights(super.outgoingEdgesOf(v));
 	}
 
@@ -225,7 +226,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 * @param eList a set of weighted edges
 	 * @return the sum of the edge set or 0 if the set is empty
 	 */
-	private double sumWeights(Set<Edge> eList) {
+	private double sumWeights(final Set<Edge> eList) {
 		return eList.stream()
 			.mapToDouble(e -> super.getEdgeWeight(e))
 			.sum();

@@ -21,7 +21,7 @@ public final class NGramVertex implements JVertex {
 	 * @param ngram the n-gram to be represented
 	 * @return a new <tt>NGramVertex</tt> object.
 	 */
-	public NGramVertex(String ngram) {
+	public NGramVertex(final String ngram) {
 		label = ngram;
 	}
 
@@ -39,27 +39,28 @@ public final class NGramVertex implements JVertex {
 	 *
 	 * @param newLabel the new label
 	 */
-	public void setLabel(String newLabel) {
+	public void setLabel(final String newLabel) {
 		label = newLabel;
 	}
 
 	/**
 	 * Gets the string representation of the vertex,
 	 * which is simply the vertex's label.
-	 * @return the vertex's string representation 
+	 * @return the vertex's string representation
 	 */
+	@Override
 	public String toString() {
 		return label;
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		if (null == o)
 			return false;
 
-		if (!(o instanceof NGramVertex)) 
+		if (!(o instanceof NGramVertex))
 			return false;
-		
+
 		//If other object is an instance of NGramVertex,
 		//their labels are used for comparison
 		return this.getLabel().equals(((NGramVertex) o).getLabel());

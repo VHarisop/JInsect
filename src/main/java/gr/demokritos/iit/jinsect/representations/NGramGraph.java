@@ -1,12 +1,11 @@
 package gr.demokritos.iit.jinsect.representations;
 
-import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
-import gr.demokritos.iit.jinsect.structs.Edge;
-
-import java.io.IOException;
 import java.io.FileNotFoundException;
-
+import java.io.IOException;
 import java.util.HashSet;
+
+import gr.demokritos.iit.jinsect.structs.Edge;
+import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 
 /**
  * An interface that must be implemented by all N-Gram Graph representations.
@@ -114,7 +113,7 @@ public interface NGramGraph extends Cloneable {
 	 * @return a hashset with all of the graph's edges
 	 */
 	public HashSet<Edge> getAllNodes();
-	
+
 	/**
 	 * Creates the graph based on a data string loaded from a given file.
 	 *

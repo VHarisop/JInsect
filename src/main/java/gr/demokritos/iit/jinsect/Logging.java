@@ -23,7 +23,7 @@ public class Logging {
 	 * @param loggerName a name for the new logger
 	 * @return a new {@link Logger}
 	 */
-	public static Logger getLogger(String loggerName) {
+	public static Logger getLogger(final String loggerName) {
 		return Logger.getLogger(loggerName);
 	}
 
@@ -35,7 +35,8 @@ public class Logging {
 	 * @param fileName the path of the log file
 	 * @return a new {@link Logger}
 	 */
-	public static Logger getFileLogger(String loggerName, String fileName) {
+	public static Logger
+	getFileLogger(final String loggerName, final String fileName) {
 		final Logger logger = Logger.getLogger(fileName);
 		try {
 			final FileHandler fh = new FileHandler();

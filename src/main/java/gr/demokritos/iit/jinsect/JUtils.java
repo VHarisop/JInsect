@@ -30,8 +30,9 @@ public final class JUtils {
 	 * @param gB the second graph
 	 * @return an integer denoting the result of the canonical codes' comparison
 	 */
-	public static int compareCanonicalCodes(UniqueVertexGraph gA,
-											UniqueVertexGraph gB)
+	public static int compareCanonicalCodes(
+			final UniqueVertexGraph gA,
+			final UniqueVertexGraph gB)
 	{
 		String currA, currB;
 
@@ -76,7 +77,7 @@ public final class JUtils {
 	 * @return The DOT formatted string representation of the graph.
 	 */
 	public static String
-	graphToDot(UniqueVertexGraph gTree, boolean bDirected) {
+	graphToDot(final UniqueVertexGraph gTree, final boolean bDirected) {
 		final StringBuilder sb = new StringBuilder();
 		String sConnector;
 
@@ -120,7 +121,7 @@ public final class JUtils {
 	 * @param b the second number
 	 * @return true if the numbers are equal, otherwise false
 	 */
-	public static boolean compareDouble(double a, double b) {
+	public static boolean compareDouble(final double a, final double b) {
 		return (Math.abs(a - b) < 0.000001);
 	}
 
@@ -130,7 +131,7 @@ public final class JUtils {
 	 * @param newLabel the new label
 	 */
 	public static void
-	changeVertexLabel(JVertex vertex, String to)
+	changeVertexLabel(final JVertex vertex, final String to)
 	{
 		final String[] parts = GenericGraph.getLabelParts(vertex);
 		final String newLabel = to + "$" + parts[1];
@@ -142,7 +143,7 @@ public final class JUtils {
 	 * randomly chosen vertices of a {@link GenericGraph}.
 	 * @param graph the graph to be edited
 	 */
-	public static void addRandomEdge(GenericGraph graph) {
+	public static void addRandomEdge(final GenericGraph graph) {
 		final Random randGen = new Random();
 		final int size = graph.vertexSet().size();
 		final int from = randGen.nextInt(size);
@@ -162,7 +163,7 @@ public final class JUtils {
 	 * @return a {@link Collection<JVertex>} of vertices
 	 */
 	public static Collection<JVertex>
-	pickRandomVertices(GenericGraph graph, int number) {
+	pickRandomVertices(final GenericGraph graph, final int number) {
 		final List<JVertex> vertices = new ArrayList<>(graph
 				.vertexSet()
 				.stream()
@@ -177,7 +178,7 @@ public final class JUtils {
 	 * @param graph the {@link GenericGraph} to pick from
 	 * @return a random {@link JVertex}
 	 */
-	public static JVertex pickRandomVertex(GenericGraph graph) {
+	public static JVertex pickRandomVertex(final GenericGraph graph) {
 		final List<JVertex> vertices = graph
 				.vertexSet()
 				.stream()
@@ -191,7 +192,7 @@ public final class JUtils {
 	 * @param graph the graph from which to get the vertices
 	 * @return a {@link List} of {@link JVertex} objects
 	 */
-	public static List<JVertex> getIsolatedVertices(GenericGraph graph) {
+	public static List<JVertex> getIsolatedVertices(final GenericGraph graph) {
 		return graph.vertexSet()
 				.stream()
 				.filter(v -> graph.edgesOf(v).size() == 0)
@@ -204,7 +205,7 @@ public final class JUtils {
 	 * @param graph the graph to remove the vertex from
 	 */
 	public static void
-	removeRandomIsolatedVertex(GenericGraph graph) {
+	removeRandomIsolatedVertex(final GenericGraph graph) {
 		final List<JVertex> isolated = getIsolatedVertices(graph);
 		final int numIsolated = isolated.size();
 		if (numIsolated > 0) {
@@ -222,7 +223,7 @@ public final class JUtils {
 	 * @return the modified {@link GenericGraph}
 	 */
 	public static GenericGraph
-	getEditedGraph(GenericGraph g, int editCount, List<String> labels) {
+	getEditedGraph(final GenericGraph g, final int editCount, final List<String> labels) {
 		final GenericGraph gNew = g.clone();
 		final Random randGen = new Random();
 		final int labelCnt = labels.size();
