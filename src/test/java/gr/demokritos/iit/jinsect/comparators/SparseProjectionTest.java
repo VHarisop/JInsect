@@ -54,17 +54,25 @@ public class SparseProjectionTest extends TestCase {
 	}
 
 	/**
-	 * Test if the distance between NGramGraphs is computed properly.
+	 * Test if the distance and similarity between NGramGraphs
+	 * are computed properly.
 	 */
-	public void testDistance() {
+	public void testDistanceAndSimilarity() {
 		final NGramGraph nggA = new NGramJGraph("ACTACTAGTCTGA");
 		final NGramGraph nggB = new NGramJGraph("ACTACTAGTCTTA");
 		final SparseProjectionComparator spc =
 			new SparseProjectionComparator(charIndex, 3, 16);
+		/* Distance */
 		final double dist = spc.getDistance(
 			nggA.getGraphLevel(0),
 			nggB.getGraphLevel(0));
 		assertNotNull(dist);
 		assertTrue(dist >= 0.0);
+		/* Similarity */
+		final double sim = spc.getSimilarity(
+			nggA.getGraphLevel(0),
+			nggB.getGraphLevel(0));
+		assertNotNull(sim);
+		assertTrue(sim != Double.NaN);
 	}
 }

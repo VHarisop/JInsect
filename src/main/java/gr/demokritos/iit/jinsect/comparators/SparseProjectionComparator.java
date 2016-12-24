@@ -1,5 +1,7 @@
 package gr.demokritos.iit.jinsect.comparators;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
@@ -21,7 +23,10 @@ public class SparseProjectionComparator {
 	protected final int rank;
 	protected final int finalDim;
 	protected final Map<Character, Integer> charIndex;
-	protected byte[][] projectionMatrix;
+
+	protected List<Integer> positiveFactors = new LinkedList<>();
+	protected List<Integer> negativeFactors = new LinkedList<>();
+
 	/**
 	 * Creates a new {@link SparseProjectionComparator} with the intention
 	 * of projecting to a feature space of a specified dimension.
@@ -64,31 +69,61 @@ public class SparseProjectionComparator {
 	}
 
 	/**
+	 * Compares two {@link UniqueVertexGraph}s and returns the similarity
+	 * between them as the total value similarity between their projected
+	 * adjacency vectors.
+	 * @param uvgA the first graph
+	 * @param uvgB the second graph
+	 * @param rank the n-gram rank
+	 * @return the graph similarity
+	 */
+	public final double getSimilarity(
+		final UniqueVertexGraph uvgA, final UniqueVertexGraph uvgB)
+	{
+		/* Get the projected vectors of both graphs and
+		 * calculate their manhattan distance.
+		 */
+		final double[] vecA = getProjectedVector(uvgA);
+		final double[] vecB = getProjectedVector(uvgB);
+		return IntStream.range(0, vecA.length)
+			.mapToDouble(i -> {
+				final double wA = vecA[i];
+				final double wB = vecB[i];
+				if ((wA == 0.0) || (wB == 0.0)) {
+					return 0.0;
+				}
+				else {
+					return Math.min(wA, wB) / Math.max(wA, wB);
+				}
+			})
+			.sum();
+	}
+
+	/**
 	 * Creates a sparse random projection matrix using the distribution
 	 * mentioned in [1]. Values of {-1, 1} are chosen with a probability
-	 * of 1 / sqrt(D) each, where D is the feature dimension.
+	 * of 1 / sqrt(D) each, where D is the feature dimension. The matrix
+	 * is not stored itself, but the indices with positive or negative
+	 * factors are stored in
+	 * {@link #positiveFactors} and {@link #negativeFactors}, respectively.
 	 */
 	private void createProjectionMatrix() {
 		final int nGramCount = (int) Math.pow(charIndex.size(), rank);
 		final int featureDim = nGramCount * nGramCount;
 		final double sigma = Math.sqrt(featureDim);
-		projectionMatrix = new byte[featureDim][finalDim];
 		for (int i = 0; i < featureDim; ++i) {
 			for (int j = 0; j < finalDim; ++j) {
 				/* Coin toss to decide which element we'll use */
 				final double toss = Math.random();
 				/* P1: 1/2s */
 				if (toss < (1 / (2 * sigma))) {
-					projectionMatrix[i][j] = 1;
+					positiveFactors.add(i * finalDim + j);
 				}
 				/* P2: > 1/2s, < 1/s */
 				else if (toss < (1 / sigma)) {
-					projectionMatrix[i][j] = -1;
+					negativeFactors.add(i * finalDim + j);
 				}
 				/* P3: 1 - 1/s */
-				else {
-					projectionMatrix[i][j] = 0;
-				}
 			}
 		}
 	}
@@ -104,13 +139,18 @@ public class SparseProjectionComparator {
 		/* Get the adjacency vector, initialize the projection */
 		final double[] adjVec = generateAdjacencyVector(uvg);
 		final double[] projVec = new double[finalDim];
-		for (int i = 0; i < finalDim; ++i) {
-			/* Iterate by column for vector - matrix multiplication */
-			for (int j = 0, n = adjVec.length; j < n; ++j) {
-				/* Note: projVec[i] is implicitly initialized to 0.0 */
-				projVec[i] += projectionMatrix[j][i] * adjVec[j];
-			}
-		}
+		/* Add all positive factors */
+		positiveFactors.forEach(i -> {
+			final int featIndex = i / finalDim;
+			final int projIndex = i % finalDim;
+			projVec[projIndex] += adjVec[featIndex];
+		});
+		/* Add all negative factors */
+		negativeFactors.forEach(i -> {
+			final int featIndex = i / finalDim;
+			final int projIndex = i % finalDim;
+			projVec[projIndex] -= adjVec[featIndex];
+		});
 		return projVec;
 	}
 
