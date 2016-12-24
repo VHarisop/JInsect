@@ -2,6 +2,7 @@ package gr.demokritos.iit.jinsect.representations;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * A utility class that performs commonly needed actions on NGramGraphs.
@@ -65,7 +66,7 @@ public final class GraphUtils {
 	 * @return the array of noise-filtered graphs
 	 */
 	public static NGramGraph[] removeNoise(final NGramGraph[] graphs) {
-		if (graphs.length == 0)
+		if (null == graphs || graphs.length == 0)
 			return null;
 
 		/* create a base graph, store the intersection of all graphs in it */
@@ -105,10 +106,23 @@ public final class GraphUtils {
 
 		/* create a new list, store filtered versions there */
 		final List<NGramGraph> filtered = new ArrayList<NGramGraph>(graphs.size());
-		for (int index = 0; index < graphs.size(); ++index) {
-			filtered.add(index, graphs.get(index).allNotIn(nggBase));
+		for (final NGramGraph ngg: graphs) {
+			filtered.add(ngg.allNotIn(nggBase));
 		}
 
 		return filtered;
+	}
+
+	/**
+	 * Creates a callable task that merges a list of graphs into a
+	 * model graph. The graphs are first denoised.
+	 * @param toMerge the list of graphs to merge
+	 * @return a callable task that will perform the merging
+	 */
+	public static Callable<NGramGraph>
+	mergeTask(final List<NGramGraph> toMerge) {
+		return () -> {
+			return mergeGraphs(removeNoise(toMerge));
+		};
 	}
 }

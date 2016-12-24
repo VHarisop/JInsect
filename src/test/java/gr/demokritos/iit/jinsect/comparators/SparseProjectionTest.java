@@ -1,0 +1,70 @@
+package gr.demokritos.iit.jinsect.comparators;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import gr.demokritos.iit.jinsect.representations.NGramGraph;
+import gr.demokritos.iit.jinsect.representations.NGramJGraph;
+import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+public class SparseProjectionTest extends TestCase {
+
+	protected Map<Character, Integer> charIndex;
+
+	public SparseProjectionTest(final String name) {
+		super(name);
+	}
+
+	public static Test suite() {
+		return new TestSuite(SparseProjectionTest.class);
+	}
+
+	@Override
+	public void setUp() {
+		charIndex = new HashMap<>();
+		charIndex.put('A', 0);
+		charIndex.put('C', 1);
+		charIndex.put('G', 2);
+		charIndex.put('T', 3);
+	}
+
+	/**
+	 * Make sure that adjacency vectors are extracted properly.
+	 */
+	public void testVectors() {
+		final NGramGraph ngg = new NGramJGraph("ACTAGTTCGT");
+		final UniqueVertexGraph uvg = ngg.getGraphLevel(0);
+		final int words = (int) Math.pow(charIndex.size(), 3);
+		final SparseProjectionComparator spc =
+			new SparseProjectionComparator(charIndex, 3, 16);
+		final double[] adjVec = spc.generateAdjacencyVector(uvg);
+		assertNotNull(adjVec);
+		final double[] projVec = spc.getProjectedVector(uvg);
+		assertNotNull(projVec);
+
+		uvg.edgeSet().forEach(e -> {
+			final int indexFrom = spc.getNGramIndex(e.getSourceLabel());
+			final int indexTo = spc.getNGramIndex(e.getTargetLabel());
+			final int totalIndex = indexFrom * words + indexTo;
+			assertTrue(adjVec[totalIndex] != 0.0);
+		});
+	}
+
+	/**
+	 * Test if the distance between NGramGraphs is computed properly.
+	 */
+	public void testDistance() {
+		final NGramGraph nggA = new NGramJGraph("ACTACTAGTCTGA");
+		final NGramGraph nggB = new NGramJGraph("ACTACTAGTCTTA");
+		final SparseProjectionComparator spc =
+			new SparseProjectionComparator(charIndex, 3, 16);
+		final double dist = spc.getDistance(
+			nggA.getGraphLevel(0),
+			nggB.getGraphLevel(0));
+		assertNotNull(dist);
+		assertTrue(dist >= 0.0);
+	}
+}

@@ -20,7 +20,7 @@ public class ComparatorsTest
      *
      * @param testName name of the test case
      */
-    public ComparatorsTest( String testName )
+    public ComparatorsTest( final String testName )
     {
         super( testName );
     }
