@@ -21,7 +21,7 @@ public class SparseProjectionComparator {
 	protected final int rank;
 	protected final int finalDim;
 	protected final Map<Character, Integer> charIndex;
-	protected int[][] projectionMatrix;
+	protected byte[][] projectionMatrix;
 	/**
 	 * Creates a new {@link SparseProjectionComparator} with the intention
 	 * of projecting to a feature space of a specified dimension.
@@ -72,7 +72,7 @@ public class SparseProjectionComparator {
 		final int nGramCount = (int) Math.pow(charIndex.size(), rank);
 		final int featureDim = nGramCount * nGramCount;
 		final double sigma = Math.sqrt(featureDim);
-		projectionMatrix = new int[featureDim][finalDim];
+		projectionMatrix = new byte[featureDim][finalDim];
 		for (int i = 0; i < featureDim; ++i) {
 			for (int j = 0; j < finalDim; ++j) {
 				/* Coin toss to decide which element we'll use */
@@ -154,5 +154,12 @@ public class SparseProjectionComparator {
 			totalIndex += ((int) Math.pow(alphabetSize, i)) * index;
 		}
 		return totalIndex;
+	}
+
+	/**
+	 * @return the rank of this comparator
+	 */
+	public final int getRank() {
+		return rank;
 	}
 }
