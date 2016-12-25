@@ -39,8 +39,10 @@ public class SparseProjectionTest extends TestCase {
 		final UniqueVertexGraph uvg = ngg.getGraphLevel(0);
 		final int words = (int) Math.pow(charIndex.size(), 3);
 		final SparseProjectionComparator spc =
-			new SparseProjectionComparator(charIndex, 3, 16);
-		final double[] adjVec = spc.generateAdjacencyVector(uvg);
+			new SparseProjectionComparator(
+				charIndex, 3, 16,
+				SparseProjectionComparator.Projection.SIGN_CONSISTENT);
+		final Map<Integer, Double> adjVec = spc.generateAdjacencyVector(uvg);
 		assertNotNull(adjVec);
 		final double[] projVec = spc.getProjectedVector(uvg);
 		assertNotNull(projVec);
@@ -49,7 +51,7 @@ public class SparseProjectionTest extends TestCase {
 			final int indexFrom = spc.getNGramIndex(e.getSourceLabel());
 			final int indexTo = spc.getNGramIndex(e.getTargetLabel());
 			final int totalIndex = indexFrom * words + indexTo;
-			assertTrue(adjVec[totalIndex] != 0.0);
+			assertTrue(adjVec.get(totalIndex) != 0.0);
 		});
 	}
 
@@ -61,7 +63,9 @@ public class SparseProjectionTest extends TestCase {
 		final NGramGraph nggA = new NGramJGraph("ACTACTAGTCTGA");
 		final NGramGraph nggB = new NGramJGraph("ACTACTAGTCTTA");
 		final SparseProjectionComparator spc =
-			new SparseProjectionComparator(charIndex, 3, 16);
+			new SparseProjectionComparator(
+				charIndex, 3, 16,
+				SparseProjectionComparator.Projection.SIGN_CONSISTENT);
 		/* Distance */
 		final double dist = spc.getDistance(
 			nggA.getGraphLevel(0),
@@ -74,5 +78,6 @@ public class SparseProjectionTest extends TestCase {
 			nggB.getGraphLevel(0));
 		assertNotNull(sim);
 		assertTrue(sim != Double.NaN);
+		assertTrue(sim >= 0.0);
 	}
 }
