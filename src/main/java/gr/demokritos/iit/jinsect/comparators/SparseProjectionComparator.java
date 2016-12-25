@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.IntStream;
 
+import gr.demokritos.iit.jinsect.JUtils;
 import gr.demokritos.iit.jinsect.representations.NGramGraph;
 import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 
@@ -128,10 +129,11 @@ public class SparseProjectionComparator {
 				for (int i = 0; i < vecA.length; ++i) {
 					final double wA = Math.abs(vecA[i]);
 					final double wB = Math.abs(vecB[i]);
-					if ((wA == 0.0) || (wB == 0.0)) {
+					final double wMin = Math.min(wA, wB);
+					if (wMin == 0.0) {
 						continue;
 					}
-					simSum += Math.min(wA, wB) / Math.max(wA, wB);
+					simSum += wMin / Math.max(wA, wB);
 				}
 				break;
 		}
@@ -281,7 +283,7 @@ public class SparseProjectionComparator {
 					projVec[index] += v;
 				}
 				else if (currNeg.contains(k)) {
-					projVec[index] += v;
+					projVec[index] -= v;
 				}
 			});
 		}
@@ -326,7 +328,7 @@ public class SparseProjectionComparator {
 		int totalIndex = 0;
 		for (int i = 0, n = ngram.length(); i < n; ++i) {
 			final int index = charIndex.get(ngram.charAt(i));
-			totalIndex += ((int) Math.pow(alphabetSize, i)) * index;
+			totalIndex += JUtils.intPow(alphabetSize, i) * index;
 		}
 		return totalIndex;
 	}

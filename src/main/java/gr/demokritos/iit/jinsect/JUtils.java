@@ -126,13 +126,26 @@ public final class JUtils {
 	}
 
 	/**
+	 * Computes num ^ exp for integers.
+	 * @param num the number to exponentiate
+	 * @param exp the exponent (greater than 0)
+	 * @return the result of the exponentiation
+	 */
+	public static final int intPow(final int num, final int exp) {
+		int result = 1;
+		for (int i = exp; i > 0; --i) {
+			result *= num;
+		}
+		return result;
+	}
+
+	/**
 	 * Changes the label of a vertex in a {@link GenericGraph}.
 	 * @param vertex the {@link JVertex} to change
 	 * @param newLabel the new label
 	 */
 	public static void
-	changeVertexLabel(final JVertex vertex, final String to)
-	{
+	changeVertexLabel(final JVertex vertex, final String to) {
 		final String[] parts = GenericGraph.getLabelParts(vertex);
 		final String newLabel = to + "$" + parts[1];
 		vertex.setLabel(newLabel);
@@ -192,7 +205,8 @@ public final class JUtils {
 	 * @param graph the graph from which to get the vertices
 	 * @return a {@link List} of {@link JVertex} objects
 	 */
-	public static List<JVertex> getIsolatedVertices(final GenericGraph graph) {
+	public static List<JVertex>
+	getIsolatedVertices(final GenericGraph graph) {
 		return graph.vertexSet()
 				.stream()
 				.filter(v -> graph.edgesOf(v).size() == 0)
@@ -218,20 +232,20 @@ public final class JUtils {
 	 * Given a {@link GenericGraph}, performs a number of elementary
 	 * edit operations on it and returns a modified version of it.
 	 * @param g the graph to edit
-	 * @param editCount the number of edits
+	 * @param editCnt the number of edits
 	 * @param labels a list of available labels to mutate to
 	 * @return the modified {@link GenericGraph}
 	 */
-	public static GenericGraph
-	getEditedGraph(final GenericGraph g, final int editCount, final List<String> labels) {
+	public static GenericGraph getEditedGraph(
+		final GenericGraph g, final int editCnt, final List<String> labels) {
 		final GenericGraph gNew = g.clone();
 		final Random randGen = new Random();
 		final int labelCnt = labels.size();
 		/* properly distribute the edit actions */
-		final int removals = randGen.nextInt(editCount + 1);
-		final int changes = randGen.nextInt(editCount + 1 - removals);
+		final int removals = randGen.nextInt(editCnt + 1);
+		final int changes = randGen.nextInt(editCnt + 1 - removals);
 		final int additions = randGen.nextInt(
-				editCount + 1 - removals - changes);
+				editCnt + 1 - removals - changes);
 		/* Perform the required number of edits per edit action */
 		for (int i = 0; i < removals; ++i) {
 			removeRandomIsolatedVertex(gNew);
