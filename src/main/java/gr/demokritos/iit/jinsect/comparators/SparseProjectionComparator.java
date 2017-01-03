@@ -309,7 +309,7 @@ public class SparseProjectionComparator {
 					projVec[index] += pair.getSecond();
 				}
 				else if (currNeg.contains(pair.getFirst())) {
-					projVec[index] += pair.getSecond();
+					projVec[index] -= pair.getSecond();
 				}
 			});
 		});
