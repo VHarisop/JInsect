@@ -47,7 +47,7 @@ public class SparseProjectionTest extends TestCase {
 		final List<Pair<Integer, Double>> adjVec =
 			spc.generateAdjacencyVector(uvg);
 		assertNotNull(adjVec);
-		final double[] projVec = spc.getProjectedVector(uvg);
+		final double[] projVec = spc.getProjectedVectorSerial(uvg);
 		assertNotNull(projVec);
 
 		uvg.edgeSet().forEach(e -> {
@@ -60,6 +60,28 @@ public class SparseProjectionTest extends TestCase {
 				.filter(d -> d > 0.0)
 				.count() > 0);
 		});
+	}
+
+	/**
+	 * Make sure that the serial and parallel methods of computation
+	 * of the final vector give consistent results.
+	 */
+	public void testSerialAndParallel() {
+		final NGramGraph ngg = new NGramJGraph("ACTAGTTCGTTGCA");
+		final UniqueVertexGraph uvg = ngg.getGraphLevel(0);
+		final SparseProjectionComparator spc =
+			new SparseProjectionComparator(
+				charIndex, 3, 16,
+				SparseProjectionComparator.Projection.SIGN_CONSISTENT);
+		final double[] projVecSerial = spc.getProjectedVectorSerial(uvg);
+		final double[] projVecParallel = spc.getProjectedVectorSerial(uvg);
+		assertNotNull(projVecSerial);
+		assertNotNull(projVecParallel);
+		/* Make sure vectors are identical */
+		for (int index = 0; index < 16; ++index) {
+			assertEquals(
+				projVecSerial[index], projVecParallel[index], 0.001);
+		}
 	}
 
 	/**

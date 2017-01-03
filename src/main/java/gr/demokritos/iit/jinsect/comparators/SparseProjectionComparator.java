@@ -5,10 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
+import java.util.stream.IntStream;
 
 import gr.demokritos.iit.jinsect.JUtils;
-import gr.demokritos.iit.jinsect.Logging;
 import gr.demokritos.iit.jinsect.representations.NGramGraph;
 import gr.demokritos.iit.jinsect.structs.Pair;
 import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
@@ -32,9 +31,6 @@ public class SparseProjectionComparator {
 	protected final int nGramCount;
 	protected final int alphabetSize;
 	protected final Map<Character, Integer> charIndex;
-
-	private static final Logger logger =
-		Logging.getLogger(SparseProjectionComparator.class.getName());
 
 	/* 2 maps holding the positive and negative factors
 	 * for every index of the final vector
@@ -103,8 +99,8 @@ public class SparseProjectionComparator {
 	public final double getDistance(
 		final UniqueVertexGraph uvgA, final UniqueVertexGraph uvgB)
 	{
-		final double[] vecA = getProjectedVector(uvgA);
-		final double[] vecB = getProjectedVector(uvgB);
+		final double[] vecA = createProjectedVector(uvgA);
+		final double[] vecB = createProjectedVector(uvgB);
 		double sum = 0.0;
 		for (int i = 0; i < vecA.length; ++i) {
 			sum += Math.abs(vecA[i] - vecB[i]);
@@ -127,8 +123,8 @@ public class SparseProjectionComparator {
 		/* Get the projected vectors of both graphs and
 		 * calculate their manhattan distance.
 		 */
-		final double[] vecA = getProjectedVector(uvgA);
-		final double[] vecB = getProjectedVector(uvgB);
+		final double[] vecA = createProjectedVector(uvgA);
+		final double[] vecB = createProjectedVector(uvgB);
 		double simSum = 0.0;
 		switch (projType) {
 			case RANDOM:
@@ -155,6 +151,17 @@ public class SparseProjectionComparator {
 				break;
 		}
 		return simSum;
+	}
+
+	/**
+	 * Creates the final vector after projection. This method is intended to
+	 * be overriden in order to specify serial or parallel calculation of the
+	 * final vector.
+	 * @param uvg the graph whose vector is sought
+	 * @return the final vector
+	 */
+	protected double[] createProjectedVector(final UniqueVertexGraph uvg) {
+		return getProjectedVectorParallel(uvg);
 	}
 
 	/**
@@ -247,8 +254,8 @@ public class SparseProjectionComparator {
 	 * @param uvg the {@link UniqueVertexGraph}
 	 * @return the projected vector as a {@link double[]}
 	 */
-	public final double[] getProjectedVector(final UniqueVertexGraph uvg) {
-		final long start = System.currentTimeMillis();
+	public final double[] getProjectedVectorSerial(
+		final UniqueVertexGraph uvg) {
 		/* Get the adjacency vector, initialize the projection */
 		final List<Pair<Integer, Double>> adjVec =
 			generateAdjacencyVector(uvg);
@@ -272,10 +279,40 @@ public class SparseProjectionComparator {
 				}
 			});
 		}
-		final long end = System.currentTimeMillis();
-		logger.info(
-			String.format("Time spent in getProjectedVector: %d ms",
-			end - start));
+		return projVec;
+	}
+
+	/**
+	 * Projects the adjacency vector of a {@link UniqueVertexGraph} to a
+	 * space of lower dimensionality. This method uses a parallel stream
+	 * to compute the value at each position of the final vector.
+	 *
+	 * @param uvg the {@link UniqueVertexGraph}
+	 * @return the projected vector as a {@link double[]}
+	 */
+	public final double[] getProjectedVectorParallel(
+		final UniqueVertexGraph uvg) {
+		/* Get the adjacency vector, initialize the projection */
+		final List<Pair<Integer, Double>> adjVec =
+			generateAdjacencyVector(uvg);
+		final double[] projVec = new double[finalDim];
+		IntStream.range(0,  finalDim).parallel().forEach(index -> {
+			/* For every position, check if it belongs to the positive
+			 * or negative factors */
+			final Set<Integer> currPos = positives.get(index);
+			final Set<Integer> currNeg = negatives.get(index);
+			adjVec.forEach(pair -> {
+				/* Check if key is in currPos or currNeg. If it
+				 * is, modify the relevant value.
+				 */
+				if (currPos.contains(pair.getFirst())) {
+					projVec[index] += pair.getSecond();
+				}
+				else if (currNeg.contains(pair.getFirst())) {
+					projVec[index] += pair.getSecond();
+				}
+			});
+		});
 		return projVec;
 	}
 
