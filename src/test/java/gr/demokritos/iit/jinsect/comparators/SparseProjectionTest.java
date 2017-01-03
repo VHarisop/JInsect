@@ -1,10 +1,12 @@
 package gr.demokritos.iit.jinsect.comparators;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import gr.demokritos.iit.jinsect.representations.NGramGraph;
 import gr.demokritos.iit.jinsect.representations.NGramJGraph;
+import gr.demokritos.iit.jinsect.structs.Pair;
 import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -42,7 +44,8 @@ public class SparseProjectionTest extends TestCase {
 			new SparseProjectionComparator(
 				charIndex, 3, 16,
 				SparseProjectionComparator.Projection.SIGN_CONSISTENT);
-		final Map<Integer, Double> adjVec = spc.generateAdjacencyVector(uvg);
+		final List<Pair<Integer, Double>> adjVec =
+			spc.generateAdjacencyVector(uvg);
 		assertNotNull(adjVec);
 		final double[] projVec = spc.getProjectedVector(uvg);
 		assertNotNull(projVec);
@@ -51,7 +54,11 @@ public class SparseProjectionTest extends TestCase {
 			final int indexFrom = spc.getNGramIndex(e.getSourceLabel());
 			final int indexTo = spc.getNGramIndex(e.getTargetLabel());
 			final int totalIndex = indexFrom * words + indexTo;
-			assertTrue(adjVec.get(totalIndex) != 0.0);
+			assertTrue(adjVec.stream()
+				.filter(p -> p.getFirst() == totalIndex)
+				.map(p -> p.getSecond())
+				.filter(d -> d > 0.0)
+				.count() > 0);
 		});
 	}
 

@@ -1,13 +1,16 @@
 package gr.demokritos.iit.jinsect.comparators;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.IntStream;
+import java.util.logging.Logger;
 
 import gr.demokritos.iit.jinsect.JUtils;
+import gr.demokritos.iit.jinsect.Logging;
 import gr.demokritos.iit.jinsect.representations.NGramGraph;
+import gr.demokritos.iit.jinsect.structs.Pair;
 import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 
 /**
@@ -30,13 +33,14 @@ public class SparseProjectionComparator {
 	protected final int alphabetSize;
 	protected final Map<Character, Integer> charIndex;
 
+	private static final Logger logger =
+		Logging.getLogger(SparseProjectionComparator.class.getName());
+
 	/* 2 maps holding the positive and negative factors
 	 * for every index of the final vector
 	 */
-	protected Map<Integer, Set<Integer>> positives =
-		new HashMap<>();
-	protected Map<Integer, Set<Integer>> negatives =
-		new HashMap<>();
+	protected List<Set<Integer>> positives;
+	protected List<Set<Integer>> negatives;
 
 	protected Projection projType;
 
@@ -70,7 +74,21 @@ public class SparseProjectionComparator {
 		projType = projectionType;
 		nGramCount = (int) Math.pow(charIndex.size(), rank);
 		alphabetSize = charIndex.size();
+		createIndexMaps();
 		createProjectionMatrix();
+	}
+
+	/**
+	 * Initializes {@link #positives} and {@link #negatives} with new
+	 * sets of integers.
+	 */
+	private final void createIndexMaps() {
+		positives = new ArrayList<>(finalDim);
+		negatives = new ArrayList<>(finalDim);
+		for (int i = 0; i < finalDim; ++i) {
+			positives.add(new HashSet<>());
+			negatives.add(new HashSet<>());
+		}
 	}
 
 	/**
@@ -85,14 +103,13 @@ public class SparseProjectionComparator {
 	public final double getDistance(
 		final UniqueVertexGraph uvgA, final UniqueVertexGraph uvgB)
 	{
-		/* Get the projected vectors of both graphs and
-		 * calculate their manhattan distance.
-		 */
 		final double[] vecA = getProjectedVector(uvgA);
 		final double[] vecB = getProjectedVector(uvgB);
-		return IntStream.range(0, vecA.length)
-			.mapToDouble(i -> Math.abs(vecA[i] - vecB[i]))
-			.sum();
+		double sum = 0.0;
+		for (int i = 0; i < vecA.length; ++i) {
+			sum += Math.abs(vecA[i] - vecB[i]);
+		}
+		return sum;
 	}
 
 	/**
@@ -172,11 +189,9 @@ public class SparseProjectionComparator {
 	private void
 	createRandomProjection(final int featureDim, final double sigma) {
 		for (int j = 0; j < finalDim; ++j) {
-			/* Retrieve sets for current index and
-			 * initialize them if necessary
-			 */
-			Set<Integer> currPos = getPositiveIndexFactors(j);
-			Set<Integer> currNeg = getNegativeIndexFactors(j);
+			/* Retrieve sets for current index */
+			Set<Integer> currPos = positives.get(j);
+			Set<Integer> currNeg = negatives.get(j);
 			for (int i = 0; i < featureDim; ++i) {
 				/* Coin toss to decide which element we'll use */
 				final double toss = Math.random();
@@ -205,11 +220,9 @@ public class SparseProjectionComparator {
 		 * in a given column.
 		 */
 		for (int j = 0; j < finalDim; ++j) {
-			/* Retrieve sets for current index and
-			 * initialize them if necessary
-			 */
-			Set<Integer> currPos = getPositiveIndexFactors(j);
-			Set<Integer> currNeg = getNegativeIndexFactors(j);
+			/* Retrieve sets for current index */
+			Set<Integer> currPos = positives.get(j);
+			Set<Integer> currNeg = negatives.get(j);
 			/* Fair coin toss, decide sign */
 			final int sign = Math.random() > 0.5 ? 1 : -1;
 			for (int i = 0; i < featureDim; ++i) {
@@ -228,36 +241,6 @@ public class SparseProjectionComparator {
 	}
 
 	/**
-	 * Retrieves the set of positive factor indices for a given index in the
-	 * projection vector, initializing it if necessary.
-	 * @param index the index of the projection vector
-	 * @return the {@link Set} of positive factors for that index
-	 */
-	private Set<Integer> getPositiveIndexFactors(final int index) {
-		Set<Integer> currPos = positives.get(index);
-		if (currPos == null) {
-			currPos = new HashSet<>();
-			positives.put(index, currPos);
-		}
-		return currPos;
-	}
-
-	/**
-	 * Retrieves the set of negative factor indices for a given index in the
-	 * projection vector, initializing it if necessary.
-	 * @param index the index of the projection vector
-	 * @return the {@link Set} of negative factors for that index
-	 */
-	private Set<Integer> getNegativeIndexFactors(final int index) {
-		Set<Integer> currNeg = negatives.get(index);
-		if (currNeg == null) {
-			currNeg = new HashSet<>();
-			negatives.put(index, currNeg);
-		}
-		return currNeg;
-	}
-
-	/**
 	 * Projects the adjacency vector of a {@link UniqueVertexGraph} to a
 	 * space of lower dimensionality.
 	 *
@@ -265,8 +248,10 @@ public class SparseProjectionComparator {
 	 * @return the projected vector as a {@link double[]}
 	 */
 	public final double[] getProjectedVector(final UniqueVertexGraph uvg) {
+		final long start = System.currentTimeMillis();
 		/* Get the adjacency vector, initialize the projection */
-		final Map<Integer, Double> adjVec = generateAdjacencyVector(uvg);
+		final List<Pair<Integer, Double>> adjVec =
+			generateAdjacencyVector(uvg);
 		final double[] projVec = new double[finalDim];
 		for (int j = 0; j < finalDim; ++j) {
 			/* For every position, check if it belongs to the positive
@@ -275,42 +260,47 @@ public class SparseProjectionComparator {
 			final Set<Integer> currNeg = negatives.get(j);
 			final int index = j;
 
-			adjVec.forEach((k, v) -> {
+			adjVec.forEach(pair -> {
 				/* Check if key is in currPos or currNeg. If it
 				 * is, modify the relevant value.
 				 */
-				if (currPos.contains(k)) {
-					projVec[index] += v;
+				if (currPos.contains(pair.getFirst())) {
+					projVec[index] += pair.getSecond();
 				}
-				else if (currNeg.contains(k)) {
-					projVec[index] -= v;
+				else if (currNeg.contains(pair.getFirst())) {
+					projVec[index] -= pair.getSecond();
 				}
 			});
 		}
+		final long end = System.currentTimeMillis();
+		logger.info(
+			String.format("Time spent in getProjectedVector: %d ms",
+			end - start));
 		return projVec;
 	}
 
 	/**
 	 * Generates the adjacency vector for a given {@link UniqueVertexGraph},
 	 * given the underlying character indices and the rank of the n-grams in
-	 * the graph. The vector is created as a {@link Map}, since it is always
-	 * expected to be sparse.
+	 * the graph. The vector is created as a {@link List} of index-value pairs
+	 * as it is expected to be sparse.
 	 *
 	 * @param uvg the {@link UniqueVertexGraph}
 	 * @param rank the n-gram rank
-	 * @return a {@link Map<Integer, Double>} containing the adjacency vector
+	 * @return a {@link List<Pair<Integer, Double>>} containing the adjacency
+	 * vector
 	 */
-	public final Map<Integer, Double>
+	public final List<Pair<Integer, Double>>
 	generateAdjacencyVector(final UniqueVertexGraph uvg) {
 		/* Note: adjacency vector is implemented as a map. */
-		final Map<Integer, Double> adjacencyVector = new HashMap<>();
+		final List<Pair<Integer, Double>> adjacencyVector =
+			new ArrayList<>(uvg.edgeSet().size());
 		uvg.edgeSet().forEach(e -> {
 			final int indexFrom = getNGramIndex(e.getSourceLabel());
 			final int indexTo = getNGramIndex(e.getTargetLabel());
 			final int totalIndex = indexFrom * nGramCount + indexTo;
-			final double currValue =
-				adjacencyVector.getOrDefault(totalIndex, 0.0);
-			adjacencyVector.put(totalIndex, currValue + e.edgeWeight());
+			adjacencyVector.add(
+				new Pair<>(totalIndex, e.edgeWeight()));
 		});
 		return adjacencyVector;
 	}
@@ -326,7 +316,8 @@ public class SparseProjectionComparator {
 	public final int getNGramIndex(final String ngram) {
 		/* Alphabet size is the number of keys in the index */
 		int totalIndex = 0;
-		for (int i = 0, n = ngram.length(); i < n; ++i) {
+		final int n = ngram.length();
+		for (int i = 0; i < n; ++i) {
 			final int index = charIndex.get(ngram.charAt(i));
 			totalIndex += JUtils.intPow(alphabetSize, i) * index;
 		}
