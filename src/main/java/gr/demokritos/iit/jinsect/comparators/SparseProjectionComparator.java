@@ -1,6 +1,7 @@
 package gr.demokritos.iit.jinsect.comparators;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -195,24 +196,31 @@ public class SparseProjectionComparator {
 	 */
 	private void
 	createRandomProjection(final int featureDim, final double sigma) {
-		for (int j = 0; j < finalDim; ++j) {
-			/* Retrieve sets for current index */
-			Set<Integer> currPos = positives.get(j);
-			Set<Integer> currNeg = negatives.get(j);
-			for (int i = 0; i < featureDim; ++i) {
-				/* Coin toss to decide which element we'll use */
-				final double toss = Math.random();
-				/* P1: 1/2s */
-				if (toss < (1 / (2 * sigma))) {
-					currPos.add(i * finalDim + j);
+		/* Use a parallel stream to create the columns of the projection
+		 * matrix in parallel fashion.
+		 */
+		IntStream.range(0, finalDim)
+			.parallel()
+			.forEach(index -> {
+				/* Every column of the projection matrix is assigned
+				 * to a possibly different thread
+				 */
+				Set<Integer> currPos = positives.get(index);
+				Set<Integer> currNeg = negatives.get(index);
+				for (int i = 0; i < featureDim; ++i) {
+					/* Coin toss to decide the element we'll use */
+					final double toss = Math.random();
+					/* P1: 1/2s */
+					if (toss < (1 / (2 * sigma))) {
+						currPos.add(i * finalDim + index);
+					}
+					/* P2: > 1/2s, < 1/s */
+					else if (toss < (1 / sigma)) {
+						currNeg.add(i * finalDim + index);
+					}
+					/* P3: 1 - 1/s */
 				}
-				/* P2: > 1/2s, < 1/s */
-				else if (toss < (1 / sigma)) {
-					currNeg.add(i * finalDim + j);
-				}
-				/* P3: 1 - 1/s */
-			}
-		}
+			});
 	}
 
 	/**
@@ -224,27 +232,28 @@ public class SparseProjectionComparator {
 	private void
 	createSCProjection(final int featureDim, final double sigma) {
 		/* Sign consistent projection: same sign for all coefficients
-		 * in a given column.
+		 * in a given column. Use a parallel stream to create the
+		 * columns of the projection matrix in a parallel fashion.
 		 */
-		for (int j = 0; j < finalDim; ++j) {
-			/* Retrieve sets for current index */
-			Set<Integer> currPos = positives.get(j);
-			Set<Integer> currNeg = negatives.get(j);
-			/* Fair coin toss, decide sign */
-			final int sign = Math.random() > 0.5 ? 1 : -1;
-			for (int i = 0; i < featureDim; ++i) {
-				/* Coin toss to decide which element we'll use */
-				final double toss = Math.random();
-				/* P1: 1/s */
-				if (toss < (1 / sigma)) {
-					if (sign > 0)
-						currPos.add(i * finalDim + j);
-					else
-						currNeg.add(i * finalDim + j);
+		IntStream.range(0, finalDim)
+			.parallel()
+			.forEach(index -> {
+				/* Retrieve the referenced set only once, based on a coin toss
+				 * uniformly distributed in [0, 1] that determines the sign of
+				 * this column's entries.
+				 */
+				Set<Integer> referencedSet = (Math.random() > 0.5) ?
+						positives.get(index) : negatives.get(index);
+				for (int i = 0; i < featureDim; ++i) {
+					/* Coin toss to decide which element we'll use */
+					final double toss = Math.random();
+					/* P1: 1/s */
+					if (toss < (1 / sigma)) {
+						referencedSet.add(i * finalDim + index);
+					}
+					/* P2: 1 - 1/s */
 				}
-				/* P2: 1 - 1/s */
-			}
-		}
+			});
 	}
 
 	/**
@@ -317,6 +326,36 @@ public class SparseProjectionComparator {
 	}
 
 	/**
+	 * Retrieves the {@link SparseVector} of a {@link UniqueVertexGraph}
+	 * using the serial method and assigning a desired label to it.
+	 *
+	 * @see #getProjectedVectorSerial(UniqueVertexGraph)
+	 * @param uvg the graph whose vector is requested
+	 * @param label the desired label
+	 * @return the resulting SparseVector
+	 */
+	public final SparseVector
+	getSparseVectorSerial(final UniqueVertexGraph uvg, final String label) {
+		final double[] projected = getProjectedVectorSerial(uvg);
+		return new SparseVector(label, projected);
+	}
+
+	/**
+	 * Retrieves the {@link SparseVector} of a {@link UniqueVertexGraph}
+	 * using the parallel method and assigning a desired label to it.
+	 *
+	 * @see #getProjectedVectorParallel(UniqueVertexGraph)
+	 * @param uvg the graph whose vector is requested
+	 * @param label the desired label
+	 * @return the resulting SparseVector
+	 */
+	public final SparseVector
+	getSparseVectorParallel(final UniqueVertexGraph uvg, final String label) {
+		final double[] projected = getProjectedVectorParallel(uvg);
+		return new SparseVector(label, projected);
+	}
+
+	/**
 	 * Generates the adjacency vector for a given {@link UniqueVertexGraph},
 	 * given the underlying character indices and the rank of the n-grams in
 	 * the graph. The vector is created as a {@link List} of index-value pairs
@@ -335,9 +374,12 @@ public class SparseProjectionComparator {
 		uvg.edgeSet().forEach(e -> {
 			final int indexFrom = getNGramIndex(e.getSourceLabel());
 			final int indexTo = getNGramIndex(e.getTargetLabel());
-			final int totalIndex = indexFrom * nGramCount + indexTo;
-			adjacencyVector.add(
-				new Pair<>(totalIndex, e.edgeWeight()));
+			if ((indexFrom >= 0) && (indexTo >= 0)) {
+				/* If unseen character was found, skip this step */
+				final int totalIndex = indexFrom * nGramCount + indexTo;
+				adjacencyVector.add(
+						new Pair<>(totalIndex, e.edgeWeight()));
+			}
 		});
 		return adjacencyVector;
 	}
@@ -346,7 +388,6 @@ public class SparseProjectionComparator {
 	 * Returns the numeric index of a given n-gram, using a provided character
 	 * to index mapping.
 	 *
-	 * @param charIndex a {@link Map<Character, Integer>}
 	 * @param ngram the n-gram
 	 * @return the numeric index of the n-gram
 	 */
@@ -354,9 +395,15 @@ public class SparseProjectionComparator {
 		/* Alphabet size is the number of keys in the index */
 		int totalIndex = 0;
 		final int n = ngram.length();
-		for (int i = 0; i < n; ++i) {
-			final int index = charIndex.get(ngram.charAt(i));
-			totalIndex += JUtils.intPow(alphabetSize, i) * index;
+		try {
+			for (int i = 0; i < n; ++i) {
+				final int index = charIndex.get(ngram.charAt(i));
+				totalIndex += JUtils.intPow(alphabetSize, i) * index;
+			}
+		}
+		/* If character is unseen, return -1 as flag value */
+		catch (NullPointerException ex) {
+			totalIndex = -1;
 		}
 		return totalIndex;
 	}
@@ -366,5 +413,43 @@ public class SparseProjectionComparator {
 	 */
 	public final int getRank() {
 		return rank;
+	}
+
+	/**
+	 * A class that implements a sparse vector, intended to store
+	 * results after the projection.
+	 * @author vharisop
+	 *
+	 */
+	public static class SparseVector {
+		private final String label;
+		private final double[] vector;
+
+		/**
+		 * Creates a new SparseVector, given a label and an array
+		 * of doubles which is the actual vector.
+		 * @param label the vector's label
+		 * @param content the vector's content
+		 */
+		public SparseVector(final String label, final double[] content) {
+			this.label = label;
+			vector = Arrays.copyOf(content, content.length);
+		}
+
+		/**
+		 * Simple getter for the vector's label.
+		 * @return the label of this vector
+		 */
+		public final String getLabel() {
+			return label;
+		}
+
+		/**
+		 * Simple getter for the vector's content.
+		 * @return the vector's content as a double array
+		 */
+		public final double[] getVector() {
+			return vector;
+		}
 	}
 }
