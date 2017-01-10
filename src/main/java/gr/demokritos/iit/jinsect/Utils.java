@@ -33,9 +33,11 @@ public final class Utils {
 	 * @param lMillis The long number of milliseconds.
 	 * @return The formated string.
 	 */
-	public static final String millisToMinSecString(long lMillis) {
-		return String.format("%d hours %d min %d sec", lMillis / (1000 * 60 * 60), (lMillis / (1000 * 60)) % 60,
-				(lMillis / 1000) % 60);
+	public static final String millisToMinSecString(final long lMillis) {
+		return String.format("%d hours %d min %d sec",
+			lMillis / (1000 * 60 * 60),
+			(lMillis / (1000 * 60)) % 60,
+			(lMillis / 1000) % 60);
 	}
 
 	/**
@@ -45,7 +47,7 @@ public final class Utils {
 	 * @param repeat The times to perform randomization. Higher values allow
 	 * more shuffling.
 	 */
-	public static final void shuffleList(List<?> l, int repeat) {
+	public static final void shuffleList(final List<?> l, final int repeat) {
 		for (int iCnt = 0 ; iCnt < repeat; iCnt++) {
 			shuffleList(l);
 		}
@@ -55,7 +57,7 @@ public final class Utils {
 	 * Randomizes the order of items in a given list.
 	 * @param l The input list that will be modified.
 	 */
-	public static final void shuffleList(List<?> l) {
+	public static final void shuffleList(final List<?> l) {
 		final Random d = new Random();
 		Collections.shuffle(l, d);
 	}
@@ -68,7 +70,7 @@ public final class Utils {
 	 * @param sStr The input string.
 	 * @return An array of String containing the words of the given string.
 	 */
-	public static final String[] splitToWords(String sStr) {
+	public static final String[] splitToWords(final String sStr) {
 		final String[] sRes = sStr.split("(\\s|\\p{Punct})+");
 		return sRes;
 	}
@@ -79,7 +81,7 @@ public final class Utils {
 	 * @param dBase The base of the logarithm.
 	 * @return The logarithm base <tt>dBase</tt> of <tt>dNumber</tt>.
 	 */
-	public static final double logX(double dNumber, double dBase) {
+	public static final double logX(final double dNumber, final double dBase) {
 		return Math.log(dNumber)/Math.log(dBase);
 	}
 
@@ -91,7 +93,7 @@ public final class Utils {
 	 * @return The ordered string representation of the iterable object.
 	 */
 	public static final String
-	printSortIterable(Iterable<?> iIterable, String sSeparator) {
+	printSortIterable(final Iterable<?> iIterable, final String sSeparator) {
 		// Use treeset to sort
 		final TreeSet<String> tsItems = new TreeSet<>();
 		for (final Object obj: iIterable) {
@@ -110,7 +112,7 @@ public final class Utils {
 	 * iterable object.
 	 */
 	public static final String
-	printIterable(Iterable<?> iIterable, String sSeparator) {
+	printIterable(final Iterable<?> iIterable, final String sSeparator) {
 		final StringBuffer sbRes = new StringBuffer();
 		final Iterator<?> iIter = iIterable.iterator();
 		while (iIter.hasNext()) {
@@ -141,7 +143,7 @@ public final class Utils {
 	 * @param sStr The input string.
 	 * @return A UTF-8 encoded version of the input string.
 	 */
-	public static String toUTF8(String sStr) {
+	public static String toUTF8(final String sStr) {
 		final byte[] baBytes = sStr.getBytes();
 		try {
 			return new String(baBytes, "UTF-8");
@@ -158,7 +160,7 @@ public final class Utils {
 	 * @return 1 if the input number is positive, -1 if negative
 	 * and zero otherwise.
 	 */
-	public static double sign(double dNum) {
+	public static double sign(final double dNum) {
 		return dNum == 0.0 ? dNum : dNum / Math.abs(dNum);
 	}
 
@@ -168,7 +170,7 @@ public final class Utils {
 	 * @param iStart The minimum term of the sequence
 	 * @param iEnd The maximum term of the sequence
 	 */
-	public static int sumFromTo(int iStart, int iEnd) {
+	public static int sumFromTo(final int iStart, final int iEnd) {
 		return IntStream.rangeClosed(iStart, iEnd).sum();
 	}
 
@@ -178,7 +180,7 @@ public final class Utils {
 	 * @param the histogram to sum from
 	 * @return the sum of the histogram's values.
 	 */
-	public double getHistogramTotal(HashMap<?, Double> hHist) {
+	public double getHistogramTotal(final HashMap<?, Double> hHist) {
 		return hHist.values()
 			.stream()
 			.mapToDouble(v -> v.doubleValue())
@@ -190,15 +192,14 @@ public final class Utils {
 	 * @param sFilename The filename of the file to load.
 	 * @return A String containing the contents of the given file.
 	 */
-	public static String loadFileToString(String sFilename) {
+	public static String loadFileToString(final String sFilename) {
 		final StringBuffer sb = new StringBuffer();
-		try {
-			final BufferedReader in = new BufferedReader(new FileReader(sFilename));
+		try (final BufferedReader in =
+			new BufferedReader(new FileReader(sFilename))) {
 			String line;
 			while ((line = in.readLine()) != null) {
 				sb.append(line);
 			}
-			in.close();
 		} catch (final Exception e) {
 			logger.warning("Could not load file:" + sFilename);
 			logger.warning(e.getMessage());
@@ -212,16 +213,15 @@ public final class Utils {
 	 * @param sFilename The filename of the file to load.
 	 * @return A String containing the contents of the given file.
 	 */
-	public static String loadFileToString(String sFilename, int iMaxLen) {
+	public static String loadFileToString(final String sFilename, final int iMaxLen) {
 		final StringBuffer sb = new StringBuffer();
-		try {
-			final BufferedReader in = new BufferedReader(new FileReader(sFilename));
+		try (final BufferedReader in =
+			new BufferedReader(new FileReader(sFilename))) {
 			String line;
 			while (((line = in.readLine()) != null) &&
 					(sb.length() + line.length() < iMaxLen)) {
 				sb.append(line);
 			}
-			in.close();
 		} catch (final Exception e) {
 			logger.warning("Could not load file:" + sFilename);
 			logger.warning(e.getMessage());
@@ -235,16 +235,16 @@ public final class Utils {
 	 * @param sFilename The filename of the file to load.
 	 * @return A String containing the contents of the given file.
 	 */
-	public static String loadFileToStringWithNewlines(String sFilename) {
+	public static String
+	loadFileToStringWithNewlines(final String sFilename) {
 		final StringBuffer sb = new StringBuffer();
-		try {
-			final BufferedReader in = new BufferedReader(new FileReader(sFilename));
+		try (final BufferedReader in =
+			new BufferedReader(new FileReader(sFilename))) {
 			String line;
 			while ((line = in.readLine()) != null) {
 				sb.append(line);
 				sb.append("\n");
 			}
-			in.close();
 		} catch (final Exception e) {
 			logger.warning("Could not load file:" + sFilename);
 			logger.warning(e.getMessage());
@@ -261,7 +261,7 @@ public final class Utils {
 	 * @return A String containing the concatenation of the contents of the
 	 * given files.
 	 */
-	public static String loadFileSetToString(Set<String> ssFiles) {
+	public static String loadFileSetToString(final Set<String> ssFiles) {
 		final StringBuffer sbRes = new StringBuffer();
 		for (final String sCurFile : ssFiles) {
 			sbRes.append(loadFileToString(sCurFile)).append((char)0);
@@ -279,8 +279,8 @@ public final class Utils {
 	 * @return A String containing the concatenation of the contents of the
 	 * given files.
 	 */
-	public static String loadFileSetToString(Set<String> ssFiles,
-			IFileLoader<String> lLoader) {
+	public static String loadFileSetToString(final Set<String> ssFiles,
+			final IFileLoader<String> lLoader) {
 		final StringBuffer sbRes = new StringBuffer();
 		for (final String sCurFile : ssFiles) {
 			sbRes.append(lLoader.loadFile(sCurFile)).append((char)0);
@@ -296,7 +296,7 @@ public final class Utils {
 	 * @return A string containing the given string
 	 * concatenated the specified number of times.
 	 */
-	public static final String repeatString(String sStr, int iTimes) {
+	public static final String repeatString(final String sStr, final int iTimes) {
 		return String.join("", Collections.nCopies(iTimes, sStr));
 	}
 
@@ -306,7 +306,7 @@ public final class Utils {
 	 * @param source the string to reverse
 	 * @return the reversed string
 	 */
-	public static String reverseString(String source) {
+	public static String reverseString(final String source) {
 		final int len = source.length();
 		final StringBuffer dest = new StringBuffer(len);
 		for (int i = (len - 1); i >= 0; i--) {
@@ -321,7 +321,7 @@ public final class Utils {
 	 * @param l The list to reverse.
 	 * @return The reversed list.
 	 */
-	public static List<?> reverseList(List<?> l) {
+	public static List<?> reverseList(final List<?> l) {
 		final LinkedList<?> lRes = new LinkedList<Object>(l);
 		Collections.reverse(lRes);
 		return lRes;
@@ -334,7 +334,7 @@ public final class Utils {
 	 * @param sFilepath The path to the file.
 	 * @return The filename stripped of directories.
 	 */
-	public static final String getFilenameOnly(String sFilepath) {
+	public static final String getFilenameOnly(final String sFilepath) {
 		return new File(sFilepath).getName();
 	}
 

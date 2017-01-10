@@ -43,16 +43,26 @@ public final class GraphUtils {
 	}
 
 	/**
-	 * Merges a list of {@link NGramGraph} objects.
-	 * @see #mergeGraphs(NGramGraph[])
+	 * Merges a list of {@link NGramJGraph}s, using a copy of the first
+	 * graph of the list as the basis for the merging process - no graph
+	 * in the list is modified. The learning rate used for merging is the
+	 * weighted average. Returns <tt>null</tt> if the list is empty.
+	 *
+	 * @param toMerge the list of graphs to merge
+	 * @return the graph that results from merging all graphs in the list
 	 */
 	public static NGramGraph mergeGraphs(final List<NGramGraph> toMerge) {
 		if ((toMerge == null) || (toMerge.size() == 0)) {
 			return null;
 		}
-
-		/* proxy call to merge graphs with array parameter */
-		return mergeGraphs(toMerge.toArray(new NGramGraph[toMerge.size()]));
+		final NGramGraph nggInit = toMerge.get(0).clone();
+		double lr = 0.5;
+		for (int index = 1, n = toMerge.size(); index < n; ++index) {
+			/* Update "learning" rate */
+			lr = 1 - (((double) index) / (index + 1));
+			nggInit.merge(toMerge.get(index), lr);
+		}
+		return nggInit;
 	}
 
 	/**
@@ -105,7 +115,7 @@ public final class GraphUtils {
 		}
 
 		/* create a new list, store filtered versions there */
-		final List<NGramGraph> filtered = new ArrayList<NGramGraph>(graphs.size());
+		final List<NGramGraph> filtered = new ArrayList<>(graphs.size());
 		for (final NGramGraph ngg: graphs) {
 			filtered.add(ngg.allNotIn(nggBase));
 		}
