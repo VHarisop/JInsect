@@ -47,7 +47,7 @@ public class SparseProjectionComparator {
 	 * @author vharisop
 	 */
 	public static enum Projection {
-		SIGN_CONSISTENT, RANDOM;
+		SIGN_CONSISTENT, RANDOM, POSITIVE;
 	}
 
 	/**
@@ -139,7 +139,6 @@ public class SparseProjectionComparator {
 				}
 				break;
 			case SIGN_CONSISTENT:
-			default:
 				for (int i = 0; i < vecA.length; ++i) {
 					final double wA = Math.abs(vecA[i]);
 					final double wB = Math.abs(vecB[i]);
@@ -150,6 +149,12 @@ public class SparseProjectionComparator {
 					simSum += wMin / Math.max(wA, wB);
 				}
 				break;
+			case POSITIVE:
+			default:
+				for (int i = 0; i < vecA.length; ++i) {
+					simSum += Math.min(vecA[i], vecB[i])
+						/ Math.max(vecA[i], vecB[i]);
+				}
 		}
 		return simSum;
 	}
@@ -182,10 +187,41 @@ public class SparseProjectionComparator {
 				createRandomProjection(featureDim, sigma);
 				break;
 			case SIGN_CONSISTENT:
-			default:
 				createSCProjection(featureDim, sigma);
 				break;
+			case POSITIVE:
+			default:
+				createPositiveProjection(featureDim, sigma);
+				break;
 		}
+	}
+
+	/**
+	 * Creates a strictly positive projection matrix, given the sparsity
+	 * parameter and the original dimension.
+	 * @param featureDim the original dimension
+	 * @param sigma the sparsity parameter
+	 */
+	private void
+	createPositiveProjection(final int featureDim, final double sigma) {
+		IntStream.range(0, finalDim)
+			.parallel()
+			.forEach(index -> {
+				/* Every column of the projection matrix is assigned
+				 * to a possibly separate thread
+				 */
+				final Set<Integer> currPos = positives.get(index);
+				for (int i = 0; i < featureDim; ++i) {
+					/* Coin toss to decide which element we'll use */
+					final double toss = Math.random();
+					/* P1: 1/s */
+					if (toss < (1 / sigma)) {
+						currPos.add(i * finalDim + index);
+					}
+					/* P2: 1 - 1/s */
+				}
+			});
+
 	}
 
 	/**
@@ -205,8 +241,8 @@ public class SparseProjectionComparator {
 				/* Every column of the projection matrix is assigned
 				 * to a possibly different thread
 				 */
-				Set<Integer> currPos = positives.get(index);
-				Set<Integer> currNeg = negatives.get(index);
+				final Set<Integer> currPos = positives.get(index);
+				final Set<Integer> currNeg = negatives.get(index);
 				for (int i = 0; i < featureDim; ++i) {
 					/* Coin toss to decide the element we'll use */
 					final double toss = Math.random();
@@ -242,7 +278,7 @@ public class SparseProjectionComparator {
 				 * uniformly distributed in [0, 1] that determines the sign of
 				 * this column's entries.
 				 */
-				Set<Integer> referencedSet = (Math.random() > 0.5) ?
+				final Set<Integer> referencedSet = (Math.random() > 0.5) ?
 						positives.get(index) : negatives.get(index);
 				for (int i = 0; i < featureDim; ++i) {
 					/* Coin toss to decide which element we'll use */
@@ -402,7 +438,7 @@ public class SparseProjectionComparator {
 			}
 		}
 		/* If character is unseen, return -1 as flag value */
-		catch (NullPointerException ex) {
+		catch (final NullPointerException ex) {
 			totalIndex = -1;
 		}
 		return totalIndex;
