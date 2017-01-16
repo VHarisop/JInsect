@@ -1,77 +1,32 @@
 package gr.demokritos.iit.jinsect.encoders;
 
-import java.lang.UnsupportedOperationException;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
 
 import gr.demokritos.iit.jinsect.structs.Edge;
 import gr.demokritos.iit.jinsect.structs.JVertex;
 import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 
-public class CanonicalCoder 
-extends BaseGraphEncoder implements GraphEncoding, Iterable<String> {
+public class CanonicalCoder
+extends BaseGraphEncoder implements GraphEncoding {
 
 	/**
-	 * Initializes only the unvisited set with a tree set structure that
-	 * contains the graph vertices in lexicographic order for ordered 
-	 * iteration when producing the canonical code. 
+	 * Creates a new CanonicalCoder object.
 	 */
-	@Override
-	protected void initSets() {
-		// comparator that sorts on lexicographic ordering
-		Comparator<JVertex> fwdComp = new Comparator<JVertex>() {
-			@Override
-			public int compare(JVertex vOne, JVertex vTwo) {
-				return vOne.getLabel().compareTo(vTwo.getLabel());
-			}
-		};
-
-		// only unvisited is initialized
-		unvisited = new TreeSet<JVertex>(fwdComp);
+	public CanonicalCoder() {
+		super();
 	}
 
-	/**
-	 * Creates a new CanonicalCoder object to operate
-	 * on a given UniqueJVertexGraph.
-	 *
-	 * @param uvg the graph to be encoded
-	 * @return a new CanonicalCoder object
-	 */
-	public CanonicalCoder(UniqueVertexGraph uvg) {
-		super(uvg);
-		unvisited.addAll(uvg.vertexSet());
-	}
-
-	/**
-	 * Creates a new CanonicalCoder object to operate on
-	 * a given UniqueJVertexGraph starting from a provided node.
-	 *
-	 * @param uvg the graph to be encoded
-	 * @param vFrom the vertex to start encoding from
-	 */
-	public CanonicalCoder(UniqueVertexGraph uvg, JVertex vFrom) {
-		super(uvg, vFrom);
-		unvisited.addAll(uvg.vertexSet());
-	}
-	
-	/**
-	 * @see GraphEncoding.getEncoding()
-	 */
-	public String getEncoding() {
-		if (vStart != null) {
-			return getEncoding(vStart);
-		}
-		else {
-			return getEncoding(chooseStart());
-		}
-	}
-
-	/* Fwd encoding for NGramJGraph should start from the 
+	/* Fwd encoding for NGramJGraph should start from the
 	 * lexicographically minimum vertex */
 	@Override
-	protected JVertex chooseStart() {
+	protected JVertex chooseStart(final UniqueVertexGraph uvg) {
 		JVertex vMin = null;
 
-		for (JVertex vCur: nGraph.vertexSet()) {
+		for (JVertex vCur: uvg.vertexSet()) {
 			if (vMin == null) {
 				vMin = vCur;
 			}
@@ -86,11 +41,13 @@ extends BaseGraphEncoder implements GraphEncoding, Iterable<String> {
 		return vMin;
 	}
 
-	/**
-	 * @see GraphEncoding.getEncoding(JVertex) 
-	 */
-	public String getEncoding(JVertex vFrom) {
-		return encodeFrom(vFrom);
+	public String getEncoding(final UniqueVertexGraph uvg) {
+		return encodeFrom(uvg, chooseStart(uvg));
+	}
+
+	public String getEncoding(
+		final UniqueVertexGraph uvg, final JVertex vFrom) {
+		return encodeFrom(uvg, vFrom);
 	}
 
 	/**
@@ -99,7 +56,14 @@ extends BaseGraphEncoder implements GraphEncoding, Iterable<String> {
 	 * @param source the node to start encoding from.
 	 * @return the string representation of the encoded graph
 	 */
-	private String encodeFrom(JVertex vFrom) {
+	private String encodeFrom(
+		final UniqueVertexGraph uvg,
+		final JVertex vFrom) {
+
+		Set<JVertex> unvisited = new TreeSet<>(
+			(v1, v2) -> v1.getLabel().compareTo(v2.getLabel()));
+		unvisited.addAll(uvg.vertexSet());
+
 		String sEncoded = "";
 		JVertex vCurr;
 
@@ -108,18 +72,18 @@ extends BaseGraphEncoder implements GraphEncoding, Iterable<String> {
 		if (vFrom == null) {
 			return sEncoded;
 		}
-	
+
 		/* labels for forward and backward canonical code */
 		StringBuilder fwdLabels = new StringBuilder();
 		StringBuilder bwdLabels = new StringBuilder();
-		
+
 		/* Iterators over vertices */
 		Iterator<JVertex> fwdIterator = unvisited.iterator();
-		Deque<JVertex> alreadySeen = new ArrayDeque<JVertex>(); 
-		
+		Deque<JVertex> alreadySeen = new ArrayDeque<JVertex>();
+
 		while (fwdIterator.hasNext()) {
 			vCurr = fwdIterator.next();
-	
+
 			// push to already seen
 			alreadySeen.push(vCurr);
 
@@ -129,10 +93,10 @@ extends BaseGraphEncoder implements GraphEncoding, Iterable<String> {
 
 			// iterate over all seen - so - far vertices, build canonical codes
 			for (JVertex vOpp: alreadySeen) {
-				Edge eFwd = nGraph.getEdge(vCurr, vOpp);
-				Edge eBwd = nGraph.getEdge(vOpp, vCurr);
+				Edge eFwd = uvg.getEdge(vCurr, vOpp);
+				Edge eBwd = uvg.getEdge(vOpp, vCurr);
 
-				if (eFwd == null) 
+				if (eFwd == null)
 					fwdLabels.append("0 ");
 				else
 					fwdLabels.append(String.valueOf(eFwd.edgeWeight()) + " ");
@@ -143,26 +107,34 @@ extends BaseGraphEncoder implements GraphEncoding, Iterable<String> {
 					bwdLabels.append(String.valueOf(eBwd.edgeWeight()) + " ");
 			}
 		}
-
 		sEncoded = fwdLabels.toString() + bwdLabels.toString();
 		return sEncoded;
 	}
 
-	@Override
-	public Iterator<String> iterator() {
-		Iterator<String> it = new Iterator<String>() {
+	/**
+	 * Returns an iterator over a given {@link UniqueVertexGraph} that returns
+	 * the graph's canonical code.
+	 * @param uvg the graph to iterate over
+	 * @return an iterator over the graph's canonical code
+	 */
+	public static Iterator<String> iterator(final UniqueVertexGraph uvg) {
+		/* Create a new set of unvisited vertices */
+		final Set<JVertex> unvisited = new TreeSet<>(
+				(v1, v2) -> v1.getLabel().compareTo(v2.getLabel()));
+		unvisited.addAll(uvg.vertexSet());
+		final Deque<JVertex> alrSeen = new ArrayDeque<>();
+		Iterator<JVertex> fwdIter = unvisited.iterator();
+
+		Iterator<String> iter = new Iterator<String>() {
 			private int curInd = 0;
-			private int finalInd = unvisited.size(); // size of treemap
-			
-			private Deque<JVertex> alrSeen = new ArrayDeque<JVertex>();
-			private Iterator<JVertex> fwdIter = unvisited.iterator();
+			private final int finalInd = unvisited.size();
 
 			@Override
 			public boolean hasNext() {
 				return curInd < finalInd;
 			}
 
-			@Override 
+			@Override
 			public String next() {
 				String retFwd, retBwd;
 				JVertex vCurr = fwdIter.next();
@@ -175,9 +147,9 @@ extends BaseGraphEncoder implements GraphEncoding, Iterable<String> {
 				alrSeen.push(vCurr);
 
 				for (JVertex vOpp: alrSeen) {
-					Edge eFwd = nGraph.getEdge(vCurr, vOpp);
-					Edge eBwd = nGraph.getEdge(vOpp, vCurr);
-					if (eFwd == null) 
+					Edge eFwd = uvg.getEdge(vCurr, vOpp);
+					Edge eBwd = uvg.getEdge(vOpp, vCurr);
+					if (eFwd == null)
 						retFwd += "0 ";
 					else
 						retFwd += String.valueOf(eFwd.edgeWeight()) + " ";
@@ -186,18 +158,11 @@ extends BaseGraphEncoder implements GraphEncoding, Iterable<String> {
 					else
 						retBwd += String.valueOf(eBwd.edgeWeight()) + " ";
 				}
-
 				// increment index
 				curInd++;
-
 				return retFwd + retBwd;
 			}
-
-			@Override
-			public void remove() {
-				throw new UnsupportedOperationException();
-			}
 		};
-		return it;
+		return iter;
 	}
 }

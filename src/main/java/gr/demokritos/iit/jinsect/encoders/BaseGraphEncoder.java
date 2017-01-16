@@ -11,58 +11,11 @@ import gr.demokritos.iit.jinsect.structs.Pair;
 import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 
 public abstract class BaseGraphEncoder {
-	protected UniqueVertexGraph nGraph;
-	protected JVertex vStart = null;
-
-	// sets of visited / unvisited vertices
-	protected Set<JVertex> visited = new HashSet<>();
-	protected Set<JVertex> unvisited = new HashSet<>();
 
 	/**
-	 * Initializes the visited / unvisited sets. Creates 2 empty
-	 * {@link java.util.HashSet} instances, one for visited and
-	 * one for unvisited nodes.
-	 *
-	 * This method can be overriden in subclasses that require
-	 * different set types.
+	 * Creates a new BaseGraphEncoder object.
 	 */
-	protected void initSets() {
-		unvisited = new HashSet<>();
-		visited = new HashSet<>();
-	}
-
-	/**
-	 * Creates a new BaseGraphEncoder object to operate on
-	 * a given UniqueJVertexGraph.
-	 *
-	 * @param uvg the graph to be encoded
-	 * @return a new BaseGraphEncoder object
-	 */
-	public BaseGraphEncoder(UniqueVertexGraph uvg) {
-		nGraph = uvg;
-
-		// initialize sets
-		initSets();
-
-		unvisited.addAll(uvg.vertexSet());
-	}
-
-	/**
-	 * Creates a new BaseGraphEncoder object to operate on
-	 * a given UniqueJVertexGraph starting on a given JVertex.
-	 *
-	 * @param uvg the graph to be encoded
-	 * @param vFrom the starting vertex
-	 * @return a new BaseGraphEncoder object
-	 */
-	public BaseGraphEncoder(UniqueVertexGraph uvg, JVertex vFrom) {
-		nGraph = uvg;
-
-		// initialize sets
-		initSets();
-
-		unvisited.addAll(uvg.vertexSet());
-		vStart = vFrom;
+	public BaseGraphEncoder() {
 	}
 
 	/**
@@ -72,8 +25,10 @@ public abstract class BaseGraphEncoder {
 	 * @param vSource the node whose edges are returned
 	 * @return a list of edge objects
 	 */
-	public List<Edge> outgoingEdgeList(JVertex vSource) {
-		return new ArrayList<>(nGraph.outgoingEdgesOf(vSource));
+	public List<Edge> outgoingEdgeList(
+		final UniqueVertexGraph uvg,
+		final JVertex vSource) {
+		return new ArrayList<>(uvg.outgoingEdgesOf(vSource));
 	}
 
 	/**
@@ -84,15 +39,16 @@ public abstract class BaseGraphEncoder {
 	 * @param vSource the vertex to explore edges from
 	 * @return a Pair of edge lists (forward and backward respectively)
 	 */
-	public Pair<List<Edge>, List<Edge>> exploreEdges(JVertex vSource) {
+	public Pair<List<Edge>, List<Edge>> exploreEdges(
+		final UniqueVertexGraph uvg, final JVertex vSource) {
 		final List<Edge> eFwd = new ArrayList<>();
 		final List<Edge> eBwd = new ArrayList<>();
-
+		final Set<String> visited = new HashSet<>();
 		/* add to backward edges if target vertex is
 		 * already visited, else add to forward edges. */
-		nGraph.outgoingEdgesOf(vSource)
+		uvg.outgoingEdgesOf(vSource)
 			.forEach(e -> {
-				if (visited.contains(nGraph.getEdgeTarget(e))) {
+				if (visited.contains(uvg.getEdgeTarget(e))) {
 					eBwd.add(e);
 				} else {
 					eFwd.add(e);
@@ -108,14 +64,19 @@ public abstract class BaseGraphEncoder {
 	 * if it isn't already contained and removing it from the set
 	 * of unvisited vertices.
 	 *
+	 * @param visited the set of visited vertices
+	 * @param unvisited the set of unvisited vertices
 	 * @param vVisit the vertex to visit
 	 * @return a boolean - true if the vertex was not already visited,
 	 * else false
 	 */
-	public boolean visitNode(JVertex vVisit) {
+	public boolean visitNode(
+		final Set<JVertex> visited, final Set<JVertex> unvisited,
+		final JVertex vVisit)
+	{
 		return (visited.add(vVisit) && unvisited.remove(vVisit));
 	}
 
 	// method to choose the starting vertex, if none was provided
-	abstract protected JVertex chooseStart();
+	abstract protected JVertex chooseStart(final UniqueVertexGraph uvg);
 }

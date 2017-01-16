@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import gr.demokritos.iit.jinsect.structs.Edge;
 import gr.demokritos.iit.jinsect.structs.JVertex;
@@ -14,54 +16,28 @@ import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 public class DepthFirstEncoder
 extends BaseGraphEncoder implements GraphEncoding {
 
-	private String encodedString = "";
-	private Deque<JVertex> stack = new ArrayDeque<>();
-
 	// default separator for DFS coding
-	private String SEPARATOR = "";
+	private final String SEPARATOR = "";
 
 	/**
-	 * Creates a new DepthFirstEncoder object to operate
-	 * on a given UniqueJVertexGraph.
-	 *
-	 * @param uvg the graph to be encoded
-	 * @return a new DepthFirstEncoder object
+	 * Creates a new DepthFirstEncoder object.
 	 */
-	public DepthFirstEncoder(UniqueVertexGraph uvg) {
-		super(uvg);
+	public DepthFirstEncoder() {
 	}
 
 	/**
-	 * Creates a new DepthFirstEncoder object to operate on
-	 * a given UniqueJVertexGraph starting from a provided node.
-	 *
-	 * @param uvg the graph to be encoded
-	 * @param vFrom the vertex to start encoding from
-	 * @return a new DepthFirstEncoder object
+	 * @see GraphEncoding.getEncoding(UniqueVertexGraph)
 	 */
-	public DepthFirstEncoder(UniqueVertexGraph uvg, JVertex vFrom) {
-		super(uvg, vFrom);
-	}
-
-	/**
-	 * @see GraphEncoding.getEncoding()
-	 */
-	public String getEncoding() {
-		if (vStart != null) {
-			return getEncoding(vStart);
-		}
-		else {
-			return getEncoding(chooseStart());
-		}
+	public String getEncoding(final UniqueVertexGraph uvg) {
+		return getEncoding(uvg, chooseStart(uvg));
 	}
 
 	/* DFS encoding for NGramJGraph should start from the
 	 * lexicographically minimum vertex */
 	@Override
-	protected JVertex chooseStart() {
+	protected JVertex chooseStart(final UniqueVertexGraph uvg) {
 		JVertex vMin = null;
-
-		for (final JVertex vCur: nGraph.vertexSet()) {
+		for (final JVertex vCur: uvg.vertexSet()) {
 			if (vMin == null) {
 				vMin = vCur;
 			}
@@ -71,7 +47,6 @@ extends BaseGraphEncoder implements GraphEncoding {
 				vMin = vCur;
 			}
 		}
-
 		// return minimum vertex
 		return vMin;
 	}
@@ -79,9 +54,17 @@ extends BaseGraphEncoder implements GraphEncoding {
 	/**
 	 * @see GraphEncoding.getEncoding(JVertex)
 	 */
-	public String getEncoding(JVertex vFrom) {
-		encodedString = encodeFrom(vFrom);
-		return encodedString;
+	@Override
+	public String getEncoding(
+		final UniqueVertexGraph uvg, final JVertex vFrom) {
+		// Create visited and unvisited vertex sets
+		final Set<JVertex> unvisited = new TreeSet<>(
+			(vA, vB) -> vA.getLabel().compareTo(vB.getLabel()));
+		final Set<JVertex> visited = new TreeSet<>(
+			(vA, vB) -> vA.getLabel().compareTo(vB.getLabel()));
+		unvisited.addAll(uvg.vertexSet());
+		final Deque<JVertex> stack = new ArrayDeque<>();
+		return encodeFrom(uvg, vFrom, visited, unvisited, stack);
 	}
 
 	/**
@@ -90,7 +73,10 @@ extends BaseGraphEncoder implements GraphEncoding {
 	 * @param source the node to start encoding from.
 	 * @return the string representation of the encoded graph
 	 */
-	private String encodeFrom(JVertex vFrom) {
+	private String encodeFrom(
+		final UniqueVertexGraph uvg, final JVertex vFrom,
+		final Set<JVertex> visited, final Set<JVertex> unvisited,
+		final Deque<JVertex> stack) {
 		String sEncoded = ""; JVertex vNext;
 
 		// handle null start case - usually for NGG representations
@@ -124,16 +110,16 @@ extends BaseGraphEncoder implements GraphEncoding {
 			 * unvisited nodes (after end of while loop) does not
 			 * produce duplicates.
 			 */
-			if (!(visitNode(vNext))) {
+			if (!(visitNode(visited, unvisited, vNext))) {
 				return sEncoded;
 			}
 
 			/* acquire a sorted list of edges */
-			final List<Edge> eList = outgoingEdgeList(vNext);
+			final List<Edge> eList = outgoingEdgeList(uvg, vNext);
 			Collections.sort(eList, eComp);
 
 			for (final Edge e: eList) {
-				vAdj = nGraph.getEdgeTarget(e);
+				vAdj = uvg.getEdgeTarget(e);
 
 				/* if node has not been visited, add it to the
 				 * stack and create a forward edge label.
@@ -165,10 +151,9 @@ extends BaseGraphEncoder implements GraphEncoding {
 			final List<JVertex> unvList = new ArrayList<>(unvisited);
 			Collections.sort(unvList, vComp);
 			for (final JVertex v: unvList) {
-				sEncoded += encodeFrom(v);
+				sEncoded += encodeFrom(uvg, v, visited, unvisited, stack);
 			}
 		}
-
 		return sEncoded;
 	}
 }

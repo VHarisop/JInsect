@@ -38,9 +38,9 @@ public final class JUtils {
 
 		// get iterators on both graphs' canonical codes
 		final Iterator<String> caIter =
-				(new CanonicalCoder(gA)).iterator();
+			CanonicalCoder.iterator(gA);
 		final Iterator<String> cbIter =
-				(new CanonicalCoder(gB)).iterator();
+			CanonicalCoder.iterator(gB);
 
 		while (caIter.hasNext()) {
 			currA = caIter.next();
@@ -137,6 +137,36 @@ public final class JUtils {
 			result *= num;
 		}
 		return result;
+	}
+
+	/**
+	 * Packs a char array (string) into a String of characters formed by
+	 * concatenating consecutive groups of bits from the char array. The
+	 * char array must only contain the '1' or '0' characters.
+	 * @param charArray the {@link String} to pack
+	 * @return the packed string
+	 * @throws {@link NumberFormatException} if the string does contain
+	 * characters other than '1' and '0'
+	 */
+	public static final String packCharArray(final String charArray)
+	throws NumberFormatException {
+		final StringBuilder packed = new StringBuilder();
+		final int endIndex = charArray.length();
+		for (int i = 0; i < (endIndex / 16) + 1; ++i) {
+			/* Obtain a 16-bit string */
+			final int toIndex = Math.min((i + 1) * 16, endIndex);
+			String charPack = charArray.substring(i * 16, toIndex);
+			/* Obtain the character value that matches that int
+			 * and append it to the string builder.
+			 */
+			if (charPack.isEmpty()) {
+				/* We reached the end, nothing more to do */
+				break;
+			}
+			final int ordinal = Integer.parseUnsignedInt(charPack, 2);
+			packed.append((char) ordinal);
+		}
+		return packed.toString();
 	}
 
 	/**
