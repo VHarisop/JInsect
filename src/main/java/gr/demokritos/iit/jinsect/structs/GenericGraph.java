@@ -138,7 +138,14 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		addVertex(target);
 		// add edge and set its weight
 		final Edge eAdded = super.addEdge(source, target);
-		setEdgeWeight(eAdded, weight);
+		if (eAdded != null) {
+			setEdgeWeight(eAdded, weight);
+		}
+		else {
+			// Null return value means edge was there already
+			final Edge prevEdge = getEdge(source, target);
+			super.setEdgeWeight(prevEdge, prevEdge.edgeWeight() + weight);
+		}
 	}
 
 	/**
