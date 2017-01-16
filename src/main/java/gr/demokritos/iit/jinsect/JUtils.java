@@ -12,6 +12,7 @@ import gr.demokritos.iit.jinsect.encoders.CanonicalCoder;
 import gr.demokritos.iit.jinsect.structs.Edge;
 import gr.demokritos.iit.jinsect.structs.GenericGraph;
 import gr.demokritos.iit.jinsect.structs.JVertex;
+import gr.demokritos.iit.jinsect.structs.Pair;
 import gr.demokritos.iit.jinsect.structs.UniqueVertexGraph;
 
 /**
@@ -121,7 +122,7 @@ public final class JUtils {
 	 * @param b the second number
 	 * @return true if the numbers are equal, otherwise false
 	 */
-	public static boolean compareDouble(final double a, final double b) {
+	public static boolean eqDouble(final double a, final double b) {
 		return (Math.abs(a - b) < 0.000001);
 	}
 
@@ -155,7 +156,7 @@ public final class JUtils {
 		for (int i = 0; i < (endIndex / 16) + 1; ++i) {
 			/* Obtain a 16-bit string */
 			final int toIndex = Math.min((i + 1) * 16, endIndex);
-			String charPack = charArray.substring(i * 16, toIndex);
+			final String charPack = charArray.substring(i * 16, toIndex);
 			/* Obtain the character value that matches that int
 			 * and append it to the string builder.
 			 */
@@ -197,6 +198,28 @@ public final class JUtils {
 				.stream()
 				.collect(Collectors.toList());
 		graph.addEdge(vertices.get(from), vertices.get(to), 1.0);
+	}
+
+	/**
+	 * Removes a random edge of unitary weight from a {@link GenericGraph}.
+	 * @param graph the graph to be edited
+	 * @return {@code true} if an edge was succesfully removed
+	 */
+	public static boolean removeRandomEdge(final GenericGraph graph) {
+		final List<Edge> unitaryEdges = graph.edgeSet()
+			.stream()
+			.filter(e -> e.edgeWeight() == 1.0)
+			.collect(Collectors.toList());
+		if (unitaryEdges == null || unitaryEdges.size() == 0) {
+			return false;
+		}
+		final Edge toRemove = unitaryEdges.get(
+			new Random().nextInt(unitaryEdges.size()));
+		if (toRemove != null) {
+			return graph.removeEdge(toRemove);
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -247,14 +270,18 @@ public final class JUtils {
 	 * Removes a randomly chosen isolated {@link JVertex} from a
 	 * {@link GenericGraph}
 	 * @param graph the graph to remove the vertex from
+	 * @returns {@code true} if a vertex was successfully removed
 	 */
-	public static void
+	public static boolean
 	removeRandomIsolatedVertex(final GenericGraph graph) {
 		final List<JVertex> isolated = getIsolatedVertices(graph);
 		final int numIsolated = isolated.size();
 		if (numIsolated > 0) {
 			final int nextRand = (new Random()).nextInt(numIsolated);
-			graph.removeVertex(isolated.get(nextRand));
+			return graph.removeVertex(isolated.get(nextRand));
+		}
+		else {
+			return false;
 		}
 	}
 
@@ -264,9 +291,10 @@ public final class JUtils {
 	 * @param g the graph to edit
 	 * @param editCnt the number of edits
 	 * @param labels a list of available labels to mutate to
-	 * @return the modified {@link GenericGraph}
+	 * @return the modified {@link GenericGraph} as well as the number of
+	 * successful edits, in a {@link Pair<GenericGraph, Integer>} object
 	 */
-	public static GenericGraph getEditedGraph(
+	public static Pair<GenericGraph, Integer> getEditedGraph(
 		final GenericGraph g, final int editCnt, final List<String> labels) {
 		final GenericGraph gNew = g.clone();
 		final Random randGen = new Random();
@@ -276,19 +304,26 @@ public final class JUtils {
 		final int changes = randGen.nextInt(editCnt + 1 - removals);
 		final int additions = randGen.nextInt(
 				editCnt + 1 - removals - changes);
+		int totalEdits = 0;
 		/* Perform the required number of edits per edit action */
 		for (int i = 0; i < removals; ++i) {
-			removeRandomIsolatedVertex(gNew);
+			if (removeRandomIsolatedVertex(gNew)) {
+				totalEdits++;
+			}
 		}
 		for (int i = 0; i < changes; ++i) {
 			final String newLabel = labels.get(randGen.nextInt(labelCnt));
 			final JVertex changed = pickRandomVertex(gNew);
-			changed.setLabel(newLabel);
+			if (!newLabel.equals(changed.getLabel())) {
+				changed.setLabel(newLabel);
+				totalEdits++;
+			}
 		}
 		for (int i = 0; i < additions; ++i) {
 			addRandomEdge(gNew);
 		}
-		return gNew;
+		totalEdits += additions;
+		return new Pair<>(gNew, totalEdits);
 	}
 }
 

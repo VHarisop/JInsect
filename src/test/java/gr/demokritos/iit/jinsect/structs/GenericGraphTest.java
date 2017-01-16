@@ -26,7 +26,7 @@ public class GenericGraphTest
      *
      * @param testName name of the test case
      */
-    public GenericGraphTest( String testName )
+    public GenericGraphTest( final String testName )
     {
         super( testName );
     }
@@ -41,31 +41,33 @@ public class GenericGraphTest
 
 	/* Helper function to add an undefined number of vertices
 	 * to a GenericGraph, given their desired labels. */
-	private void addVertices(GenericGraph gGraph, String ... labels) {
-		for (String s: labels) {
+	private void addVertices(
+		final GenericGraph gGraph, final String ... labels) {
+		for (final String s: labels) {
 			gGraph.addVertex(new NGramVertex(s));
 		}
 	}
 
 	/* Helper function to determine if a graph contains a vertex
 	 * that matches a given label */
-	private boolean hasVertex(GenericGraph gGraph, String label) {
+	private boolean hasVertex(final GenericGraph gGraph, final String label) {
 		return gGraph.containsVertex(new NGramVertex(label));
 	}
 
 	/* Helper function that returns true if a graph contains an edge
 	 * connecting two vertices designated by their labels as well as
 	 * having a certain specified weight. */
-	private boolean
-	hasEdge(GenericGraph gGraph, String from, String to, double w) {
-		JVertex vFrom = new NGramVertex(from);
-		JVertex vTo = new NGramVertex(to);
-		Edge eFound = gGraph.getEdge(vFrom, vTo);
+	private boolean hasEdge(
+		final GenericGraph gGraph,
+		final String from, final String to, final double w) {
+		final JVertex vFrom = new NGramVertex(from);
+		final JVertex vTo = new NGramVertex(to);
+		final Edge eFound = gGraph.getEdge(vFrom, vTo);
 		if (null == eFound) {
 			return false;
 		}
 		else {
-			if (eqDouble(gGraph.getEdgeWeight(eFound), w)) {
+			if (JUtils.eqDouble(gGraph.getEdgeWeight(eFound), w)) {
 				return true;
 			}
 			else {
@@ -77,10 +79,11 @@ public class GenericGraphTest
 
 	/* Helper function that adds an edge to a graph, given the labels
 	 * of its source and target vertices and its desired weight. */
-	private void
-	putEdge(GenericGraph gGraph, String from, String to, double w) {
-		JVertex vFrom = new NGramVertex(from);
-		JVertex vTo = new NGramVertex(to);
+	private void putEdge(
+		final GenericGraph gGraph,
+		final String from, final String to, final double w) {
+		final JVertex vFrom = new NGramVertex(from);
+		final JVertex vTo = new NGramVertex(to);
 		gGraph.addEdge(vFrom, vTo, w);
 	}
 
@@ -89,7 +92,7 @@ public class GenericGraphTest
 	 * {@link GenericGraph} object.
 	 */
 	public void testCreation() {
-		GenericGraph gGraph = new GenericGraph();
+		final GenericGraph gGraph = new GenericGraph();
 		addVertices(gGraph, "C$1", "C$2", "O$3", "C$4");
 		// make sure every vertex was added
 		assertTrue(hasVertex(gGraph, "C$1"));
@@ -117,7 +120,7 @@ public class GenericGraphTest
 	 * {@link UniqueVertexGraph}.
 	 */
 	public void testCompacting() {
-		GenericGraph gGraph = new GenericGraph();
+		final GenericGraph gGraph = new GenericGraph();
 		addVertices(gGraph,
 			"a$1", "b$2", "b$3", "a$4", "c$5");
 		putEdge(gGraph, "a$1", "b$2", 3.0);
@@ -126,11 +129,11 @@ public class GenericGraphTest
 		putEdge(gGraph, "a$2", "c$5", 2.0);
 		putEdge(gGraph, "c$5", "b$3", 1.0);
 		// apply compacting
-		UniqueVertexGraph uvg = gGraph.compactToUniqueVertexGraph();
+		final UniqueVertexGraph uvg = gGraph.compactToUniqueVertexGraph();
 		// make sure vertices are there
-		JVertex vA = new NGramVertex("a");
-		JVertex vB = new NGramVertex("b");
-		JVertex vC = new NGramVertex("c");
+		final JVertex vA = new NGramVertex("a");
+		final JVertex vB = new NGramVertex("b");
+		final JVertex vC = new NGramVertex("c");
 		assertTrue(uvg.containsVertex(vA));
 		assertTrue(uvg.containsVertex(vB));
 		assertTrue(uvg.containsVertex(vC));
@@ -138,16 +141,16 @@ public class GenericGraphTest
 		// make sure edges are there
 		final Edge e1 = uvg.getEdge(vA, vB);
 		assertNotNull(e1);
-		assertTrue(eqDouble(e1.edgeWeight(), 5.0));
+		assertEquals(e1.edgeWeight(), 5.0, 1e-6);
 		final Edge e2 = uvg.getEdge(vB, vB);
 		assertNotNull(e2);
-		assertTrue(eqDouble(e2.edgeWeight(), 4.0));
+		assertEquals(e2.edgeWeight(), 4.0, 1e-6);
 		final Edge e3 = uvg.getEdge(vC, vB);
 		assertNotNull(e3);
-		assertTrue(eqDouble(e3.edgeWeight(), 1.0));
+		assertEquals(e3.edgeWeight(), 1.0, 1e-6);
 		final Edge e4 = uvg.getEdge(vA, vC);
 		assertNotNull(e4);
-		assertTrue(eqDouble(e4.edgeWeight(), 2.0));
+		assertEquals(e4.edgeWeight(), 2.0, 1e-6);
 		// make sure they are the only edges there
 		assertTrue(uvg.edgeSet().size() == 4);
 	}
@@ -160,52 +163,49 @@ public class GenericGraphTest
 		final String fileName = "/small.json";
 		try {
 			assertNotNull("Missing file!", getClass().getResource(fileName));
-			URI resource = getClass().getResource(fileName).toURI();
-			File fJson = new File(resource);
-			List<GenericGraph> graphs = GenericGraph.fromJsonFile(fJson);
+			final URI resource = getClass().getResource(fileName).toURI();
+			final File fJson = new File(resource);
+			final List<GenericGraph> graphs = GenericGraph.fromJsonFile(fJson);
 			assertNotNull(graphs);
 			assertEquals(3, graphs.size());
 		}
-		catch (URISyntaxException ex) {
+		catch (final URISyntaxException ex) {
 			/* Print exception and fail instantly */
 			ex.printStackTrace();
 			assertTrue(false);
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			e.printStackTrace();
 			assertTrue(false);
 		}
 	}
-	
+
 	public void testMutations() {
-		List<GenericGraph> graphs = getGraphList();
-		Set<String> availLabels = new HashSet<>();
+		final List<GenericGraph> graphs = getGraphList();
+		final Set<String> availLabels = new HashSet<>();
 		graphs.forEach(g -> {
 			availLabels.addAll(g.getEffectiveLabelSet());
 		});
 		/* Create a mutation for every graph */
 		graphs.forEach(g -> {
-			GenericGraph gNew = JUtils.getEditedGraph(
-				g, 3, availLabels.stream().collect(Collectors.toList()));
+			final Pair<GenericGraph, Integer> gNew = JUtils.getEditedGraph(
+				g, 5, availLabels.stream().collect(Collectors.toList()));
 			assertNotNull(gNew);
+			assertNotNull(gNew.getFirst());
+			assertTrue(gNew.getSecond() >= 0);
 		});
 	}
-	
+
 	/* Get the list of generic graphs from <small.json> */
 	private List<GenericGraph> getGraphList() {
 		final String fileName = "/small.json";
 		try {
-			URI resource = getClass().getResource(fileName).toURI();
-			File jsonFile = new File(resource);
-			List<GenericGraph> graphs = GenericGraph.fromJsonFile(jsonFile);
+			final URI resource = getClass().getResource(fileName).toURI();
+			final File jsonFile = new File(resource);
+			final List<GenericGraph> graphs = GenericGraph.fromJsonFile(jsonFile);
 			return graphs;
 		}
-		catch (Exception ex) {
+		catch (final Exception ex) {
 			return null;
 		}
-	}
-
-	/* Helper function to check doubles for equality */
-	private static boolean eqDouble(double a, double b) {
-		return (Math.abs(a - b) < 0.000001);
 	}
 }

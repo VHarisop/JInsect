@@ -41,7 +41,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		label = "";
 	}
 
-	public GenericGraph(String label) {
+	public GenericGraph(final String label) {
 		super(Edge.class);
 		this.label = label;
 	}
@@ -100,7 +100,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 * @param v the {@link JVertex} whose label is required
 	 * @return the label of the vertex
 	 */
-	private final String extractLabel(JVertex v) {
+	private final String extractLabel(final JVertex v) {
 		return v.getLabel().split("\\$")[0];
 	}
 
@@ -110,7 +110,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 * @param v the vertex whose label will be split
 	 * @return a {@link String[]} containing the parts
 	 */
-	public static String[] getLabelParts(JVertex v) {
+	public static String[] getLabelParts(final JVertex v) {
 		return v.getLabel().split("\\$");
 	}
 
@@ -131,7 +131,8 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 * @param target the target {@link JVertex}
 	 * @param weight the edge's weight
 	 */
-	public void addEdge(JVertex source, JVertex target, double weight) {
+	public void addEdge(
+		final JVertex source, final JVertex target, final double weight) {
 		// add vertices
 		addVertex(source);
 		addVertex(target);
@@ -148,10 +149,31 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 * @param lblTo the label of the target vertex
 	 * @return the {@link Edge} found, if any, otherwise null
 	 */
-	public final Edge getEdge(String lblFrom, String lblTo) {
+	public final Edge getEdge(final String lblFrom, final String lblTo) {
 		return super.getEdge(
 				new NGramVertex(lblFrom),
 				new NGramVertex(lblTo));
+	}
+
+	/**
+	 * Serializes a {@link GenericGraph} to a string representation.
+	 *
+	 * @return the string representation of this graph
+	 */
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("Graph: " + label + " Nodes: {\n");
+		for (final JVertex v: vertexSet()) {
+			sb.append("\t" + v.getLabel() + "\n");
+		}
+		sb.append("} - Edges: {\n");
+		for (final Edge e: edgeSet()) {
+			sb.append("\t" +  e.getLabels() + String.format(
+				" [ %.2f ]\n", e.edgeWeight()));
+		}
+		sb.append("}");
+		return sb.toString();
 	}
 
 	@Override
@@ -161,11 +183,10 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		 * eventually be added both to the supergraph's vertex set
 		 * and the hashmap, because of calls to the add() method */
 		this.edgeSet().forEach(e ->
-		res.addEdge(
+			res.addEdge(
 				getEdgeSource(e),
 				getEdgeTarget(e),
-				getEdgeWeight(e))
-				);
+				getEdgeWeight(e)));
 		return res;
 	}
 
@@ -187,7 +208,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		 * @return a list of {@link GraphTemplate} objects
 		 * @throws {@link FileNotFoundException}
 		 */
-		public static List<GraphTemplate> fromJsonFile(File file)
+		public static List<GraphTemplate> fromJsonFile(final File file)
 		throws FileNotFoundException
 		{
 			final Gson gson = new Gson();
@@ -202,7 +223,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		 * @return a list of {@link GraphTemplate} objects
 		 * @throws {@link FileNotFoundException}
 		 */
-		public static List<GraphTemplate> fromJsonFile(String fileName)
+		public static List<GraphTemplate> fromJsonFile(final String fileName)
 		throws FileNotFoundException {
 			final File f = new File(fileName);
 			return fromJsonFile(f);
@@ -223,7 +244,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		 * @return a new generic graph object
 		 */
 		public GenericGraph toGenericGraph() {
-			final GenericGraph gGen = new GenericGraph(id);
+			final GenericGraph gGen = new GenericGraph(id.trim());
 			addNodes(gGen); addEdges(gGen);
 			return gGen;
 		}
@@ -232,7 +253,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		 * Add all the nodes to a {@link GenericGraph}.
 		 * @param g the {@link GenericGraph} to populate
 		 */
-		private void addNodes(GenericGraph g) {
+		private void addNodes(final GenericGraph g) {
 			nodes.forEach(
 				(id, label) -> g.addVertex(new NGramVertex(label)));
 		}
@@ -241,7 +262,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 		 * Add all the edges to a {@link GenericGraph}
 		 * @param g the {@link GenericGraph} to add the edges to
 		 */
-		private void addEdges(GenericGraph g) {
+		private void addEdges(final GenericGraph g) {
 			/* Iterate over all source ids */
 			edges.forEach((sourceId, edgeMap) -> {
 				final String sourceLabel = nodes.get(sourceId);
@@ -288,20 +309,21 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 	 * @param args program arguments
 	 * @throws FileNotFoundException
 	 */
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main(final String[] args) throws FileNotFoundException {
 		final String fileName = args[0];
-		// List<GenericGraph> parsed = GenericGraph.fromJsonFile(fileName);
-		final List<GraphTemplate> parsed = GraphTemplate.fromJsonFile(fileName);
-		parsed.forEach(g -> {
-			final GenericGraph gGen = g.toGenericGraph();
+		final List<GenericGraph> parsedGraphs =
+			GenericGraph.fromJsonFile(fileName);
+		parsedGraphs.forEach(gGen -> {
 			final UniqueVertexGraph uvg = gGen.compactToUniqueVertexGraph();
+			System.out.println(gGen.toString());
+			System.out.println("Id: " + gGen.getLabel());
 			System.out.println("Vertices: ");
 			uvg.vertexSet().forEach(v -> {
 				System.out.println("\t" + v.getLabel());
 			});
 			System.out.println("Edges: ");
 			uvg.edgeSet().forEach(e -> {
-				System.out.println("\t" + e.getLabels());
+				System.out.println("\t" + e.getLabels() + " " + e.edgeWeight());
 			});
 		});
 	}
