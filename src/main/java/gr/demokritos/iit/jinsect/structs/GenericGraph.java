@@ -185,7 +185,7 @@ extends DefaultDirectedWeightedGraph<JVertex, Edge>
 
 	@Override
 	public GenericGraph clone() {
-		final GenericGraph res = new GenericGraph();
+		final GenericGraph res = new GenericGraph(label);
 		/* add all edges to the clone graph - all vertices will
 		 * eventually be added both to the supergraph's vertex set
 		 * and the hashmap, because of calls to the add() method */
