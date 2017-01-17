@@ -314,7 +314,11 @@ public final class JUtils {
 		for (int i = 0; i < changes; ++i) {
 			final String newLabel = labels.get(randGen.nextInt(labelCnt));
 			final JVertex changed = pickRandomVertex(gNew);
-			if (!newLabel.equals(changed.getLabel())) {
+			/* Labels are in the form <label>$<id>, so the first part
+			 * should be checked
+			 */
+			final String[] labelParts = GenericGraph.getLabelParts(changed);
+			if (!newLabel.equals(labelParts[0])) {
 				changed.setLabel(newLabel);
 				totalEdits++;
 			}
